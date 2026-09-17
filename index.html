@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0D2137">
+    <title>Parc Fluides · PAGANETTI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy:      #0D2137;
+            --navy-mid:  #1A3A5C;
+            --orange:    #E05F00;
+            --orange-bg: #FFF0E6;
+            --green:     #1A6E38;
+            --green-bg:  #E8F5EE;
+            --bg:        #EDF0F3;
+            --card:      #FFFFFF;
+            --border:    #D2D8DF;
+            --text:      #0D2137;
+            --muted:     #6B7A8A;
+            --danger:    #C0392B;
+            --danger-bg: #FDEDEC;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            max-width: 430px;
+            margin: 0 auto;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: var(--navy);
+            color: white;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .header-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; opacity: 0.5; margin-bottom: 2px; }
+        .header-title   { font-size: 16px; font-weight: 800; }
+        .demo-tag {
+            background: var(--orange);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 9px;
+            border-radius: 4px;
+            letter-spacing: 0.06em;
+        }
+
+        /* ── Screens ── */
+        .screen { display: none; padding: 20px; }
+        .screen.active { display: block; }
+
+        /* ── Loading ── */
+        .loading-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 45vh;
+            gap: 14px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+        .spinner {
+            width: 34px; height: 34px;
+            border: 3px solid var(--border);
+            border-top-color: var(--navy);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--card);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 14px;
+            border: 1px solid var(--border);
+        }
+
+        /* ── Bottle display ── */
+        .bottle-num {
+            font-size: 34px;
+            font-weight: 800;
+            color: var(--navy);
+            letter-spacing: 0.02em;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        .pill-avail { background: var(--green-bg); color: var(--green); }
+        .pill-out   { background: var(--orange-bg); color: var(--orange); }
+
+        .info-grid { margin-top: 16px; }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-key { color: var(--muted); }
+        .info-val { font-weight: 600; }
+
+        /* ── Action buttons ── */
+        .action-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .action-btn {
+            border: none;
+            border-radius: 14px;
+            padding: 24px 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.08s;
+            font-family: inherit;
+            letter-spacing: 0.04em;
+        }
+        .action-btn:active:not(:disabled) { transform: scale(0.95); }
+        .action-btn:disabled { opacity: 0.22; cursor: not-allowed; }
+        .action-btn .icon { font-size: 28px; }
+        .btn-sortie { background: var(--orange); color: white; }
+        .btn-retour { background: var(--green); color: white; }
+
+        /* ── Form ── */
+        .form-section { margin-bottom: 18px; }
+        .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .form-select, .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            background: var(--card);
+            color: var(--text);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .form-select:focus, .form-input:focus {
+            outline: none;
+            border-color: var(--navy);
+        }
+        .select-wrap { position: relative; }
+        .select-wrap::after {
+            content: '▾';
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            pointer-events: none;
+        }
+
+        .form-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .form-bottle-id { font-size: 18px; font-weight: 800; color: var(--navy); }
+        .form-tag {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+        .form-tag.sortie { background: var(--orange-bg); color: var(--orange); }
+        .form-tag.retour { background: var(--green-bg);  color: var(--green);  }
+
+        /* ── Buttons ── */
+        .btn-primary {
+            width: 100%;
+            padding: 17px;
+            background: var(--navy);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            margin-top: 6px;
+        }
+        .btn-primary:active { opacity: 0.85; }
+        .btn-ghost {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            color: var(--muted);
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: inherit;
+            margin-top: 4px;
+            text-decoration: underline;
+        }
+
+        /* ── Search hero ── */
+        .search-hero {
+            text-align: center;
+            padding: 28px 0 20px;
+        }
+        .search-hero-icon  { font-size: 44px; margin-bottom: 8px; }
+        .search-hero-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+        .search-hero-sub   { font-size: 13px; color: var(--muted); }
+
+        /* Demo list */
+        .demo-notice {
+            background: #FFF8E1;
+            border: 1px solid #FFE082;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-size: 12px;
+            color: #7B5800;
+            margin-bottom: 12px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .demo-bottle-item {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .demo-bottle-item:active { opacity: 0.75; }
+
+        /* ── Success ── */
+        .success-wrap {
+            text-align: center;
+            padding: 24px 0 8px;
+        }
+        .success-icon  { font-size: 60px; margin-bottom: 12px; }
+        .success-title { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+        .success-sub   { font-size: 13px; color: var(--muted); }
+
+        .success-detail {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .succ-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .succ-row:last-child { border-bottom: none; }
+        .succ-row .val { font-weight: 700; }
+
+        .conso-box {
+            background: var(--green-bg);
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 14px;
+            text-align: center;
+        }
+        .conso-label { font-size: 11px; font-weight: 700; color: var(--green); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; }
+        .conso-val   { font-size: 28px; font-weight: 800; color: var(--green); }
+
+        /* ── Error ── */
+        .error-box {
+            background: var(--danger-bg);
+            border-left: 3px solid var(--danger);
+            padding: 13px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--danger);
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <div class="header-eyebrow">PAGANETTI THERMIQUE</div>
+        <div class="header-title">🧊 Parc à Fluides</div>
+    </div>
+    <div id="demo-badge" style="display:none"><span class="demo-tag">DÉMO</span></div>
+</div>
+
+<!-- ── Loading ── -->
+<div id="s-loading" class="screen active">
+    <div class="loading-wrap">
+        <div class="spinner"></div>
+        <div>Chargement…</div>
+    </div>
+</div>
+
+<!-- ── Search / Home ── -->
+<div id="s-search" class="screen">
+    <div class="search-hero">
+        <div class="search-hero-icon">📦</div>
+        <div class="search-hero-title">Identifier une bouteille</div>
+        <div class="search-hero-sub">Scannez un QR code ou saisissez le numéro</div>
+    </div>
+    <div class="card">
+        <div class="form-section" style="margin:0">
+            <label class="form-label">N° de bouteille</label>
+            <input type="text" class="form-input" id="manual-id"
+                   placeholder="ex : R410A-001"
+                   autocapitalize="characters" autocomplete="off" />
+        </div>
+        <div id="search-error"></div>
+        <button class="btn-primary" style="margin-top:14px" onclick="searchBottle()">Rechercher</button>
+    </div>
+    <div id="demo-list" style="display:none"></div>
+</div>
+
+<!-- ── Bottle detail ── -->
+<div id="s-bottle" class="screen">
+    <div id="bottle-card" class="card"></div>
+    <div class="action-row">
+        <button class="action-btn btn-sortie" id="btn-sortie" onclick="startAction('sortie')">
+            <span class="icon">↗</span><span>SORTIE</span>
+        </button>
+        <button class="action-btn btn-retour" id="btn-retour" onclick="startAction('retour')">
+            <span class="icon">↙</span><span>RETOUR</span>
+        </button>
+    </div>
+    <button class="btn-ghost" onclick="goSearch()">← Autre bouteille</button>
+</div>
+
+<!-- ── Form ── -->
+<div id="s-form" class="screen">
+    <div class="card">
+        <div class="form-header">
+            <div class="form-bottle-id" id="f-bid"></div>
+            <span class="form-tag" id="f-tag"></span>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label">Technicien</label>
+            <div class="select-wrap">
+                <select class="form-select" id="f-tech">
+                    <option value="">— Sélectionner —</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label">Gestionnaire de parc</label>
+            <div class="select-wrap">
+                <select class="form-select" id="f-gest">
+                    <option value="">— Sélectionner —</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label" id="f-poids-lbl">Poids (kg)</label>
+            <input type="number" class="form-input" id="f-poids"
+                   placeholder="ex : 12.4" step="0.1" min="0" inputmode="decimal" />
+        </div>
+
+        <div class="form-section" id="f-aff-grp" style="display:none">
+            <label class="form-label">N° Affaire / OT (optionnel)</label>
+            <input type="text" class="form-input" id="f-aff"
+                   placeholder="ex : 2025-047" autocomplete="off" />
+        </div>
+    </div>
+
+    <div id="form-error"></div>
+    <button class="btn-primary" onclick="submitForm()">✔ Valider le mouvement</button>
+    <button class="btn-ghost" onclick="showScreen('s-bottle')">Annuler</button>
+</div>
+
+<!-- ── Submitting ── -->
+<div id="s-submitting" class="screen">
+    <div class="loading-wrap" style="min-height:50vh">
+        <div class="spinner"></div>
+        <div>Enregistrement en cours…</div>
+    </div>
+</div>
+
+<!-- ── Success ── -->
+<div id="s-success" class="screen">
+    <div class="card">
+        <div class="success-wrap">
+            <div class="success-icon">✅</div>
+            <div class="success-title" id="succ-title"></div>
+            <div class="success-sub"   id="succ-sub"></div>
+        </div>
+        <div class="success-detail" id="succ-detail"></div>
+        <div id="succ-conso" style="display:none" class="conso-box">
+            <div class="conso-label">Consommation calculée</div>
+            <div class="conso-val" id="succ-conso-val"></div>
+        </div>
+    </div>
+    <button class="btn-primary" onclick="reset()">Nouveau mouvement</button>
+</div>
+
+
+<script>
+// ══════════════════════════════════════════
+//  ① CONFIGURATION  (à remplir avant déploiement)
+// ══════════════════════════════════════════
+const CFG = {
+    // Coller l'URL de déploiement Apps Script
+    SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzYoKD0FWNrQ87sbAMn3yLcE-Qej37VYDVwECZFAg65rtA5UdiWzjJMpYn1p-AccUYVnQ/exec',
+
+    techniciens: [
+        'Julien BREON',
+        'Tanguy BUREL',
+        'Mathieu CHRISTINE',
+        'Maxime CLARYSSE',
+        'Martial COTTARD',
+        'Thierry DESCHAMPS',
+        'Richard DURAND',
+		'Viencent FAIE',
+		'Alban GUEUDEVILLE',
+		'Antoine HAUCHARD',
+		'Cyrille LANGE',
+		'Killian LECACHEUX',
+		'Arnaud MAZUAY',
+		'Clement RODRIGUEZ',
+		'Alexandre SALAM',
+		'Abdoul SALL',
+    ],
+
+    gestionnaires: [
+        'Maxime CLARYSSE',
+        'Alan BELLET',
+        'Edouard BARIL',
+    ],
+};
+
+// ══════════════════════════════════════════
+//  ② MODE DÉMO (actif tant que URL = placeholder)
+// ══════════════════════════════════════════
+const IS_DEMO = CFG.SCRIPT_URL.includes('VOTRE_ID_ICI');
+
+const DEMO = {
+    'R410A-001': { id:'R410A-001', fluide:'R410A',  type:'Neuve',        tare:8.5, statut:'Disponible', dernierPoids:15.2, technicien:null },
+    'R32-003':   { id:'R32-003',   fluide:'R32',    type:'Récupération',  tare:7.2, statut:'En sortie',  dernierPoids:12.8, technicien:'Jean DUPONT' },
+    'R454B-002': { id:'R454B-002', fluide:'R454B',  type:'Transfert',     tare:9.1, statut:'Disponible', dernierPoids:18.5, technicien:null },
+};
+
+// ══════════════════════════════════════════
+//  ③ STATE
+// ══════════════════════════════════════════
+let ST = { bottleId: null, bottle: null, action: null };
+
+// ══════════════════════════════════════════
+//  ④ INIT
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    populateSelects();
+
+    if (IS_DEMO) {
+        document.getElementById('demo-badge').style.display = 'block';
+    }
+
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (id) {
+        ST.bottleId = id.toUpperCase().trim();
+        loadBottle(ST.bottleId);
+    } else {
+        if (IS_DEMO) buildDemoList();
+        showScreen('s-search');
+    }
+});
+
+function populateSelects() {
+    const t = document.getElementById('f-tech');
+    const g = document.getElementById('f-gest');
+    CFG.techniciens.forEach(n => t.innerHTML  += `<option value="${n}">${n}</option>`);
+    CFG.gestionnaires.forEach(n => g.innerHTML += `<option value="${n}">${n}</option>`);
+}
+
+function buildDemoList() {
+    const wrap = document.getElementById('demo-list');
+    wrap.style.display = 'block';
+    wrap.innerHTML = `<div class="demo-notice">⚗️ Mode démo — cliquez sur une bouteille pour tester</div>`;
+    Object.values(DEMO).forEach(b => {
+        const d = document.createElement('div');
+        d.className = 'card demo-bottle-item';
+        const av = b.statut === 'Disponible';
+        d.innerHTML = `
+            <div>
+                <div style="font-weight:700;font-size:15px">${b.id}</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px">${b.fluide} · ${b.type} · ${b.dernierPoids} kg</div>
+            </div>
+            <span class="status-pill ${av ? 'pill-avail' : 'pill-out'}">
+                <span class="dot"></span>${b.statut}
+            </span>`;
+        d.onclick = () => { ST.bottleId = b.id; loadBottle(b.id); };
+        wrap.appendChild(d);
+    });
+}
+
+// ══════════════════════════════════════════
+//  ⑤ SCREENS
+// ══════════════════════════════════════════
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+}
+
+// ══════════════════════════════════════════
+//  ⑥ LOAD BOTTLE
+// ══════════════════════════════════════════
+function searchBottle() {
+    const val = document.getElementById('manual-id').value.trim().toUpperCase();
+    if (!val) return;
+    ST.bottleId = val;
+    loadBottle(val);
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && document.getElementById('s-search').classList.contains('active'))
+        searchBottle();
+});
+
+async function loadBottle(id) {
+    showScreen('s-loading');
+    document.getElementById('search-error').innerHTML = '';
+    try {
+        let data;
+        if (IS_DEMO) {
+            await delay(500);
+            data = DEMO[id];
+            if (!data) throw new Error(`"${id}" introuvable. Essayez R410A-001, R32-003 ou R454B-002.`);
+        } else {
+            const r = await fetch(`${CFG.SCRIPT_URL}?action=getBottle&id=${encodeURIComponent(id)}`);
+            data = await r.json();
+            if (data.error) throw new Error(data.error);
+        }
+        ST.bottle = data;
+        renderBottle(data);
+        showScreen('s-bottle');
+    } catch(err) {
+        if (IS_DEMO) buildDemoList();
+        showScreen('s-search');
+        document.getElementById('manual-id').value = id;
+        document.getElementById('search-error').innerHTML = `<div class="error-box">❌ ${err.message}</div>`;
+    }
+}
+
+function renderBottle(b) {
+    const av = b.statut === 'Disponible';
+    document.getElementById('bottle-card').innerHTML = `
+        <div class="bottle-num">${b.id}</div>
+        <span class="status-pill ${av ? 'pill-avail' : 'pill-out'}">
+            <span class="dot"></span>${b.statut}
+        </span>
+        <div class="info-grid">
+            <div class="info-row"><span class="info-key">Fluide</span><span class="info-val">${b.fluide}</span></div>
+            <div class="info-row"><span class="info-key">Type</span><span class="info-val">${b.type}</span></div>
+            <div class="info-row"><span class="info-key">Tare</span><span class="info-val">${b.tare} kg</span></div>
+            <div class="info-row"><span class="info-key">Dernier poids</span><span class="info-val">${b.dernierPoids ?? '—'} kg</span></div>
+            ${!av && b.technicien ? `<div class="info-row"><span class="info-key">Avec</span><span class="info-val">${b.technicien}</span></div>` : ''}
+        </div>`;
+    document.getElementById('btn-sortie').disabled = !av;
+    document.getElementById('btn-retour').disabled =  av;
+}
+
+// ══════════════════════════════════════════
+//  ⑦ ACTION FORM
+// ══════════════════════════════════════════
+function startAction(action) {
+    ST.action = action;
+    document.getElementById('f-bid').textContent = ST.bottleId;
+    const tag = document.getElementById('f-tag');
+    tag.textContent = action === 'sortie' ? '↗ SORTIE' : '↙ RETOUR';
+    tag.className = `form-tag ${action}`;
+    document.getElementById('f-poids-lbl').textContent =
+        action === 'sortie' ? 'Poids au départ (kg)' : 'Poids au retour (kg)';
+    document.getElementById('f-aff-grp').style.display = action === 'sortie' ? 'block' : 'none';
+    ['f-tech','f-gest'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('f-poids').value = '';
+    document.getElementById('f-aff').value   = '';
+    document.getElementById('form-error').innerHTML = '';
+    showScreen('s-form');
+}
+
+// ══════════════════════════════════════════
+//  ⑧ SUBMIT
+// ══════════════════════════════════════════
+async function submitForm() {
+    const tech  = document.getElementById('f-tech').value;
+    const gest  = document.getElementById('f-gest').value;
+    const poids = parseFloat(document.getElementById('f-poids').value);
+    const aff   = document.getElementById('f-aff').value.trim();
+
+    if (!tech)              { setFormErr('Sélectionnez un technicien.'); return; }
+    if (!gest)              { setFormErr('Sélectionnez un gestionnaire.'); return; }
+    if (!poids || poids<=0) { setFormErr('Saisissez un poids valide (ex : 12.4).'); return; }
+
+    showScreen('s-submitting');
+
+    const payload = {
+        action: ST.action,
+        bottleId: ST.bottleId,
+        fluide: ST.bottle.fluide,
+        typeBouteille: ST.bottle.type,
+        technicien: tech,
+        gestionnaire: gest,
+        poids,
+        affaire: aff,
+        date: new Date().toISOString(),
+    };
+
+    try {
+        if (IS_DEMO) {
+            await delay(900);
+            if (DEMO[ST.bottleId]) {
+                DEMO[ST.bottleId].statut       = ST.action === 'sortie' ? 'En sortie' : 'Disponible';
+                DEMO[ST.bottleId].dernierPoids  = poids;
+                DEMO[ST.bottleId].technicien    = ST.action === 'sortie' ? tech : null;
+            }
+        } else {
+            const r = await fetch(CFG.SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(payload),
+            });
+            const res = await r.json();
+            if (res.error) throw new Error(res.error);
+        }
+        renderSuccess(payload);
+        showScreen('s-success');
+    } catch(err) {
+        showScreen('s-form');
+        setFormErr('❌ Erreur réseau : ' + err.message);
+    }
+}
+
+function setFormErr(msg) {
+    document.getElementById('form-error').innerHTML = `<div class="error-box">${msg}</div>`;
+}
+
+// ══════════════════════════════════════════
+//  ⑨ SUCCESS
+// ══════════════════════════════════════════
+function renderSuccess(p) {
+    const isRet = p.action === 'retour';
+    const dt = new Date(p.date);
+    const ds = dt.toLocaleDateString('fr-FR') + ' à ' +
+               dt.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+
+    document.getElementById('succ-title').textContent = isRet ? 'Retour enregistré' : 'Sortie enregistrée';
+    document.getElementById('succ-sub').textContent   = ds;
+
+    document.getElementById('succ-detail').innerHTML = `
+        <div class="succ-row"><span>Bouteille</span><span class="val">${p.bottleId}</span></div>
+        <div class="succ-row"><span>Fluide</span><span class="val">${p.fluide}</span></div>
+        <div class="succ-row"><span>Type</span><span class="val">${p.typeBouteille}</span></div>
+        <div class="succ-row"><span>Poids</span><span class="val">${p.poids} kg</span></div>
+        <div class="succ-row"><span>Technicien</span><span class="val">${p.technicien}</span></div>
+        <div class="succ-row"><span>Gestionnaire</span><span class="val">${p.gestionnaire}</span></div>
+        ${p.affaire ? `<div class="succ-row"><span>N° Affaire</span><span class="val">${p.affaire}</span></div>` : ''}`;
+
+    const conso = document.getElementById('succ-conso');
+    if (isRet && ST.bottle?.dernierPoids) {
+        const diff = (ST.bottle.dernierPoids - p.poids);
+        if (diff > 0.01) {
+            document.getElementById('succ-conso-val').textContent = diff.toFixed(2) + ' kg';
+            conso.style.display = 'block';
+        } else { conso.style.display = 'none'; }
+    } else { conso.style.display = 'none'; }
+}
+
+// ══════════════════════════════════════════
+//  ⑩ UTILS
+// ══════════════════════════════════════════
+function goSearch() {
+    ST = { bottleId: null, bottle: null, action: null };
+    document.getElementById('manual-id').value = '';
+    document.getElementById('search-error').innerHTML = '';
+    showScreen('s-search');
+}
+
+function reset() {
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (id) { ST.bottleId = id.toUpperCase(); loadBottle(ST.bottleId); }
+    else goSearch();
+}
+
+const delay = ms => new Promise(r => setTimeout(r, ms));
+</script>
+</body>
+</html>
