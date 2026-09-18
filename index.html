@@ -60,7 +60,7 @@
         .info-key { color: var(--muted); }
         .info-val { font-weight: 600; }
 
-        /* Capacity section (bottle card) */
+        /* Capacity section — bottle card */
         .cap-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
         .cap-title { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 10px; }
         .cap-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 3px 0; }
@@ -69,7 +69,8 @@
         .cap-free { color: var(--green); font-size: 15px; font-weight: 800; }
         .cap-bar-wrap { margin: 8px 0 10px; }
         .cap-bar { background: #DDE3EA; border-radius: 6px; height: 10px; overflow: hidden; }
-        .cap-fill { height: 100%; background: var(--navy); border-radius: 6px; transition: width 0.4s; }
+        .cap-fill-navy   { height: 100%; background: var(--navy);  border-radius: 6px; }
+        .cap-fill-orange { height: 100%; background: var(--orange); border-radius: 6px; }
 
         /* Action buttons */
         .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
@@ -111,32 +112,33 @@
         .form-tag { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; }
         .form-tag.sortie { background: var(--orange-bg); color: var(--orange); }
         .form-tag.retour { background: var(--green-bg);  color: var(--green); }
-        .form-hint { font-size: 11px; color: var(--muted); margin-top: 6px; }
+        .form-hint { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
 
-        /* Info banners */
-        .info-banner { border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; }
-        .info-banner.blue   { background: var(--blue-bg);   border: 1px solid var(--blue-bdr); }
-        .info-banner.orange { background: var(--orange-bg); border: 1px solid #FFD0A8; }
+        /* Info banners (formulaire) */
+        .ib { border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
+        .ib.blue   { background: var(--blue-bg);   border: 1px solid var(--blue-bdr); }
+        .ib.orange { background: var(--orange-bg); border: 1px solid #FFD0A8; }
         .ib-row { display: flex; justify-content: space-between; align-items: center; }
         .ib-lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
-        .ib-val { font-size: 20px; font-weight: 800; }
-        .ib-lbl.blue  { color: var(--blue); }
-        .ib-val.blue  { color: var(--blue); }
-        .ib-lbl.orange { color: var(--orange); }
-        .ib-val.orange { color: var(--navy); font-size: 14px; }
+        .ib-lbl.blue   { color: var(--blue); }
         .ib-lbl.green  { color: var(--green); }
-        .ib-val.green  { color: var(--green); font-size: 22px; }
-        .ib-bar-wrap { margin: 6px 0; }
+        .ib-lbl.orange { color: var(--orange); }
+        .ib-val { font-size: 20px; font-weight: 800; }
+        .ib-val.blue   { color: var(--blue); }
+        .ib-val.green  { color: var(--green); }
+        .ib-val.orange { color: var(--navy); font-size: 14px; }
+        .ib-bar-wrap { margin: 8px 0 6px; }
         .ib-bar { background: #DDE3EA; border-radius: 4px; height: 8px; overflow: hidden; }
-        .ib-fill { height: 100%; background: var(--blue); border-radius: 4px; }
-        .ib-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+        .ib-fill-blue  { height: 100%; background: var(--navy); border-radius: 4px; }
+        .ib-fill-green { height: 100%; background: var(--orange); border-radius: 4px; }
+        .ib-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
 
         /* Buttons */
         .btn-primary { width: 100%; padding: 17px; background: var(--navy); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 6px; }
         .btn-primary:active { opacity: 0.85; }
         .btn-ghost { width: 100%; padding: 14px; background: transparent; color: var(--muted); border: none; font-size: 14px; cursor: pointer; font-family: inherit; margin-top: 4px; text-decoration: underline; }
 
-        /* Search hero */
+        /* Search */
         .search-hero { text-align: center; padding: 28px 0 20px; }
         .search-hero-icon  { font-size: 44px; margin-bottom: 8px; }
         .search-hero-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
@@ -243,10 +245,7 @@
             <div class="form-bottle-id" id="f-bid"></div>
             <span class="form-tag" id="f-tag"></span>
         </div>
-
-        <!-- Bandeau dynamique (quantité / capacité / client) -->
         <div id="f-banner"></div>
-
         <div class="form-section">
             <label class="form-label">Technicien</label>
             <div class="select-wrap">
@@ -310,18 +309,18 @@ const CFG = {
     ],
     gestionnaires: ['Maxime CLARYSSE','Alan BELLET','Edouard BARIL'],
 };
-
 const PIN_CODE = '1858';
 
 // ══════════════════════════════════════════
-//  DÉMO
+//  DÉMO — données réalistes pour tous les types
 // ══════════════════════════════════════════
 const IS_DEMO = CFG.SCRIPT_URL.includes('VOTRE_ID_ICI');
 const DEMO = {
-    'TEST-01': { id:'TEST-01', fluide:'R404-A', type:'Neuve',        tare:8.5, statut:'Disponible', dernierPoids:10,  technicien:null,          affaire:null,      capaciteMax:null },
-    'TEST-02': { id:'TEST-02', fluide:'R410-A', type:'Neuve',        tare:8.5, statut:'En sortie',  dernierPoids:20,  technicien:'Julien BREON', affaire:'2025-047',capaciteMax:null },
-    'TEST-03': { id:'TEST-03', fluide:'R404-A', type:'Transfert',    tare:5.5, statut:'Disponible', dernierPoids:8.5, technicien:null,          affaire:null,      capaciteMax:20 },
-    'TEST-04': { id:'TEST-04', fluide:'R32',    type:'Récupération', tare:5.5, statut:'En sortie',  dernierPoids:5.5, technicien:'Tanguy BUREL', affaire:'TOTAL-12',capaciteMax:15 },
+    //                                tare   statut       dernierPoids  tech               affaire      capaciteMax
+    'TEST-01': { id:'TEST-01', fluide:'R404-A', type:'Neuve',        tare:8.5, statut:'Disponible', dernierPoids:18.0, technicien:null,           affaire:null,       capaciteMax:10 },
+    'TEST-02': { id:'TEST-02', fluide:'R410-A', type:'Neuve',        tare:8.5, statut:'En sortie',  dernierPoids:14.5, technicien:'Julien BREON',  affaire:'2025-047', capaciteMax:13 },
+    'TEST-03': { id:'TEST-03', fluide:'R404-A', type:'Transfert',    tare:5.5, statut:'Disponible', dernierPoids:8.5,  technicien:null,           affaire:null,       capaciteMax:20 },
+    'TEST-04': { id:'TEST-04', fluide:'R32',    type:'Récupération', tare:5.5, statut:'En sortie',  dernierPoids:5.5,  technicien:'Tanguy BUREL',  affaire:'TOTAL-12', capaciteMax:15 },
 };
 
 // ══════════════════════════════════════════
@@ -329,7 +328,11 @@ const DEMO = {
 // ══════════════════════════════════════════
 let ST = { bottleId:null, bottle:null, action:null, pin:'' };
 
-const isCapType = b => b.type === 'Récupération' || b.type === 'Transfert';
+// helpers
+const isRecType = b => b.type === 'Récupération' || b.type === 'Transfert';
+const parseNum  = v  => parseFloat(String(v ?? '0').replace(',', '.'));
+const pct       = (v,max) => Math.min(100, Math.max(0, (v/max)*100)).toFixed(1);
+const delay     = ms => new Promise(r => setTimeout(r, ms));
 
 // ══════════════════════════════════════════
 //  INIT
@@ -354,18 +357,20 @@ function buildDemoList() {
     wrap.style.display = 'block';
     wrap.innerHTML = `<div class="demo-notice">⚗️ Mode démo · Code PIN : <strong>1858</strong></div>`;
     Object.values(DEMO).forEach(b => {
-        const d = document.createElement('div');
+        const d   = document.createElement('div');
         d.className = 'card demo-item';
-        const av = b.statut === 'Disponible';
-        let extra = '';
-        if (isCapType(b) && b.capaciteMax) {
-            const libre = Math.max(0, b.capaciteMax - (b.dernierPoids - b.tare));
-            extra = ` · ${libre.toFixed(1)} kg libres`;
+        const av  = b.statut === 'Disponible';
+        const cap = b.capaciteMax ? parseNum(b.capaciteMax) : null;
+        let sub   = `${b.fluide} · ${b.type}`;
+        if (cap) {
+            const fluide = Math.max(0, parseNum(b.dernierPoids) - parseNum(b.tare));
+            const libre  = Math.max(0, cap - fluide);
+            sub += isRecType(b) ? ` · ${libre.toFixed(1)} kg libres` : ` · ${fluide.toFixed(1)} kg restants`;
         }
         d.innerHTML = `
             <div>
                 <div style="font-weight:700;font-size:15px">${b.id}</div>
-                <div style="font-size:12px;color:var(--muted);margin-top:2px">${b.fluide} · ${b.type}${extra}</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px">${sub}</div>
             </div>
             <span class="status-pill ${av?'pill-avail':'pill-out'}"><span class="dot"></span>${b.statut}</span>`;
         d.onclick = () => { ST.bottleId = b.id; loadBottle(b.id); };
@@ -379,7 +384,7 @@ function buildDemoList() {
 function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    window.scrollTo(0,0);
+    window.scrollTo(0, 0);
 }
 
 // ══════════════════════════════════════════
@@ -419,26 +424,40 @@ async function loadBottle(id) {
     }
 }
 
+// ══════════════════════════════════════════
+//  RENDER BOTTLE CARD
+// ══════════════════════════════════════════
 function renderBottle(b) {
-    const av  = b.statut === 'Disponible';
-    const cap = isCapType(b) && b.capaciteMax;
+    const av     = b.statut === 'Disponible';
+    const capMax = b.capaciteMax ? parseNum(b.capaciteMax) : null;
+    const isRec  = isRecType(b);
 
     let capHtml = '';
-    if (cap) {
-        const fluide  = Math.max(0, parseNum(b.dernierPoids) - parseNum(b.tare));
-        const capMax  = parseNum(b.capaciteMax);
-        const libre   = Math.max(0, capMax - fluide);
-        const pct     = Math.min(100, (fluide / capMax) * 100).toFixed(1);
-        capHtml = `
-            <div class="cap-section">
-                <div class="cap-title">Capacité bouteille</div>
-                <div class="cap-row"><span class="cap-lbl">Fluide actuel</span><span class="cap-val">${fluide.toFixed(2)} kg</span></div>
-                <div class="cap-bar-wrap">
-                    <div class="cap-bar"><div class="cap-fill" style="width:${pct}%"></div></div>
-                </div>
-                <div class="cap-row"><span class="cap-lbl">Place restante</span><span class="cap-val cap-free">${libre.toFixed(2)} kg</span></div>
-                <div class="cap-row" style="opacity:0.55"><span class="cap-lbl">Capacité max fluide</span><span class="cap-val">${capMax} kg</span></div>
-            </div>`;
+    if (capMax) {
+        const fluide = Math.max(0, parseNum(b.dernierPoids) - parseNum(b.tare));
+        const libre  = Math.max(0, capMax - fluide);
+        const p      = pct(fluide, capMax);
+
+        if (isRec) {
+            // Récupération / Transfert : affiche fluide actuel + place restante
+            capHtml = `
+                <div class="cap-section">
+                    <div class="cap-title">Capacité bouteille</div>
+                    <div class="cap-row"><span class="cap-lbl">Fluide actuel</span><span class="cap-val">${fluide.toFixed(2)} kg</span></div>
+                    <div class="cap-bar-wrap"><div class="cap-bar"><div class="cap-fill-orange" style="width:${p}%"></div></div></div>
+                    <div class="cap-row"><span class="cap-lbl">Place restante</span><span class="cap-val cap-free">${libre.toFixed(2)} kg</span></div>
+                    <div class="cap-row" style="opacity:0.5"><span class="cap-lbl">Capacité max</span><span class="cap-val">${capMax} kg</span></div>
+                </div>`;
+        } else {
+            // Neuve : affiche fluide restant
+            capHtml = `
+                <div class="cap-section">
+                    <div class="cap-title">Fluide restant</div>
+                    <div class="cap-row"><span class="cap-lbl">Restant</span><span class="cap-val">${fluide.toFixed(2)} kg</span></div>
+                    <div class="cap-bar-wrap"><div class="cap-bar"><div class="cap-fill-navy" style="width:${p}%"></div></div></div>
+                    <div class="cap-row" style="opacity:0.5"><span class="cap-lbl">Charge initiale</span><span class="cap-val">${capMax} kg</span></div>
+                </div>`;
+        }
     }
 
     document.getElementById('bottle-card').innerHTML = `
@@ -470,7 +489,6 @@ function startAction(action) {
     tag.className = `pin-hero-tag ${action}`;
     showScreen('s-pin');
 }
-
 function pressPin(d) {
     if (ST.pin.length >= 4) return;
     ST.pin += d; updatePinDots();
@@ -489,7 +507,7 @@ function updatePinDots() {
 }
 
 // ══════════════════════════════════════════
-//  BUILD FORM
+//  BUILD FORM (après PIN OK)
 // ══════════════════════════════════════════
 function buildForm() {
     document.getElementById('f-bid').textContent = ST.bottleId;
@@ -497,11 +515,14 @@ function buildForm() {
     tag.textContent = ST.action === 'sortie' ? '↗ SORTIE' : '↙ RETOUR';
     tag.className = `form-tag ${ST.action}`;
     document.getElementById('form-error').innerHTML = '';
+    ['f-tech','f-gest'].forEach(id => document.getElementById(id).value = '');
 
-    const tare          = parseNum(ST.bottle.tare);
-    const dernierPoids   = parseNum(ST.bottle.dernierPoids);
-    const cap            = isCapType(ST.bottle) && ST.bottle.capaciteMax;
-    const capMax         = cap ? parseNum(ST.bottle.capaciteMax) : null;
+    const tare         = parseNum(ST.bottle.tare);
+    const dernierPoids  = parseNum(ST.bottle.dernierPoids);
+    const isRec        = isRecType(ST.bottle);
+    const capMax       = ST.bottle.capaciteMax ? parseNum(ST.bottle.capaciteMax) : null;
+
+    let banner = '';
 
     if (ST.action === 'sortie') {
         document.getElementById('f-poids-lbl').textContent = 'Poids au départ (kg)';
@@ -510,38 +531,38 @@ function buildForm() {
         document.getElementById('f-aff').value = '';
         document.getElementById('f-tech').value = '';
 
-        if (cap) {
-            // Récupération / Transfert → afficher fluide actuel + place restante
+        if (isRec && capMax) {
+            // Récupération / Transfert : fluide actuel + place restante
             const fluide = Math.max(0, dernierPoids - tare);
             const libre  = Math.max(0, capMax - fluide);
-            const pct    = Math.min(100,(fluide/capMax)*100).toFixed(1);
-            document.getElementById('f-banner').innerHTML = `
-                <div class="info-banner blue">
-                    <div class="ib-row">
-                        <span class="ib-lbl blue">Fluide actuel</span>
-                        <span class="ib-val blue">${fluide.toFixed(2)} kg</span>
-                    </div>
-                    <div class="ib-bar-wrap">
-                        <div class="ib-bar"><div class="ib-fill" style="width:${pct}%"></div></div>
-                    </div>
-                    <div class="ib-row">
-                        <span class="ib-lbl green">Place restante</span>
-                        <span class="ib-val green">${libre.toFixed(2)} kg</span>
-                    </div>
-                    <div class="ib-sub">Capacité max fluide : ${capMax} kg</div>
+            const p      = pct(fluide, capMax);
+            banner = `
+                <div class="ib blue">
+                    <div class="ib-row"><span class="ib-lbl blue">Fluide actuel</span><span class="ib-val blue">${fluide.toFixed(2)} kg</span></div>
+                    <div class="ib-bar-wrap"><div class="ib-bar"><div class="ib-fill-green" style="width:${p}%"></div></div></div>
+                    <div class="ib-row"><span class="ib-lbl green">Place restante</span><span class="ib-val green">${libre.toFixed(2)} kg</span></div>
+                    <div class="ib-sub">Capacité max : ${capMax} kg · Tare : ${tare} kg</div>
                 </div>`;
             document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Modifiable si re-pesage`;
-        } else {
-            // Neuve → quantité disponible uniquement
-            const dispo = Math.max(0, dernierPoids - tare);
-            document.getElementById('f-banner').innerHTML = `
-                <div class="info-banner blue">
-                    <div class="ib-row">
-                        <span class="ib-lbl blue">Quantité disponible</span>
-                        <span class="ib-val blue">${dispo.toFixed(2)} kg</span>
-                    </div>
+        } else if (!isRec && capMax) {
+            // Neuve avec capacité renseignée : fluide restant
+            const fluide = Math.max(0, dernierPoids - tare);
+            const p      = pct(fluide, capMax);
+            banner = `
+                <div class="ib blue">
+                    <div class="ib-row"><span class="ib-lbl blue">Fluide restant</span><span class="ib-val blue">${fluide.toFixed(2)} kg</span></div>
+                    <div class="ib-bar-wrap"><div class="ib-bar"><div class="ib-fill-blue" style="width:${p}%"></div></div></div>
+                    <div class="ib-sub">Charge initiale : ${capMax} kg · Tare : ${tare} kg</div>
                 </div>`;
             document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Poids maxi : ${dernierPoids} kg · Modifiable si re-pesage`;
+        } else {
+            // Neuve sans capacité renseignée : quantité simple
+            const dispo = Math.max(0, dernierPoids - tare);
+            banner = `
+                <div class="ib blue">
+                    <div class="ib-row"><span class="ib-lbl blue">Quantité disponible</span><span class="ib-val blue">${dispo.toFixed(2)} kg</span></div>
+                </div>`;
+            document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Poids maxi : ${dernierPoids} kg`;
         }
 
     } else {
@@ -551,26 +572,35 @@ function buildForm() {
         document.getElementById('f-aff-grp').style.display = 'none';
         document.getElementById('f-tech').value = ST.bottle.technicien || '';
 
-        let banner = '';
         if (ST.bottle.affaire) {
             banner += `
-                <div class="info-banner orange">
+                <div class="ib orange">
                     <div class="ib-row">
                         <span class="ib-lbl orange">Affaire / Client</span>
                         <span class="ib-val orange">${ST.bottle.affaire}</span>
                     </div>
                 </div>`;
         }
-        if (cap) {
-            const poidsMax = tare + capMax;
-            document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Poids max acceptable : ${poidsMax.toFixed(2)} kg (cap. ${capMax} kg de fluide)`;
+
+        if (isRec && capMax) {
+            // Récupération / Transfert : montrer la place disponible au retour
+            const fluideDepart   = Math.max(0, dernierPoids - tare);
+            const placeDisponible = Math.max(0, capMax - fluideDepart);
+            const p = pct(fluideDepart, capMax);
+            banner += `
+                <div class="ib blue">
+                    <div class="ib-row"><span class="ib-lbl blue">Fluide au départ</span><span class="ib-val blue">${fluideDepart.toFixed(2)} kg</span></div>
+                    <div class="ib-bar-wrap"><div class="ib-bar"><div class="ib-fill-green" style="width:${p}%"></div></div></div>
+                    <div class="ib-row"><span class="ib-lbl green">Place disponible</span><span class="ib-val green">${placeDisponible.toFixed(2)} kg</span></div>
+                    <div class="ib-sub">Capacité max : ${capMax} kg · Poids max retour : ${(tare+capMax).toFixed(2)} kg</div>
+                </div>`;
+            document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Poids max acceptable : ${(tare+capMax).toFixed(2)} kg`;
         } else {
             document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Poids de sortie : ${dernierPoids} kg`;
         }
-        document.getElementById('f-banner').innerHTML = banner;
     }
 
-    document.getElementById('f-gest').value = '';
+    document.getElementById('f-banner').innerHTML = banner;
     showScreen('s-form');
     setTimeout(() => document.getElementById('f-poids').focus(), 200);
 }
@@ -590,38 +620,37 @@ async function submitForm() {
 
     const tare         = parseNum(ST.bottle.tare);
     const dernierPoids  = parseNum(ST.bottle.dernierPoids);
-    const cap           = isCapType(ST.bottle) && ST.bottle.capaciteMax;
-    const capMax        = cap ? parseNum(ST.bottle.capaciteMax) : null;
+    const isRec        = isRecType(ST.bottle);
+    const capMax       = ST.bottle.capaciteMax ? parseNum(ST.bottle.capaciteMax) : null;
 
-    // ── Règle universelle : jamais moins que la tare ──
+    // Règle universelle : jamais inférieur à la tare
     if (poids < tare) {
         setFormErr(`❌ Poids impossible — inférieur à la tare de la bouteille (${tare} kg).`);
         return;
     }
 
     if (ST.action === 'sortie') {
-        // ── SORTIE Neuve : poids ne peut pas dépasser le dernier poids connu ──
-        if (ST.bottle.type === 'Neuve' && poids > dernierPoids) {
+        // Sortie Neuve : ne peut pas partir plus lourde
+        if (!isRec && poids > dernierPoids) {
             setFormErr(`❌ Poids impossible — une bouteille neuve ne peut pas partir plus lourde que son dernier pesage (${dernierPoids} kg).`);
             return;
         }
     }
 
     if (ST.action === 'retour') {
-        // ── RETOUR Neuve : ne peut pas revenir plus lourde ──
-        if (ST.bottle.type === 'Neuve' && poids > dernierPoids) {
+        // Retour Neuve : ne peut pas revenir plus lourde
+        if (!isRec && poids > dernierPoids) {
             setFormErr(`❌ Poids impossible — une bouteille neuve ne peut pas revenir plus lourde qu'à son départ (${dernierPoids} kg).`);
             return;
         }
-        // ── RETOUR Récupération/Transfert : ne peut pas dépasser la capacité max ──
-        if (cap && poids > tare + capMax) {
-            setFormErr(`❌ Poids impossible — la bouteille ne peut contenir que ${capMax} kg de fluide (poids max : ${(tare + capMax).toFixed(2)} kg).`);
+        // Retour Récupération/Transfert : ne peut pas dépasser la capacité max
+        if (isRec && capMax && poids > tare + capMax) {
+            setFormErr(`❌ Bouteille saturée — la capacité max est ${capMax} kg de fluide (poids max : ${(tare+capMax).toFixed(2)} kg).`);
             return;
         }
     }
 
     showScreen('s-submitting');
-
     const payload = {
         action: ST.action, bottleId: ST.bottleId,
         fluide: ST.bottle.fluide, typeBouteille: ST.bottle.type,
@@ -699,8 +728,6 @@ function reset() {
     if (id) { ST.bottleId=id.toUpperCase(); loadBottle(ST.bottleId); }
     else goSearch();
 }
-function parseNum(v) { return parseFloat(String(v??'0').replace(',','.')); }
-const delay = ms => new Promise(r => setTimeout(r,ms));
 </script>
 </body>
 </html>
