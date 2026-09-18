@@ -28,46 +28,28 @@
             --danger-bg: #FDEDEC;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            max-width: 430px;
-            margin: 0 auto;
-            -webkit-font-smoothing: antialiased;
-        }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; max-width: 430px; margin: 0 auto; -webkit-font-smoothing: antialiased; }
 
-        /* ── Header ── */
-        .header {
-            background: var(--navy);
-            color: white;
-            padding: 14px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
+        /* Header */
+        .header { background: var(--navy); color: white; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
         .header-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; opacity: 0.5; margin-bottom: 2px; }
-        .header-title   { font-size: 16px; font-weight: 800; }
-        .demo-tag { background: var(--orange); color: white; font-size: 10px; font-weight: 700; padding: 4px 9px; border-radius: 4px; letter-spacing: 0.06em; }
+        .header-title { font-size: 16px; font-weight: 800; }
+        .demo-tag { background: var(--orange); color: white; font-size: 10px; font-weight: 700; padding: 4px 9px; border-radius: 4px; }
 
-        /* ── Screens ── */
+        /* Screens */
         .screen { display: none; padding: 20px; }
         .screen.active { display: block; }
 
-        /* ── Loading ── */
+        /* Loading */
         .loading-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 45vh; gap: 14px; color: var(--muted); font-size: 13px; }
         .spinner { width: 34px; height: 34px; border: 3px solid var(--border); border-top-color: var(--navy); border-radius: 50%; animation: spin 0.7s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ── Card ── */
+        /* Card */
         .card { background: var(--card); border-radius: 14px; padding: 20px; margin-bottom: 14px; border: 1px solid var(--border); }
 
-        /* ── Bottle display ── */
-        .bottle-num { font-size: 34px; font-weight: 800; color: var(--navy); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; line-height: 1; margin-bottom: 12px; }
+        /* Bottle display */
+        .bottle-num { font-size: 34px; font-weight: 800; color: var(--navy); letter-spacing: 0.02em; line-height: 1; margin-bottom: 12px; }
         .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
         .status-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
         .pill-avail { background: var(--green-bg); color: var(--green); }
@@ -78,21 +60,32 @@
         .info-key { color: var(--muted); }
         .info-val { font-weight: 600; }
 
-        /* ── Action buttons ── */
+        /* Capacity section (bottle card) */
+        .cap-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+        .cap-title { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 10px; }
+        .cap-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 3px 0; }
+        .cap-lbl { color: var(--muted); }
+        .cap-val { font-weight: 700; }
+        .cap-free { color: var(--green); font-size: 15px; font-weight: 800; }
+        .cap-bar-wrap { margin: 8px 0 10px; }
+        .cap-bar { background: #DDE3EA; border-radius: 6px; height: 10px; overflow: hidden; }
+        .cap-fill { height: 100%; background: var(--navy); border-radius: 6px; transition: width 0.4s; }
+
+        /* Action buttons */
         .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
-        .action-btn { border: none; border-radius: 14px; padding: 24px 10px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: transform 0.08s; font-family: inherit; letter-spacing: 0.04em; }
+        .action-btn { border: none; border-radius: 14px; padding: 24px 10px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: transform 0.08s; font-family: inherit; }
         .action-btn:active:not(:disabled) { transform: scale(0.95); }
         .action-btn:disabled { opacity: 0.22; cursor: not-allowed; }
         .action-btn .icon { font-size: 28px; }
         .btn-sortie { background: var(--orange); color: white; }
-        .btn-retour { background: var(--green); color: white; }
+        .btn-retour { background: var(--green);  color: white; }
 
-        /* ── PIN Screen ── */
+        /* PIN */
         .pin-hero { text-align: center; padding: 8px 0 0; }
         .pin-hero-bottle { font-size: 20px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
         .pin-hero-tag { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 4px; }
         .pin-hero-tag.sortie { background: var(--orange-bg); color: var(--orange); }
-        .pin-hero-tag.retour { background: var(--green-bg); color: var(--green); }
+        .pin-hero-tag.retour { background: var(--green-bg);  color: var(--green); }
         .pin-hero-sub { font-size: 12px; color: var(--muted); margin-top: 8px; }
         .pin-dots { display: flex; gap: 18px; justify-content: center; margin: 22px 0 8px; }
         .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2.5px solid var(--border); background: transparent; transition: all 0.12s; }
@@ -106,7 +99,7 @@
         .np-btn.del { font-size: 18px; color: var(--danger); border-color: transparent; background: transparent; }
         .np-btn.empty { opacity: 0; pointer-events: none; }
 
-        /* ── Form ── */
+        /* Form */
         .form-section { margin-bottom: 18px; }
         .form-label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 8px; text-transform: uppercase; }
         .form-select, .form-input { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 16px; font-family: inherit; background: var(--card); color: var(--text); -webkit-appearance: none; appearance: none; }
@@ -117,31 +110,42 @@
         .form-bottle-id { font-size: 18px; font-weight: 800; color: var(--navy); }
         .form-tag { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; }
         .form-tag.sortie { background: var(--orange-bg); color: var(--orange); }
-        .form-tag.retour { background: var(--green-bg); color: var(--green); }
+        .form-tag.retour { background: var(--green-bg);  color: var(--green); }
+        .form-hint { font-size: 11px; color: var(--muted); margin-top: 6px; }
 
-        /* ── Info banners ── */
-        .qty-banner { background: var(--blue-bg); border: 1px solid var(--blue-bdr); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
-        .qty-banner-lbl { font-size: 11px; font-weight: 700; color: var(--blue); letter-spacing: 0.05em; text-transform: uppercase; }
-        .qty-banner-val { font-size: 26px; font-weight: 800; color: var(--blue); }
-        .client-banner { background: var(--orange-bg); border: 1px solid #FFD0A8; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-        .client-banner-lbl { font-size: 11px; font-weight: 700; color: var(--orange); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; }
-        .client-banner-val { font-size: 14px; font-weight: 700; color: var(--navy); text-align: right; }
+        /* Info banners */
+        .info-banner { border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; }
+        .info-banner.blue   { background: var(--blue-bg);   border: 1px solid var(--blue-bdr); }
+        .info-banner.orange { background: var(--orange-bg); border: 1px solid #FFD0A8; }
+        .ib-row { display: flex; justify-content: space-between; align-items: center; }
+        .ib-lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+        .ib-val { font-size: 20px; font-weight: 800; }
+        .ib-lbl.blue  { color: var(--blue); }
+        .ib-val.blue  { color: var(--blue); }
+        .ib-lbl.orange { color: var(--orange); }
+        .ib-val.orange { color: var(--navy); font-size: 14px; }
+        .ib-lbl.green  { color: var(--green); }
+        .ib-val.green  { color: var(--green); font-size: 22px; }
+        .ib-bar-wrap { margin: 6px 0; }
+        .ib-bar { background: #DDE3EA; border-radius: 4px; height: 8px; overflow: hidden; }
+        .ib-fill { height: 100%; background: var(--blue); border-radius: 4px; }
+        .ib-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
-        /* ── Buttons ── */
+        /* Buttons */
         .btn-primary { width: 100%; padding: 17px; background: var(--navy); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 6px; }
         .btn-primary:active { opacity: 0.85; }
         .btn-ghost { width: 100%; padding: 14px; background: transparent; color: var(--muted); border: none; font-size: 14px; cursor: pointer; font-family: inherit; margin-top: 4px; text-decoration: underline; }
 
-        /* ── Search hero ── */
+        /* Search hero */
         .search-hero { text-align: center; padding: 28px 0 20px; }
         .search-hero-icon  { font-size: 44px; margin-bottom: 8px; }
         .search-hero-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
         .search-hero-sub   { font-size: 13px; color: var(--muted); }
         .demo-notice { background: #FFF8E1; border: 1px solid #FFE082; border-radius: 10px; padding: 11px 16px; font-size: 12px; color: #7B5800; margin-bottom: 12px; text-align: center; font-weight: 500; }
-        .demo-bottle-item { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-        .demo-bottle-item:active { opacity: 0.75; }
+        .demo-item { cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .demo-item:active { opacity: 0.75; }
 
-        /* ── Success ── */
+        /* Success */
         .success-wrap { text-align: center; padding: 24px 0 8px; }
         .success-icon  { font-size: 60px; margin-bottom: 12px; }
         .success-title { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
@@ -154,7 +158,7 @@
         .conso-label { font-size: 11px; font-weight: 700; color: var(--green); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; }
         .conso-val   { font-size: 28px; font-weight: 800; color: var(--green); }
 
-        /* ── Error ── */
+        /* Error */
         .error-box { background: var(--danger-bg); border-left: 3px solid var(--danger); padding: 13px 16px; border-radius: 8px; font-size: 13px; color: var(--danger); margin-top: 12px; line-height: 1.5; }
     </style>
 </head>
@@ -168,12 +172,12 @@
     <div id="demo-badge" style="display:none"><span class="demo-tag">DÉMO</span></div>
 </div>
 
-<!-- ── Loading ── -->
+<!-- Loading -->
 <div id="s-loading" class="screen active">
     <div class="loading-wrap"><div class="spinner"></div><div>Chargement…</div></div>
 </div>
 
-<!-- ── Search / Home ── -->
+<!-- Search -->
 <div id="s-search" class="screen">
     <div class="search-hero">
         <div class="search-hero-icon">📦</div>
@@ -191,7 +195,7 @@
     <div id="demo-list" style="display:none"></div>
 </div>
 
-<!-- ── Bottle detail ── -->
+<!-- Bottle detail -->
 <div id="s-bottle" class="screen">
     <div id="bottle-card" class="card"></div>
     <div class="action-row">
@@ -201,7 +205,7 @@
     <button class="btn-ghost" onclick="goSearch()">← Autre bouteille</button>
 </div>
 
-<!-- ── PIN ── -->
+<!-- PIN -->
 <div id="s-pin" class="screen">
     <div class="card">
         <div class="pin-hero">
@@ -210,10 +214,8 @@
             <div class="pin-hero-sub">Saisissez le code d'accès à 4 chiffres</div>
         </div>
         <div class="pin-dots" id="pin-dots">
-            <div class="pin-dot" id="pd1"></div>
-            <div class="pin-dot" id="pd2"></div>
-            <div class="pin-dot" id="pd3"></div>
-            <div class="pin-dot" id="pd4"></div>
+            <div class="pin-dot" id="pd1"></div><div class="pin-dot" id="pd2"></div>
+            <div class="pin-dot" id="pd3"></div><div class="pin-dot" id="pd4"></div>
         </div>
         <div class="pin-err" id="pin-err"></div>
         <div class="numpad">
@@ -234,7 +236,7 @@
     <button class="btn-ghost" onclick="showScreen('s-bottle')">Annuler</button>
 </div>
 
-<!-- ── Form ── -->
+<!-- Form -->
 <div id="s-form" class="screen">
     <div class="card">
         <div class="form-header">
@@ -242,17 +244,8 @@
             <span class="form-tag" id="f-tag"></span>
         </div>
 
-        <!-- Quantité disponible (SORTIE) -->
-        <div class="qty-banner" id="f-qty-banner" style="display:none">
-            <div class="qty-banner-lbl">Quantité disponible</div>
-            <div class="qty-banner-val" id="f-qty-val">— kg</div>
-        </div>
-
-        <!-- Affaire / client à la sortie (RETOUR) -->
-        <div class="client-banner" id="f-client-banner" style="display:none">
-            <div class="client-banner-lbl">Affaire / Client</div>
-            <div class="client-banner-val" id="f-client-val">—</div>
-        </div>
+        <!-- Bandeau dynamique (quantité / capacité / client) -->
+        <div id="f-banner"></div>
 
         <div class="form-section">
             <label class="form-label">Technicien</label>
@@ -260,37 +253,33 @@
                 <select class="form-select" id="f-tech"><option value="">— Sélectionner —</option></select>
             </div>
         </div>
-
         <div class="form-section">
             <label class="form-label">Gestionnaire de parc</label>
             <div class="select-wrap">
                 <select class="form-select" id="f-gest"><option value="">— Sélectionner —</option></select>
             </div>
         </div>
-
         <div class="form-section">
             <label class="form-label" id="f-poids-lbl">Poids (kg)</label>
             <input type="number" class="form-input" id="f-poids" placeholder="ex : 12.4" step="0.1" min="0" inputmode="decimal" />
-            <div style="font-size:11px;color:var(--muted);margin-top:6px" id="f-poids-hint"></div>
+            <div class="form-hint" id="f-poids-hint"></div>
         </div>
-
         <div class="form-section" id="f-aff-grp" style="display:none">
             <label class="form-label">N° Affaire / OT (optionnel)</label>
             <input type="text" class="form-input" id="f-aff" placeholder="ex : 2025-047" autocomplete="off" />
         </div>
     </div>
-
     <div id="form-error"></div>
     <button class="btn-primary" onclick="submitForm()">✔ Valider le mouvement</button>
     <button class="btn-ghost" onclick="showScreen('s-bottle')">Annuler</button>
 </div>
 
-<!-- ── Submitting ── -->
+<!-- Submitting -->
 <div id="s-submitting" class="screen">
-    <div class="loading-wrap" style="min-height:50vh"><div class="spinner"></div><div>Enregistrement en cours…</div></div>
+    <div class="loading-wrap" style="min-height:50vh"><div class="spinner"></div><div>Enregistrement…</div></div>
 </div>
 
-<!-- ── Success ── -->
+<!-- Success -->
 <div id="s-success" class="screen">
     <div class="card">
         <div class="success-wrap">
@@ -307,14 +296,12 @@
     <button class="btn-primary" onclick="reset()">Nouveau mouvement</button>
 </div>
 
-
 <script>
 // ══════════════════════════════════════════
 //  CONFIGURATION
 // ══════════════════════════════════════════
 const CFG = {
     SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzYoKD0FWNrQ87sbAMn3yLcE-Qej37VYDVwECZFAg65rtA5UdiWzjJMpYn1p-AccUYVnQ/exec',
-
     techniciens: [
         'Julien BREON','Tanguy BUREL','Mathieu CHRISTINE','Maxime CLARYSSE',
         'Martial COTTARD','Thierry DESCHAMPS','Richard DURAND','Vincent FAIE',
@@ -331,29 +318,25 @@ const PIN_CODE = '1858';
 // ══════════════════════════════════════════
 const IS_DEMO = CFG.SCRIPT_URL.includes('VOTRE_ID_ICI');
 const DEMO = {
-    'TEST-01': { id:'TEST-01', fluide:'R404-A', type:'Neuve',        tare:8.5,  statut:'Disponible', dernierPoids:10,   technicien:null, affaire:null },
-    'TEST-02': { id:'TEST-02', fluide:'R410-A', type:'Neuve',        tare:8.5,  statut:'En sortie',  dernierPoids:20,   technicien:'Julien BREON', affaire:'2025-047' },
-    'TEST-03': { id:'TEST-03', fluide:'R404-A', type:'Transfert',    tare:5.5,  statut:'Disponible', dernierPoids:5.5,  technicien:null, affaire:null },
-    'TEST-04': { id:'TEST-04', fluide:'R32',    type:'Récupération', tare:5.5,  statut:'En sortie',  dernierPoids:5.5,  technicien:'Tanguy BUREL', affaire:'TOTAL-12' },
+    'TEST-01': { id:'TEST-01', fluide:'R404-A', type:'Neuve',        tare:8.5, statut:'Disponible', dernierPoids:10,  technicien:null,          affaire:null,      capaciteMax:null },
+    'TEST-02': { id:'TEST-02', fluide:'R410-A', type:'Neuve',        tare:8.5, statut:'En sortie',  dernierPoids:20,  technicien:'Julien BREON', affaire:'2025-047',capaciteMax:null },
+    'TEST-03': { id:'TEST-03', fluide:'R404-A', type:'Transfert',    tare:5.5, statut:'Disponible', dernierPoids:8.5, technicien:null,          affaire:null,      capaciteMax:20 },
+    'TEST-04': { id:'TEST-04', fluide:'R32',    type:'Récupération', tare:5.5, statut:'En sortie',  dernierPoids:5.5, technicien:'Tanguy BUREL', affaire:'TOTAL-12',capaciteMax:15 },
 };
 
 // ══════════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════════
-let ST = { bottleId: null, bottle: null, action: null, pin: '' };
+let ST = { bottleId:null, bottle:null, action:null, pin:'' };
+
+const isCapType = b => b.type === 'Récupération' || b.type === 'Transfert';
 
 // ══════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
     populateSelects();
-    if (IS_DEMO) {
-        document.getElementById('demo-badge').style.display = 'block';
-        Object.assign(DEMO, {
-            'TEST-02': { ...DEMO['TEST-02'], statut:'En sortie' },
-            'TEST-04': { ...DEMO['TEST-04'], statut:'En sortie' },
-        });
-    }
+    if (IS_DEMO) document.getElementById('demo-badge').style.display = 'block';
     const id = new URLSearchParams(window.location.search).get('id');
     if (id) { ST.bottleId = id.toUpperCase().trim(); loadBottle(ST.bottleId); }
     else { if (IS_DEMO) buildDemoList(); showScreen('s-search'); }
@@ -362,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function populateSelects() {
     const t = document.getElementById('f-tech');
     const g = document.getElementById('f-gest');
-    CFG.techniciens.forEach(n => t.innerHTML  += `<option value="${n}">${n}</option>`);
+    CFG.techniciens.forEach(n  => t.innerHTML += `<option value="${n}">${n}</option>`);
     CFG.gestionnaires.forEach(n => g.innerHTML += `<option value="${n}">${n}</option>`);
 }
 
@@ -372,12 +355,17 @@ function buildDemoList() {
     wrap.innerHTML = `<div class="demo-notice">⚗️ Mode démo · Code PIN : <strong>1858</strong></div>`;
     Object.values(DEMO).forEach(b => {
         const d = document.createElement('div');
-        d.className = 'card demo-bottle-item';
+        d.className = 'card demo-item';
         const av = b.statut === 'Disponible';
+        let extra = '';
+        if (isCapType(b) && b.capaciteMax) {
+            const libre = Math.max(0, b.capaciteMax - (b.dernierPoids - b.tare));
+            extra = ` · ${libre.toFixed(1)} kg libres`;
+        }
         d.innerHTML = `
             <div>
                 <div style="font-weight:700;font-size:15px">${b.id}</div>
-                <div style="font-size:12px;color:var(--muted);margin-top:2px">${b.fluide} · ${b.type} · ${b.dernierPoids} kg</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px">${b.fluide} · ${b.type}${extra}</div>
             </div>
             <span class="status-pill ${av?'pill-avail':'pill-out'}"><span class="dot"></span>${b.statut}</span>`;
         d.onclick = () => { ST.bottleId = b.id; loadBottle(b.id); };
@@ -391,7 +379,7 @@ function buildDemoList() {
 function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    window.scrollTo(0, 0);
+    window.scrollTo(0,0);
 }
 
 // ══════════════════════════════════════════
@@ -400,8 +388,7 @@ function showScreen(id) {
 function searchBottle() {
     const val = document.getElementById('manual-id').value.trim().toUpperCase();
     if (!val) return;
-    ST.bottleId = val;
-    loadBottle(val);
+    ST.bottleId = val; loadBottle(val);
 }
 document.addEventListener('keydown', e => {
     if (e.key === 'Enter' && document.getElementById('s-search').classList.contains('active')) searchBottle();
@@ -433,7 +420,27 @@ async function loadBottle(id) {
 }
 
 function renderBottle(b) {
-    const av = b.statut === 'Disponible';
+    const av  = b.statut === 'Disponible';
+    const cap = isCapType(b) && b.capaciteMax;
+
+    let capHtml = '';
+    if (cap) {
+        const fluide  = Math.max(0, parseNum(b.dernierPoids) - parseNum(b.tare));
+        const capMax  = parseNum(b.capaciteMax);
+        const libre   = Math.max(0, capMax - fluide);
+        const pct     = Math.min(100, (fluide / capMax) * 100).toFixed(1);
+        capHtml = `
+            <div class="cap-section">
+                <div class="cap-title">Capacité bouteille</div>
+                <div class="cap-row"><span class="cap-lbl">Fluide actuel</span><span class="cap-val">${fluide.toFixed(2)} kg</span></div>
+                <div class="cap-bar-wrap">
+                    <div class="cap-bar"><div class="cap-fill" style="width:${pct}%"></div></div>
+                </div>
+                <div class="cap-row"><span class="cap-lbl">Place restante</span><span class="cap-val cap-free">${libre.toFixed(2)} kg</span></div>
+                <div class="cap-row" style="opacity:0.55"><span class="cap-lbl">Capacité max fluide</span><span class="cap-val">${capMax} kg</span></div>
+            </div>`;
+    }
+
     document.getElementById('bottle-card').innerHTML = `
         <div class="bottle-num">${b.id}</div>
         <span class="status-pill ${av?'pill-avail':'pill-out'}"><span class="dot"></span>${b.statut}</span>
@@ -443,7 +450,9 @@ function renderBottle(b) {
             <div class="info-row"><span class="info-key">Tare</span><span class="info-val">${b.tare} kg</span></div>
             <div class="info-row"><span class="info-key">Dernier poids</span><span class="info-val">${b.dernierPoids ?? '—'} kg</span></div>
             ${!av && b.technicien ? `<div class="info-row"><span class="info-key">Avec</span><span class="info-val">${b.technicien}</span></div>` : ''}
-        </div>`;
+        </div>
+        ${capHtml}`;
+
     document.getElementById('btn-sortie').disabled = !av;
     document.getElementById('btn-retour').disabled =  av;
 }
@@ -452,8 +461,7 @@ function renderBottle(b) {
 //  PIN
 // ══════════════════════════════════════════
 function startAction(action) {
-    ST.action = action;
-    ST.pin = '';
+    ST.action = action; ST.pin = '';
     updatePinDots();
     document.getElementById('pin-err').textContent = '';
     document.getElementById('pin-bottle-id').textContent = ST.bottleId;
@@ -465,40 +473,23 @@ function startAction(action) {
 
 function pressPin(d) {
     if (ST.pin.length >= 4) return;
-    ST.pin += d;
-    updatePinDots();
+    ST.pin += d; updatePinDots();
     document.getElementById('pin-err').textContent = '';
     if (ST.pin.length === 4) setTimeout(checkPin, 160);
 }
-
-function deletePin() {
-    ST.pin = ST.pin.slice(0, -1);
-    updatePinDots();
-}
-
+function deletePin() { ST.pin = ST.pin.slice(0,-1); updatePinDots(); }
 function checkPin() {
-    if (ST.pin === PIN_CODE) {
-        buildForm();
-    } else {
-        const dots = document.getElementById('pin-dots');
-        dots.classList.add('pshake');
-        setTimeout(() => {
-            ST.pin = '';
-            updatePinDots();
-            dots.classList.remove('pshake');
-            document.getElementById('pin-err').textContent = 'Code incorrect — réessayez';
-        }, 420);
-    }
+    if (ST.pin === PIN_CODE) { buildForm(); return; }
+    const dots = document.getElementById('pin-dots');
+    dots.classList.add('pshake');
+    setTimeout(() => { ST.pin=''; updatePinDots(); dots.classList.remove('pshake'); document.getElementById('pin-err').textContent='Code incorrect — réessayez'; }, 420);
 }
-
 function updatePinDots() {
-    for (let i = 1; i <= 4; i++) {
-        document.getElementById(`pd${i}`).classList.toggle('filled', i <= ST.pin.length);
-    }
+    for (let i=1;i<=4;i++) document.getElementById(`pd${i}`).classList.toggle('filled', i<=ST.pin.length);
 }
 
 // ══════════════════════════════════════════
-//  BUILD FORM (après PIN OK)
+//  BUILD FORM
 // ══════════════════════════════════════════
 function buildForm() {
     document.getElementById('f-bid').textContent = ST.bottleId;
@@ -507,58 +498,85 @@ function buildForm() {
     tag.className = `form-tag ${ST.action}`;
     document.getElementById('form-error').innerHTML = '';
 
-    const tare        = parseNum(ST.bottle.tare);
-    const dernierPoids = parseNum(ST.bottle.dernierPoids);
+    const tare          = parseNum(ST.bottle.tare);
+    const dernierPoids   = parseNum(ST.bottle.dernierPoids);
+    const cap            = isCapType(ST.bottle) && ST.bottle.capaciteMax;
+    const capMax         = cap ? parseNum(ST.bottle.capaciteMax) : null;
 
     if (ST.action === 'sortie') {
-        // Quantité disponible
-        const dispo = Math.max(0, dernierPoids - tare);
-        document.getElementById('f-qty-val').textContent = dispo.toFixed(2) + ' kg';
-        document.getElementById('f-qty-banner').style.display = 'flex';
-        document.getElementById('f-client-banner').style.display = 'none';
-
-        // Poids pré-rempli + hint
-        document.getElementById('f-poids').value = dernierPoids;
         document.getElementById('f-poids-lbl').textContent = 'Poids au départ (kg)';
-        document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Modifiable si re-pesage`;
-
-        // Affaire field visible
+        document.getElementById('f-poids').value = dernierPoids;
         document.getElementById('f-aff-grp').style.display = 'block';
         document.getElementById('f-aff').value = '';
-
-        // Reset technicien
         document.getElementById('f-tech').value = '';
+
+        if (cap) {
+            // Récupération / Transfert → afficher fluide actuel + place restante
+            const fluide = Math.max(0, dernierPoids - tare);
+            const libre  = Math.max(0, capMax - fluide);
+            const pct    = Math.min(100,(fluide/capMax)*100).toFixed(1);
+            document.getElementById('f-banner').innerHTML = `
+                <div class="info-banner blue">
+                    <div class="ib-row">
+                        <span class="ib-lbl blue">Fluide actuel</span>
+                        <span class="ib-val blue">${fluide.toFixed(2)} kg</span>
+                    </div>
+                    <div class="ib-bar-wrap">
+                        <div class="ib-bar"><div class="ib-fill" style="width:${pct}%"></div></div>
+                    </div>
+                    <div class="ib-row">
+                        <span class="ib-lbl green">Place restante</span>
+                        <span class="ib-val green">${libre.toFixed(2)} kg</span>
+                    </div>
+                    <div class="ib-sub">Capacité max fluide : ${capMax} kg</div>
+                </div>`;
+            document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Modifiable si re-pesage`;
+        } else {
+            // Neuve → quantité disponible uniquement
+            const dispo = Math.max(0, dernierPoids - tare);
+            document.getElementById('f-banner').innerHTML = `
+                <div class="info-banner blue">
+                    <div class="ib-row">
+                        <span class="ib-lbl blue">Quantité disponible</span>
+                        <span class="ib-val blue">${dispo.toFixed(2)} kg</span>
+                    </div>
+                </div>`;
+            document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Poids maxi : ${dernierPoids} kg · Modifiable si re-pesage`;
+        }
 
     } else {
         // RETOUR
-        document.getElementById('f-qty-banner').style.display = 'none';
-
-        // Affaire / client
-        if (ST.bottle.affaire) {
-            document.getElementById('f-client-val').textContent = ST.bottle.affaire;
-            document.getElementById('f-client-banner').style.display = 'flex';
-        } else {
-            document.getElementById('f-client-banner').style.display = 'none';
-        }
-
-        // Pré-remplir technicien
+        document.getElementById('f-poids-lbl').textContent = 'Poids au retour (kg)';
+        document.getElementById('f-poids').value = '';
+        document.getElementById('f-aff-grp').style.display = 'none';
         document.getElementById('f-tech').value = ST.bottle.technicien || '';
 
-        // Poids au retour
-        document.getElementById('f-poids').value = '';
-        document.getElementById('f-poids-lbl').textContent = 'Poids au retour (kg)';
-        document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Poids maxi : ${dernierPoids} kg (poids de sortie)`;
-
-        document.getElementById('f-aff-grp').style.display = 'none';
+        let banner = '';
+        if (ST.bottle.affaire) {
+            banner += `
+                <div class="info-banner orange">
+                    <div class="ib-row">
+                        <span class="ib-lbl orange">Affaire / Client</span>
+                        <span class="ib-val orange">${ST.bottle.affaire}</span>
+                    </div>
+                </div>`;
+        }
+        if (cap) {
+            const poidsMax = tare + capMax;
+            document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Poids max acceptable : ${poidsMax.toFixed(2)} kg (cap. ${capMax} kg de fluide)`;
+        } else {
+            document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Poids de sortie : ${dernierPoids} kg`;
+        }
+        document.getElementById('f-banner').innerHTML = banner;
     }
 
     document.getElementById('f-gest').value = '';
-    document.getElementById('f-poids').focus();
     showScreen('s-form');
+    setTimeout(() => document.getElementById('f-poids').focus(), 200);
 }
 
 // ══════════════════════════════════════════
-//  SUBMIT
+//  SUBMIT + VALIDATIONS
 // ══════════════════════════════════════════
 async function submitForm() {
     const tech  = document.getElementById('f-tech').value;
@@ -572,17 +590,34 @@ async function submitForm() {
 
     const tare         = parseNum(ST.bottle.tare);
     const dernierPoids  = parseNum(ST.bottle.dernierPoids);
+    const cap           = isCapType(ST.bottle) && ST.bottle.capaciteMax;
+    const capMax        = cap ? parseNum(ST.bottle.capaciteMax) : null;
 
-    // Validation : inférieur à la tare (toujours)
+    // ── Règle universelle : jamais moins que la tare ──
     if (poids < tare) {
-        setFormErr(`❌ Poids impossible — le poids (${poids} kg) ne peut pas être inférieur à la tare de la bouteille (${tare} kg).`);
+        setFormErr(`❌ Poids impossible — inférieur à la tare de la bouteille (${tare} kg).`);
         return;
     }
 
-    // Validation RETOUR : supérieur au poids de départ pour les bouteilles Neuves
-    if (ST.action === 'retour' && ST.bottle.type === 'Neuve' && poids > dernierPoids) {
-        setFormErr(`❌ Poids impossible — une bouteille neuve ne peut pas revenir plus lourde qu'à son départ. Poids de sortie : ${dernierPoids} kg.`);
-        return;
+    if (ST.action === 'sortie') {
+        // ── SORTIE Neuve : poids ne peut pas dépasser le dernier poids connu ──
+        if (ST.bottle.type === 'Neuve' && poids > dernierPoids) {
+            setFormErr(`❌ Poids impossible — une bouteille neuve ne peut pas partir plus lourde que son dernier pesage (${dernierPoids} kg).`);
+            return;
+        }
+    }
+
+    if (ST.action === 'retour') {
+        // ── RETOUR Neuve : ne peut pas revenir plus lourde ──
+        if (ST.bottle.type === 'Neuve' && poids > dernierPoids) {
+            setFormErr(`❌ Poids impossible — une bouteille neuve ne peut pas revenir plus lourde qu'à son départ (${dernierPoids} kg).`);
+            return;
+        }
+        // ── RETOUR Récupération/Transfert : ne peut pas dépasser la capacité max ──
+        if (cap && poids > tare + capMax) {
+            setFormErr(`❌ Poids impossible — la bouteille ne peut contenir que ${capMax} kg de fluide (poids max : ${(tare + capMax).toFixed(2)} kg).`);
+            return;
+        }
     }
 
     showScreen('s-submitting');
@@ -599,10 +634,10 @@ async function submitForm() {
             await delay(800);
             const db = DEMO[ST.bottleId];
             if (db) {
-                db.statut       = ST.action === 'sortie' ? 'En sortie' : 'Disponible';
-                db.dernierPoids  = poids;
-                db.technicien    = ST.action === 'sortie' ? tech : null;
-                db.affaire       = ST.action === 'sortie' ? (aff || null) : null;
+                db.statut      = ST.action==='sortie' ? 'En sortie' : 'Disponible';
+                db.dernierPoids = poids;
+                db.technicien   = ST.action==='sortie' ? tech : null;
+                db.affaire      = ST.action==='sortie' ? (aff||null) : null;
             }
         } else {
             const url = new URL(CFG.SCRIPT_URL);
@@ -631,7 +666,7 @@ function setFormErr(msg) {
 function renderSuccess(p) {
     const isRet = p.action === 'retour';
     const dt = new Date(p.date);
-    const ds = dt.toLocaleDateString('fr-FR') + ' à ' + dt.toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
+    const ds = dt.toLocaleDateString('fr-FR') + ' à ' + dt.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
     document.getElementById('succ-title').textContent = isRet ? 'Retour enregistré' : 'Sortie enregistrée';
     document.getElementById('succ-sub').textContent   = ds;
     document.getElementById('succ-detail').innerHTML = `
@@ -641,31 +676,31 @@ function renderSuccess(p) {
         <div class="succ-row"><span>Poids</span><span class="val">${p.poids} kg</span></div>
         <div class="succ-row"><span>Technicien</span><span class="val">${p.technicien}</span></div>
         <div class="succ-row"><span>Gestionnaire</span><span class="val">${p.gestionnaire}</span></div>
-        ${p.affaire ? `<div class="succ-row"><span>Affaire</span><span class="val">${p.affaire}</span></div>` : ''}`;
+        ${p.affaire?`<div class="succ-row"><span>Affaire</span><span class="val">${p.affaire}</span></div>`:''}`;
     const conso = document.getElementById('succ-conso');
     if (isRet && ST.bottle?.dernierPoids) {
         const diff = parseNum(ST.bottle.dernierPoids) - p.poids;
-        if (diff > 0.01) { document.getElementById('succ-conso-val').textContent = diff.toFixed(2) + ' kg'; conso.style.display = 'block'; }
-        else conso.style.display = 'none';
-    } else conso.style.display = 'none';
+        if (diff > 0.01) { document.getElementById('succ-conso-val').textContent = diff.toFixed(2)+' kg'; conso.style.display='block'; }
+        else conso.style.display='none';
+    } else conso.style.display='none';
 }
 
 // ══════════════════════════════════════════
 //  UTILS
 // ══════════════════════════════════════════
 function goSearch() {
-    ST = { bottleId: null, bottle: null, action: null, pin: '' };
-    document.getElementById('manual-id').value = '';
-    document.getElementById('search-error').innerHTML = '';
+    ST = {bottleId:null,bottle:null,action:null,pin:''};
+    document.getElementById('manual-id').value='';
+    document.getElementById('search-error').innerHTML='';
     showScreen('s-search');
 }
 function reset() {
     const id = new URLSearchParams(window.location.search).get('id');
-    if (id) { ST.bottleId = id.toUpperCase(); loadBottle(ST.bottleId); }
+    if (id) { ST.bottleId=id.toUpperCase(); loadBottle(ST.bottleId); }
     else goSearch();
 }
-function parseNum(v) { return parseFloat(String(v ?? '0').replace(',', '.')); }
-const delay = ms => new Promise(r => setTimeout(r, ms));
+function parseNum(v) { return parseFloat(String(v??'0').replace(',','.')); }
+const delay = ms => new Promise(r => setTimeout(r,ms));
 </script>
 </body>
 </html>
