@@ -545,6 +545,7 @@ function renderBottle(b) {
     if (!archived && b.dernierPoids != null) {
         const fluide = Math.max(0, parseNum(b.dernierPoids) - parseNum(b.tare));
         if (isRec && capMax) {
+            // Récup/Transfert avec capacité max → affiche place disponible
             const libre = Math.max(0, capMax - fluide);
             qtyHlHtml = `
                 <div class="qty-hl green">
@@ -553,6 +554,16 @@ function renderBottle(b) {
                         <span class="qty-hl-sub">Fluide actuel : ${fluide.toFixed(2)} kg · Cap. max : ${capMax} kg</span>
                     </div>
                     <span class="qty-hl-val">${libre.toFixed(2)} kg</span>
+                </div>`;
+        } else if (isRec && !capMax) {
+            // Récup/Transfert sans capacité max → affiche fluide actuel
+            qtyHlHtml = `
+                <div class="qty-hl green">
+                    <div class="qty-hl-left">
+                        <span class="qty-hl-lbl">Fluide actuel</span>
+                        <span class="qty-hl-sub">Tare : ${b.tare} kg · Capacité max non renseignée</span>
+                    </div>
+                    <span class="qty-hl-val">${fluide.toFixed(2)} kg</span>
                 </div>`;
         } else if (!isRec && capMax) {
             qtyHlHtml = `
