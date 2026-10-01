@@ -80,6 +80,22 @@
         .cap-fill-navy   { height: 100%; background: var(--navy);  border-radius: 6px; }
         .cap-fill-orange { height: 100%; background: var(--orange); border-radius: 6px; }
 
+        /* Quantity highlight — visible immédiatement au scan */
+        .qty-hl { margin: 12px 0 0; padding: 14px 16px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .qty-hl.blue  { background: var(--blue-bg);  border: 1px solid var(--blue-bdr); }
+        .qty-hl.green { background: var(--green-bg); border: 1px solid #A7D7B8; }
+        .qty-hl.grey  { background: var(--grey-bg);  border: 1px solid var(--border); }
+        .qty-hl-left  { display: flex; flex-direction: column; gap: 2px; }
+        .qty-hl-lbl   { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+        .qty-hl-sub   { font-size: 11px; color: var(--muted); }
+        .qty-hl-val   { font-size: 32px; font-weight: 800; line-height: 1; }
+        .qty-hl.blue  .qty-hl-lbl { color: var(--blue); }
+        .qty-hl.blue  .qty-hl-val { color: var(--blue); }
+        .qty-hl.green .qty-hl-lbl { color: var(--green); }
+        .qty-hl.green .qty-hl-val { color: var(--green); }
+        .qty-hl.grey  .qty-hl-lbl { color: var(--grey); }
+        .qty-hl.grey  .qty-hl-val { color: var(--grey); }
+
         /* Archived banner */
         .archived-banner { background: var(--grey-bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; text-align: center; margin-top: 14px; }
         .archived-banner-icon { font-size: 24px; margin-bottom: 6px; }
@@ -492,9 +508,18 @@ async function loadBottle(id) {
             data = await r.json();
             if (data.error) throw new Error(data.error);
         }
-        // Compatibilité avec l'ancien vocabulaire du Sheet
-        const COMPAT = { 'Disponible':'Stock', 'En sortie':'Sortie' };
-        if (COMPAT[data.statut]) data.statut = COMPAT[data.statut];
+        // Compatibilité avec l'ancien vocabulaire du Sheet (insensible à la casse)
+        const COMPAT = {
+            'disponible':'Stock', 'Disponible':'Stock',
+            'en sortie':'Sortie', 'En sortie':'Sortie', 'EN SORTIE':'Sortie',
+            'stock':'Stock',
+            'sortie':'Sortie',
+            'attendu':'Attendu',
+            'retourné fournisseur':'Retourné fournisseur',
+        };
+        const statLower = String(data.statut || '').trim().toLowerCase();
+        const statNorm  = COMPAT[statLower] || COMPAT[data.statut];
+        if (statNorm) data.statut = statNorm;
         ST.bottle = data;
         renderBottle(data);
         showScreen('s-bottle');
@@ -515,7 +540,42 @@ function renderBottle(b) {
     const isRec    = isRecType(b);
     const archived = b.statut === 'Retourné fournisseur';
 
-    // Capacity section
+    // Bloc quantité en évidence (visible immédiatement, avant le PIN)
+    let qtyHlHtml = '';
+    if (!archived && b.dernierPoids != null) {
+        const fluide = Math.max(0, parseNum(b.dernierPoids) - parseNum(b.tare));
+        if (isRec && capMax) {
+            const libre = Math.max(0, capMax - fluide);
+            qtyHlHtml = `
+                <div class="qty-hl green">
+                    <div class="qty-hl-left">
+                        <span class="qty-hl-lbl">Place disponible</span>
+                        <span class="qty-hl-sub">Fluide actuel : ${fluide.toFixed(2)} kg · Cap. max : ${capMax} kg</span>
+                    </div>
+                    <span class="qty-hl-val">${libre.toFixed(2)} kg</span>
+                </div>`;
+        } else if (!isRec && capMax) {
+            qtyHlHtml = `
+                <div class="qty-hl blue">
+                    <div class="qty-hl-left">
+                        <span class="qty-hl-lbl">Fluide restant</span>
+                        <span class="qty-hl-sub">Charge initiale : ${capMax} kg · Tare : ${b.tare} kg</span>
+                    </div>
+                    <span class="qty-hl-val">${fluide.toFixed(2)} kg</span>
+                </div>`;
+        } else if (!isRec) {
+            qtyHlHtml = `
+                <div class="qty-hl blue">
+                    <div class="qty-hl-left">
+                        <span class="qty-hl-lbl">Fluide restant</span>
+                        <span class="qty-hl-sub">Tare : ${b.tare} kg</span>
+                    </div>
+                    <span class="qty-hl-val">${fluide.toFixed(2)} kg</span>
+                </div>`;
+        }
+    }
+
+    // Capacity section (barre graphique — détail supplémentaire)
     let capHtml = '';
     if (capMax && b.dernierPoids != null) {
         const fluide = Math.max(0, parseNum(b.dernierPoids) - parseNum(b.tare));
@@ -550,6 +610,7 @@ function renderBottle(b) {
     document.getElementById('bottle-card').innerHTML = `
         <div class="bottle-num${archived?' archived':''}">${b.id}</div>
         <span class="status-pill ${pillCls}"><span class="dot"></span>${b.statut}</span>
+        ${qtyHlHtml}
         <div class="info-grid">
             <div class="info-row"><span class="info-key">Fluide</span><span class="info-val">${b.fluide}</span></div>
             <div class="info-row"><span class="info-key">Type</span><span class="info-val">${b.type}</span></div>
@@ -580,7 +641,10 @@ function renderBottle(b) {
             </div>`;
             break;
         default:
-            btns.innerHTML = '';
+            btns.innerHTML = `<div style="background:#FFF8E1;border:1px solid #FFE082;border-radius:10px;padding:14px 16px;font-size:13px;color:#7B5800;text-align:center;margin-top:4px">
+                ⚠️ Statut non reconnu : <strong>${b.statut || '(vide)'}</strong><br>
+                <span style="font-size:11px;opacity:0.8">Corrige la colonne E dans l'onglet Stock du Sheet<br>(valeurs acceptées : Attendu · Stock · Sortie · Retourné fournisseur)</span>
+            </div>`;
     }
 }
 
