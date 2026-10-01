@@ -19,6 +19,11 @@
             --blue:      #1A4DB5;
             --blue-bg:   #EEF4FF;
             --blue-bdr:  #BDD0F5;
+            --red:       #9B1C1C;
+            --red-bg:    #FEF2F2;
+            --red-bdr:   #FECACA;
+            --grey:      #4B5563;
+            --grey-bg:   #F3F4F6;
             --bg:        #EDF0F3;
             --card:      #FFFFFF;
             --border:    #D2D8DF;
@@ -50,17 +55,20 @@
 
         /* Bottle display */
         .bottle-num { font-size: 34px; font-weight: 800; color: var(--navy); letter-spacing: 0.02em; line-height: 1; margin-bottom: 12px; }
+        .bottle-num.archived { color: var(--grey); text-decoration: line-through; opacity: 0.6; }
         .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
         .status-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-        .pill-avail { background: var(--green-bg); color: var(--green); }
-        .pill-out   { background: var(--orange-bg); color: var(--orange); }
+        .pill-stock    { background: var(--green-bg);  color: var(--green); }
+        .pill-sortie   { background: var(--orange-bg); color: var(--orange); }
+        .pill-attendu  { background: var(--blue-bg);   color: var(--blue); }
+        .pill-archived { background: var(--grey-bg);   color: var(--grey); }
         .info-grid { margin-top: 16px; }
         .info-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
         .info-row:last-child { border-bottom: none; }
         .info-key { color: var(--muted); }
         .info-val { font-weight: 600; }
 
-        /* Capacity section — bottle card */
+        /* Capacity section */
         .cap-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
         .cap-title { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 10px; }
         .cap-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 3px 0; }
@@ -72,21 +80,33 @@
         .cap-fill-navy   { height: 100%; background: var(--navy);  border-radius: 6px; }
         .cap-fill-orange { height: 100%; background: var(--orange); border-radius: 6px; }
 
+        /* Archived banner */
+        .archived-banner { background: var(--grey-bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; text-align: center; margin-top: 14px; }
+        .archived-banner-icon { font-size: 24px; margin-bottom: 6px; }
+        .archived-banner-title { font-size: 13px; font-weight: 700; color: var(--grey); }
+        .archived-banner-sub   { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
         /* Action buttons */
-        .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
-        .action-btn { border: none; border-radius: 14px; padding: 24px 10px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: transform 0.08s; font-family: inherit; }
+        .action-row { display: grid; gap: 10px; margin-top: 4px; }
+        .action-row.two { grid-template-columns: 1fr 1fr; }
+        .action-row.one { grid-template-columns: 1fr; }
+        .action-btn { border: none; border-radius: 14px; padding: 22px 10px; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: transform 0.08s; font-family: inherit; }
         .action-btn:active:not(:disabled) { transform: scale(0.95); }
         .action-btn:disabled { opacity: 0.22; cursor: not-allowed; }
-        .action-btn .icon { font-size: 28px; }
-        .btn-sortie { background: var(--orange); color: white; }
-        .btn-retour { background: var(--green);  color: white; }
+        .action-btn .icon { font-size: 26px; }
+        .btn-sortie    { background: var(--orange); color: white; }
+        .btn-retour    { background: var(--green);  color: white; }
+        .btn-reception { background: var(--navy);   color: white; }
+        .btn-archive   { background: var(--red-bg); color: var(--red); border: 1.5px solid var(--red-bdr); font-size: 12px; padding: 16px 8px; }
 
         /* PIN */
         .pin-hero { text-align: center; padding: 8px 0 0; }
         .pin-hero-bottle { font-size: 20px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
         .pin-hero-tag { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 4px; }
-        .pin-hero-tag.sortie { background: var(--orange-bg); color: var(--orange); }
-        .pin-hero-tag.retour { background: var(--green-bg);  color: var(--green); }
+        .pin-hero-tag.sortie          { background: var(--orange-bg); color: var(--orange); }
+        .pin-hero-tag.retour          { background: var(--green-bg);  color: var(--green); }
+        .pin-hero-tag.réception       { background: var(--blue-bg);   color: var(--blue); }
+        .pin-hero-tag.retour_fournisseur { background: var(--red-bg);  color: var(--red); }
         .pin-hero-sub { font-size: 12px; color: var(--muted); margin-top: 8px; }
         .pin-dots { display: flex; gap: 18px; justify-content: center; margin: 22px 0 8px; }
         .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2.5px solid var(--border); background: transparent; transition: all 0.12s; }
@@ -110,27 +130,32 @@
         .form-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
         .form-bottle-id { font-size: 18px; font-weight: 800; color: var(--navy); }
         .form-tag { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; }
-        .form-tag.sortie { background: var(--orange-bg); color: var(--orange); }
-        .form-tag.retour { background: var(--green-bg);  color: var(--green); }
+        .form-tag.sortie          { background: var(--orange-bg); color: var(--orange); }
+        .form-tag.retour          { background: var(--green-bg);  color: var(--green); }
+        .form-tag.réception       { background: var(--blue-bg);   color: var(--blue); }
+        .form-tag.retour_fournisseur { background: var(--red-bg);  color: var(--red); }
         .form-hint { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
 
-        /* Info banners (formulaire) */
+        /* Info banners */
         .ib { border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
         .ib.blue   { background: var(--blue-bg);   border: 1px solid var(--blue-bdr); }
         .ib.orange { background: var(--orange-bg); border: 1px solid #FFD0A8; }
+        .ib.red    { background: var(--red-bg);    border: 1px solid var(--red-bdr); }
         .ib-row { display: flex; justify-content: space-between; align-items: center; }
         .ib-lbl { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
         .ib-lbl.blue   { color: var(--blue); }
         .ib-lbl.green  { color: var(--green); }
         .ib-lbl.orange { color: var(--orange); }
+        .ib-lbl.red    { color: var(--red); }
         .ib-val { font-size: 20px; font-weight: 800; }
         .ib-val.blue   { color: var(--blue); }
         .ib-val.green  { color: var(--green); }
         .ib-val.orange { color: var(--navy); font-size: 14px; }
+        .ib-val.red    { color: var(--red); font-size: 13px; }
         .ib-bar-wrap { margin: 8px 0 6px; }
         .ib-bar { background: #DDE3EA; border-radius: 4px; height: 8px; overflow: hidden; }
-        .ib-fill-blue  { height: 100%; background: var(--navy); border-radius: 4px; }
-        .ib-fill-green { height: 100%; background: var(--orange); border-radius: 4px; }
+        .ib-fill-blue  { height: 100%; background: var(--navy);   border-radius: 4px; }
+        .ib-fill-green { height: 100%; background: var(--orange);  border-radius: 4px; }
         .ib-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
 
         /* Buttons */
@@ -176,7 +201,7 @@
 
 <!-- Loading -->
 <div id="s-loading" class="screen active">
-    <div class="loading-wrap"><div class="spinner"></div><div>Chargement…</div></div>
+    <div class="loading-wrap"><div class="spinner"></div><div id="loading-msg">Chargement…</div></div>
 </div>
 
 <!-- Search -->
@@ -200,10 +225,7 @@
 <!-- Bottle detail -->
 <div id="s-bottle" class="screen">
     <div id="bottle-card" class="card"></div>
-    <div class="action-row">
-        <button class="action-btn btn-sortie" id="btn-sortie" onclick="startAction('sortie')"><span class="icon">↗</span><span>SORTIE</span></button>
-        <button class="action-btn btn-retour" id="btn-retour" onclick="startAction('retour')"><span class="icon">↙</span><span>RETOUR</span></button>
-    </div>
+    <div id="action-buttons"></div>
     <button class="btn-ghost" onclick="goSearch()">← Autre bouteille</button>
 </div>
 
@@ -246,30 +268,46 @@
             <span class="form-tag" id="f-tag"></span>
         </div>
         <div id="f-banner"></div>
-        <div class="form-section">
+
+        <!-- Fournisseur (réception + retour fournisseur) -->
+        <div class="form-section" id="f-four-grp" style="display:none">
+            <label class="form-label">Fournisseur</label>
+            <div class="select-wrap">
+                <select class="form-select" id="f-four"><option value="">— Sélectionner —</option></select>
+            </div>
+        </div>
+
+        <!-- Technicien (sortie + retour) -->
+        <div class="form-section" id="f-tech-grp" style="display:none">
             <label class="form-label">Technicien</label>
             <div class="select-wrap">
                 <select class="form-select" id="f-tech"><option value="">— Sélectionner —</option></select>
             </div>
         </div>
+
+        <!-- Gestionnaire (toujours) -->
         <div class="form-section">
             <label class="form-label">Gestionnaire de parc</label>
             <div class="select-wrap">
                 <select class="form-select" id="f-gest"><option value="">— Sélectionner —</option></select>
             </div>
         </div>
+
+        <!-- Poids (toujours) -->
         <div class="form-section">
             <label class="form-label" id="f-poids-lbl">Poids (kg)</label>
             <input type="number" class="form-input" id="f-poids" placeholder="ex : 12.4" step="0.1" min="0" inputmode="decimal" />
             <div class="form-hint" id="f-poids-hint"></div>
         </div>
+
+        <!-- N° Affaire (sortie uniquement) -->
         <div class="form-section" id="f-aff-grp" style="display:none">
             <label class="form-label">N° Affaire / OT (optionnel)</label>
             <input type="text" class="form-input" id="f-aff" placeholder="ex : 2025-047" autocomplete="off" />
         </div>
     </div>
     <div id="form-error"></div>
-    <button class="btn-primary" onclick="submitForm()">✔ Valider le mouvement</button>
+    <button class="btn-primary" onclick="submitForm()">✔ Valider</button>
     <button class="btn-ghost" onclick="showScreen('s-bottle')">Annuler</button>
 </div>
 
@@ -282,7 +320,7 @@
 <div id="s-success" class="screen">
     <div class="card">
         <div class="success-wrap">
-            <div class="success-icon">✅</div>
+            <div class="success-icon" id="succ-icon">✅</div>
             <div class="success-title" id="succ-title"></div>
             <div class="success-sub"   id="succ-sub"></div>
         </div>
@@ -292,87 +330,127 @@
             <div class="conso-val" id="succ-conso-val"></div>
         </div>
     </div>
-    <button class="btn-primary" onclick="reset()">Nouveau mouvement</button>
+    <button class="btn-primary" id="succ-btn" onclick="reset()">Nouveau mouvement</button>
 </div>
 
 <script>
 // ══════════════════════════════════════════
-//  CONFIGURATION
+//  CONFIGURATION (fallback si Sheet indisponible)
 // ══════════════════════════════════════════
 const CFG = {
     SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzYoKD0FWNrQ87sbAMn3yLcE-Qej37VYDVwECZFAg65rtA5UdiWzjJMpYn1p-AccUYVnQ/exec',
-    techniciens: [
-        'Julien BREON','Tanguy BUREL','Mathieu CHRISTINE','Maxime CLARYSSE',
-        'Martial COTTARD','Thierry DESCHAMPS','Richard DURAND','Vincent FAIE',
-        'Alban GUEUDEVILLE','Antoine HAUCHARD','Cyrille LANGE','Killian LECACHEUX',
-        'Arnaud MAZUAY','Clement RODRIGUEZ','Alexandre SALAM','Abdoul SALL',
-    ],
-    gestionnaires: ['Maxime CLARYSSE','Alan BELLET','Edouard BARIL'],
+    techniciens:  ['Julien BREON','Tanguy BUREL','Mathieu CHRISTINE','Maxime CLARYSSE','Martial COTTARD','Thierry DESCHAMPS','Richard DURAND','Vincent FAIE','Alban GUEUDEVILLE','Antoine HAUCHARD','Cyrille LANGE','Killian LECACHEUX','Arnaud MAZUAY','Clement RODRIGUEZ','Alexandre SALAM','Abdoul SALL'],
+    gestionnaires:['Maxime CLARYSSE','Alan BELLET','Edouard BARIL'],
+    fournisseurs: ['FRITEC','GFF','Techniparts'],
+    fluides:      ['MO29-R422D','MO79-R422A','R134A','R22','R32','R404A','R407C','R410A','R413A','R417A','R449A','R452A','R454C','R513A'],
 };
 const PIN_CODE = '1858';
 
 // ══════════════════════════════════════════
-//  DÉMO — données réalistes pour tous les types
+//  DÉMO
 // ══════════════════════════════════════════
 const IS_DEMO = CFG.SCRIPT_URL.includes('VOTRE_ID_ICI');
 const DEMO = {
-    //                                tare   statut       dernierPoids  tech               affaire      capaciteMax
-    'TEST-01': { id:'TEST-01', fluide:'R404-A', type:'Neuve',        tare:8.5, statut:'Disponible', dernierPoids:18.0, technicien:null,           affaire:null,       capaciteMax:10 },
-    'TEST-02': { id:'TEST-02', fluide:'R410-A', type:'Neuve',        tare:8.5, statut:'En sortie',  dernierPoids:14.5, technicien:'Julien BREON',  affaire:'2025-047', capaciteMax:13 },
-    'TEST-03': { id:'TEST-03', fluide:'R404-A', type:'Transfert',    tare:5.5, statut:'Disponible', dernierPoids:8.5,  technicien:null,           affaire:null,       capaciteMax:20 },
-    'TEST-04': { id:'TEST-04', fluide:'R32',    type:'Récupération', tare:5.5, statut:'En sortie',  dernierPoids:5.5,  technicien:'Tanguy BUREL',  affaire:'TOTAL-12', capaciteMax:15 },
+    'TEST-01': { id:'TEST-01', fluide:'R410A', type:'Neuf',        tare:8.5,  statut:'Attendu',               dernierPoids:null, technicien:null,          affaire:null,       capaciteMax:13,  fournisseur:'FRITEC' },
+    'TEST-02': { id:'TEST-02', fluide:'R134A', type:'Neuf',        tare:12.8, statut:'Sortie',                dernierPoids:25.5, technicien:'Julien BREON', affaire:'2025-047', capaciteMax:18,  fournisseur:null },
+    'TEST-03': { id:'TEST-03', fluide:'R32',   type:'Récupération',tare:5.5,  statut:'Stock',                 dernierPoids:8.2,  technicien:null,          affaire:null,       capaciteMax:15,  fournisseur:null },
+    'TEST-04': { id:'TEST-04', fluide:'R404A', type:'Transfert',   tare:7.2,  statut:'Retourné fournisseur',  dernierPoids:7.2,  technicien:null,          affaire:null,       capaciteMax:20,  fournisseur:'GFF' },
 };
 
 // ══════════════════════════════════════════
-//  STATE
+//  STATE + CONFIG chargée
 // ══════════════════════════════════════════
-let ST = { bottleId:null, bottle:null, action:null, pin:'' };
+let ST      = { bottleId:null, bottle:null, action:null, pin:'' };
+let LCONFIG = null; // loaded from Sheet
 
-// helpers
-const isRecType = b => b.type === 'Récupération' || b.type === 'Transfert';
-const parseNum  = v  => parseFloat(String(v ?? '0').replace(',', '.'));
-const pct       = (v,max) => Math.min(100, Math.max(0, (v/max)*100)).toFixed(1);
-const delay     = ms => new Promise(r => setTimeout(r, ms));
+// ══════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════
+const isRecType  = b   => b.type === 'Récupération' || b.type === 'Transfert';
+const parseNum   = v   => parseFloat(String(v ?? '0').replace(',', '.'));
+const pct        = (v,max) => Math.min(100, Math.max(0, (v/max)*100)).toFixed(1);
+const delay      = ms  => new Promise(r => setTimeout(r, ms));
+
+const ACTION_LABELS = {
+    réception:          '✅ RÉCEPTION',
+    sortie:             '↗ SORTIE',
+    retour:             '↙ RETOUR',
+    retour_fournisseur: '📦 RETOUR FOURNISSEUR',
+};
+const STATUS_PILL = {
+    'Attendu':               'pill-attendu',
+    'Stock':                 'pill-stock',
+    'Sortie':                'pill-sortie',
+    'Retourné fournisseur':  'pill-archived',
+};
 
 // ══════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
-    populateSelects();
+document.addEventListener('DOMContentLoaded', async () => {
     if (IS_DEMO) document.getElementById('demo-badge').style.display = 'block';
+
+    document.getElementById('loading-msg').textContent = 'Chargement de la configuration…';
+    await loadConfig();
+
     const id = new URLSearchParams(window.location.search).get('id');
-    if (id) { ST.bottleId = id.toUpperCase().trim(); loadBottle(ST.bottleId); }
-    else { if (IS_DEMO) buildDemoList(); showScreen('s-search'); }
+    if (id) {
+        ST.bottleId = id.toUpperCase().trim();
+        await loadBottle(ST.bottleId);
+    } else {
+        if (IS_DEMO) buildDemoList();
+        showScreen('s-search');
+    }
 });
 
-function populateSelects() {
-    const t = document.getElementById('f-tech');
-    const g = document.getElementById('f-gest');
-    CFG.techniciens.forEach(n  => t.innerHTML += `<option value="${n}">${n}</option>`);
-    CFG.gestionnaires.forEach(n => g.innerHTML += `<option value="${n}">${n}</option>`);
+// ══════════════════════════════════════════
+//  LOAD CONFIG (Sheet ou fallback)
+// ══════════════════════════════════════════
+async function loadConfig() {
+    if (IS_DEMO) {
+        LCONFIG = { techniciens: CFG.techniciens, gestionnaires: CFG.gestionnaires, fournisseurs: CFG.fournisseurs, fluides: CFG.fluides };
+        populateAllSelects();
+        return;
+    }
+    try {
+        const r = await fetch(`${CFG.SCRIPT_URL}?action=getConfig`);
+        const d = await r.json();
+        if (d.error) throw new Error(d.error);
+        LCONFIG = d;
+    } catch {
+        LCONFIG = { techniciens: CFG.techniciens, gestionnaires: CFG.gestionnaires, fournisseurs: CFG.fournisseurs, fluides: CFG.fluides };
+    }
+    populateAllSelects();
 }
 
+function populateAllSelects() {
+    populateSel('f-tech', LCONFIG.techniciens);
+    populateSel('f-gest', LCONFIG.gestionnaires);
+    populateSel('f-four', LCONFIG.fournisseurs);
+}
+function populateSel(id, items) {
+    const el = document.getElementById(id);
+    el.innerHTML = '<option value="">— Sélectionner —</option>';
+    (items||[]).forEach(n => el.innerHTML += `<option value="${n}">${n}</option>`);
+}
+
+// ══════════════════════════════════════════
+//  DEMO LIST
+// ══════════════════════════════════════════
 function buildDemoList() {
     const wrap = document.getElementById('demo-list');
     wrap.style.display = 'block';
     wrap.innerHTML = `<div class="demo-notice">⚗️ Mode démo · Code PIN : <strong>1858</strong></div>`;
     Object.values(DEMO).forEach(b => {
-        const d   = document.createElement('div');
+        const d = document.createElement('div');
         d.className = 'card demo-item';
-        const av  = b.statut === 'Disponible';
-        const cap = b.capaciteMax ? parseNum(b.capaciteMax) : null;
-        let sub   = `${b.fluide} · ${b.type}`;
-        if (cap) {
-            const fluide = Math.max(0, parseNum(b.dernierPoids) - parseNum(b.tare));
-            const libre  = Math.max(0, cap - fluide);
-            sub += isRecType(b) ? ` · ${libre.toFixed(1)} kg libres` : ` · ${fluide.toFixed(1)} kg restants`;
-        }
+        const pillCls = STATUS_PILL[b.statut] || 'pill-stock';
         d.innerHTML = `
             <div>
                 <div style="font-weight:700;font-size:15px">${b.id}</div>
-                <div style="font-size:12px;color:var(--muted);margin-top:2px">${sub}</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px">${b.fluide} · ${b.type}</div>
             </div>
-            <span class="status-pill ${av?'pill-avail':'pill-out'}"><span class="dot"></span>${b.statut}</span>`;
+            <span class="status-pill ${pillCls}"><span class="dot"></span>${b.statut}</span>`;
         d.onclick = () => { ST.bottleId = b.id; loadBottle(b.id); };
         wrap.appendChild(d);
     });
@@ -401,11 +479,12 @@ document.addEventListener('keydown', e => {
 
 async function loadBottle(id) {
     showScreen('s-loading');
+    document.getElementById('loading-msg').textContent = 'Chargement…';
     document.getElementById('search-error').innerHTML = '';
     try {
         let data;
         if (IS_DEMO) {
-            await delay(400);
+            await delay(350);
             data = DEMO[id];
             if (!data) throw new Error(`"${id}" introuvable. Essayez TEST-01 à TEST-04.`);
         } else {
@@ -413,6 +492,9 @@ async function loadBottle(id) {
             data = await r.json();
             if (data.error) throw new Error(data.error);
         }
+        // Compatibilité avec l'ancien vocabulaire du Sheet
+        const COMPAT = { 'Disponible':'Stock', 'En sortie':'Sortie' };
+        if (COMPAT[data.statut]) data.statut = COMPAT[data.statut];
         ST.bottle = data;
         renderBottle(data);
         showScreen('s-bottle');
@@ -425,55 +507,81 @@ async function loadBottle(id) {
 }
 
 // ══════════════════════════════════════════
-//  RENDER BOTTLE CARD
+//  RENDER BOTTLE CARD + BUTTONS
 // ══════════════════════════════════════════
 function renderBottle(b) {
-    const av     = b.statut === 'Disponible';
-    const capMax = b.capaciteMax ? parseNum(b.capaciteMax) : null;
-    const isRec  = isRecType(b);
+    const pillCls  = STATUS_PILL[b.statut] || 'pill-stock';
+    const capMax   = b.capaciteMax ? parseNum(b.capaciteMax) : null;
+    const isRec    = isRecType(b);
+    const archived = b.statut === 'Retourné fournisseur';
 
+    // Capacity section
     let capHtml = '';
-    if (capMax) {
+    if (capMax && b.dernierPoids != null) {
         const fluide = Math.max(0, parseNum(b.dernierPoids) - parseNum(b.tare));
         const libre  = Math.max(0, capMax - fluide);
         const p      = pct(fluide, capMax);
-
         if (isRec) {
-            // Récupération / Transfert : affiche fluide actuel + place restante
-            capHtml = `
-                <div class="cap-section">
-                    <div class="cap-title">Capacité bouteille</div>
-                    <div class="cap-row"><span class="cap-lbl">Fluide actuel</span><span class="cap-val">${fluide.toFixed(2)} kg</span></div>
-                    <div class="cap-bar-wrap"><div class="cap-bar"><div class="cap-fill-orange" style="width:${p}%"></div></div></div>
-                    <div class="cap-row"><span class="cap-lbl">Place restante</span><span class="cap-val cap-free">${libre.toFixed(2)} kg</span></div>
-                    <div class="cap-row" style="opacity:0.5"><span class="cap-lbl">Capacité max</span><span class="cap-val">${capMax} kg</span></div>
-                </div>`;
+            capHtml = `<div class="cap-section">
+                <div class="cap-title">Capacité bouteille</div>
+                <div class="cap-row"><span class="cap-lbl">Fluide actuel</span><span class="cap-val">${fluide.toFixed(2)} kg</span></div>
+                <div class="cap-bar-wrap"><div class="cap-bar"><div class="cap-fill-orange" style="width:${p}%"></div></div></div>
+                <div class="cap-row"><span class="cap-lbl">Place restante</span><span class="cap-val cap-free">${libre.toFixed(2)} kg</span></div>
+                <div class="cap-row" style="opacity:0.5"><span class="cap-lbl">Capacité max</span><span class="cap-val">${capMax} kg</span></div>
+            </div>`;
         } else {
-            // Neuve : affiche fluide restant
-            capHtml = `
-                <div class="cap-section">
-                    <div class="cap-title">Fluide restant</div>
-                    <div class="cap-row"><span class="cap-lbl">Restant</span><span class="cap-val">${fluide.toFixed(2)} kg</span></div>
-                    <div class="cap-bar-wrap"><div class="cap-bar"><div class="cap-fill-navy" style="width:${p}%"></div></div></div>
-                    <div class="cap-row" style="opacity:0.5"><span class="cap-lbl">Charge initiale</span><span class="cap-val">${capMax} kg</span></div>
-                </div>`;
+            capHtml = `<div class="cap-section">
+                <div class="cap-title">Fluide restant</div>
+                <div class="cap-row"><span class="cap-lbl">Restant</span><span class="cap-val">${fluide.toFixed(2)} kg</span></div>
+                <div class="cap-bar-wrap"><div class="cap-bar"><div class="cap-fill-navy" style="width:${p}%"></div></div></div>
+                <div class="cap-row" style="opacity:0.5"><span class="cap-lbl">Charge initiale</span><span class="cap-val">${capMax} kg</span></div>
+            </div>`;
         }
     }
 
+    // Archived banner
+    const archBanner = archived ? `
+        <div class="archived-banner">
+            <div class="archived-banner-icon">🔒</div>
+            <div class="archived-banner-title">Bouteille archivée</div>
+            <div class="archived-banner-sub">Retournée chez ${b.fournisseur || 'le fournisseur'}</div>
+        </div>` : '';
+
     document.getElementById('bottle-card').innerHTML = `
-        <div class="bottle-num">${b.id}</div>
-        <span class="status-pill ${av?'pill-avail':'pill-out'}"><span class="dot"></span>${b.statut}</span>
+        <div class="bottle-num${archived?' archived':''}">${b.id}</div>
+        <span class="status-pill ${pillCls}"><span class="dot"></span>${b.statut}</span>
         <div class="info-grid">
             <div class="info-row"><span class="info-key">Fluide</span><span class="info-val">${b.fluide}</span></div>
             <div class="info-row"><span class="info-key">Type</span><span class="info-val">${b.type}</span></div>
             <div class="info-row"><span class="info-key">Tare</span><span class="info-val">${b.tare} kg</span></div>
-            <div class="info-row"><span class="info-key">Dernier poids</span><span class="info-val">${b.dernierPoids ?? '—'} kg</span></div>
-            ${!av && b.technicien ? `<div class="info-row"><span class="info-key">Avec</span><span class="info-val">${b.technicien}</span></div>` : ''}
+            ${b.dernierPoids != null ? `<div class="info-row"><span class="info-key">Dernier poids</span><span class="info-val">${b.dernierPoids} kg</span></div>` : ''}
+            ${b.statut==='Sortie' && b.technicien ? `<div class="info-row"><span class="info-key">Avec</span><span class="info-val">${b.technicien}</span></div>` : ''}
+            ${archived && b.fournisseur ? `<div class="info-row"><span class="info-key">Fournisseur</span><span class="info-val">${b.fournisseur}</span></div>` : ''}
         </div>
-        ${capHtml}`;
+        ${capHtml}${archBanner}`;
 
-    document.getElementById('btn-sortie').disabled = !av;
-    document.getElementById('btn-retour').disabled =  av;
+    // Action buttons
+    const btns = document.getElementById('action-buttons');
+    switch(b.statut) {
+        case 'Attendu':
+            btns.innerHTML = `<div class="action-row one">
+                <button class="action-btn btn-reception" onclick="startAction('réception')"><span class="icon">✅</span><span>RÉCEPTION</span></button>
+            </div>`;
+            break;
+        case 'Stock':
+            btns.innerHTML = `<div class="action-row two">
+                <button class="action-btn btn-sortie" onclick="startAction('sortie')"><span class="icon">↗</span><span>SORTIE</span></button>
+                <button class="action-btn btn-archive" onclick="startAction('retour_fournisseur')"><span class="icon">📦</span><span>RETOUR FOURNISSEUR</span></button>
+            </div>`;
+            break;
+        case 'Sortie':
+            btns.innerHTML = `<div class="action-row one">
+                <button class="action-btn btn-retour" onclick="startAction('retour')"><span class="icon">↙</span><span>RETOUR</span></button>
+            </div>`;
+            break;
+        default:
+            btns.innerHTML = '';
+    }
 }
 
 // ══════════════════════════════════════════
@@ -485,7 +593,7 @@ function startAction(action) {
     document.getElementById('pin-err').textContent = '';
     document.getElementById('pin-bottle-id').textContent = ST.bottleId;
     const tag = document.getElementById('pin-action-tag');
-    tag.textContent = action === 'sortie' ? '↗ SORTIE' : '↙ RETOUR';
+    tag.textContent = ACTION_LABELS[action] || action;
     tag.className = `pin-hero-tag ${action}`;
     showScreen('s-pin');
 }
@@ -507,97 +615,105 @@ function updatePinDots() {
 }
 
 // ══════════════════════════════════════════
-//  BUILD FORM (après PIN OK)
+//  BUILD FORM
 // ══════════════════════════════════════════
 function buildForm() {
+    const act = ST.action;
+    const b   = ST.bottle;
+
     document.getElementById('f-bid').textContent = ST.bottleId;
     const tag = document.getElementById('f-tag');
-    tag.textContent = ST.action === 'sortie' ? '↗ SORTIE' : '↙ RETOUR';
-    tag.className = `form-tag ${ST.action}`;
+    tag.textContent = ACTION_LABELS[act];
+    tag.className   = `form-tag ${act}`;
     document.getElementById('form-error').innerHTML = '';
-    ['f-tech','f-gest'].forEach(id => document.getElementById(id).value = '');
 
-    const tare         = parseNum(ST.bottle.tare);
-    const dernierPoids  = parseNum(ST.bottle.dernierPoids);
-    const isRec        = isRecType(ST.bottle);
-    const capMax       = ST.bottle.capaciteMax ? parseNum(ST.bottle.capaciteMax) : null;
+    const tare        = parseNum(b.tare);
+    const dernierPoids = parseNum(b.dernierPoids);
+    const isRec       = isRecType(b);
+    const capMax      = b.capaciteMax ? parseNum(b.capaciteMax) : null;
+
+    // Show/hide field groups
+    const showTech  = act === 'sortie' || act === 'retour';
+    const showFour  = act === 'réception' || act === 'retour_fournisseur';
+    document.getElementById('f-tech-grp').style.display = showTech ? 'block' : 'none';
+    document.getElementById('f-four-grp').style.display = showFour ? 'block' : 'none';
+    document.getElementById('f-aff-grp').style.display  = act === 'sortie' ? 'block' : 'none';
+
+    // Reset
+    ['f-tech','f-gest','f-four'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('f-poids').value = '';
+    document.getElementById('f-aff').value = '';
 
     let banner = '';
 
-    if (ST.action === 'sortie') {
-        document.getElementById('f-poids-lbl').textContent = 'Poids au départ (kg)';
-        document.getElementById('f-poids').value = dernierPoids;
-        document.getElementById('f-aff-grp').style.display = 'block';
-        document.getElementById('f-aff').value = '';
-        document.getElementById('f-tech').value = '';
+    switch(act) {
+        case 'réception':
+            document.getElementById('f-poids-lbl').textContent = 'Poids à la réception (kg)';
+            document.getElementById('f-poids-hint').textContent = `Tare indiquée sur la bouteille : ${tare} kg`;
+            break;
 
-        if (isRec && capMax) {
-            // Récupération / Transfert : fluide actuel + place restante
-            const fluide = Math.max(0, dernierPoids - tare);
-            const libre  = Math.max(0, capMax - fluide);
-            const p      = pct(fluide, capMax);
-            banner = `
-                <div class="ib blue">
+        case 'sortie':
+            document.getElementById('f-poids-lbl').textContent = 'Poids au départ (kg)';
+            document.getElementById('f-poids').value = dernierPoids || '';
+            if (isRec && capMax) {
+                const fluide = Math.max(0, dernierPoids - tare);
+                const libre  = Math.max(0, capMax - fluide);
+                const p = pct(fluide, capMax);
+                banner = `<div class="ib blue">
                     <div class="ib-row"><span class="ib-lbl blue">Fluide actuel</span><span class="ib-val blue">${fluide.toFixed(2)} kg</span></div>
                     <div class="ib-bar-wrap"><div class="ib-bar"><div class="ib-fill-green" style="width:${p}%"></div></div></div>
                     <div class="ib-row"><span class="ib-lbl green">Place restante</span><span class="ib-val green">${libre.toFixed(2)} kg</span></div>
                     <div class="ib-sub">Capacité max : ${capMax} kg · Tare : ${tare} kg</div>
                 </div>`;
-            document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Modifiable si re-pesage`;
-        } else if (!isRec && capMax) {
-            // Neuve avec capacité renseignée : fluide restant
-            const fluide = Math.max(0, dernierPoids - tare);
-            const p      = pct(fluide, capMax);
-            banner = `
-                <div class="ib blue">
+            } else if (capMax) {
+                const fluide = Math.max(0, dernierPoids - tare);
+                const p = pct(fluide, capMax);
+                banner = `<div class="ib blue">
                     <div class="ib-row"><span class="ib-lbl blue">Fluide restant</span><span class="ib-val blue">${fluide.toFixed(2)} kg</span></div>
                     <div class="ib-bar-wrap"><div class="ib-bar"><div class="ib-fill-blue" style="width:${p}%"></div></div></div>
                     <div class="ib-sub">Charge initiale : ${capMax} kg · Tare : ${tare} kg</div>
                 </div>`;
-            document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Poids maxi : ${dernierPoids} kg · Modifiable si re-pesage`;
-        } else {
-            // Neuve sans capacité renseignée : quantité simple
-            const dispo = Math.max(0, dernierPoids - tare);
-            banner = `
-                <div class="ib blue">
+            } else {
+                const dispo = Math.max(0, dernierPoids - tare);
+                banner = `<div class="ib blue">
                     <div class="ib-row"><span class="ib-lbl blue">Quantité disponible</span><span class="ib-val blue">${dispo.toFixed(2)} kg</span></div>
                 </div>`;
-            document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Poids maxi : ${dernierPoids} kg`;
-        }
+            }
+            document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Modifiable si re-pesage`;
+            break;
 
-    } else {
-        // RETOUR
-        document.getElementById('f-poids-lbl').textContent = 'Poids au retour (kg)';
-        document.getElementById('f-poids').value = '';
-        document.getElementById('f-aff-grp').style.display = 'none';
-        document.getElementById('f-tech').value = ST.bottle.technicien || '';
-
-        if (ST.bottle.affaire) {
-            banner += `
-                <div class="ib orange">
-                    <div class="ib-row">
-                        <span class="ib-lbl orange">Affaire / Client</span>
-                        <span class="ib-val orange">${ST.bottle.affaire}</span>
-                    </div>
+        case 'retour':
+            document.getElementById('f-poids-lbl').textContent = 'Poids au retour (kg)';
+            document.getElementById('f-tech').value = b.technicien || '';
+            if (b.affaire) {
+                banner += `<div class="ib orange">
+                    <div class="ib-row"><span class="ib-lbl orange">Affaire / Client</span><span class="ib-val orange">${b.affaire}</span></div>
                 </div>`;
-        }
-
-        if (isRec && capMax) {
-            // Récupération / Transfert : montrer la place disponible au retour
-            const fluideDepart   = Math.max(0, dernierPoids - tare);
-            const placeDisponible = Math.max(0, capMax - fluideDepart);
-            const p = pct(fluideDepart, capMax);
-            banner += `
-                <div class="ib blue">
+            }
+            if (isRec && capMax) {
+                const fluideDepart = Math.max(0, dernierPoids - tare);
+                const placeDisp    = Math.max(0, capMax - fluideDepart);
+                const p = pct(fluideDepart, capMax);
+                banner += `<div class="ib blue">
                     <div class="ib-row"><span class="ib-lbl blue">Fluide au départ</span><span class="ib-val blue">${fluideDepart.toFixed(2)} kg</span></div>
                     <div class="ib-bar-wrap"><div class="ib-bar"><div class="ib-fill-green" style="width:${p}%"></div></div></div>
-                    <div class="ib-row"><span class="ib-lbl green">Place disponible</span><span class="ib-val green">${placeDisponible.toFixed(2)} kg</span></div>
+                    <div class="ib-row"><span class="ib-lbl green">Place disponible</span><span class="ib-val green">${placeDisp.toFixed(2)} kg</span></div>
                     <div class="ib-sub">Capacité max : ${capMax} kg · Poids max retour : ${(tare+capMax).toFixed(2)} kg</div>
                 </div>`;
-            document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Poids max acceptable : ${(tare+capMax).toFixed(2)} kg`;
-        } else {
-            document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Poids de sortie : ${dernierPoids} kg`;
-        }
+                document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Poids max acceptable : ${(tare+capMax).toFixed(2)} kg`;
+            } else {
+                document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg · Poids de sortie : ${dernierPoids} kg`;
+            }
+            break;
+
+        case 'retour_fournisseur':
+            document.getElementById('f-poids-lbl').textContent = 'Poids au retour (kg)';
+            document.getElementById('f-poids-hint').textContent = `Tare : ${tare} kg`;
+            banner = `<div class="ib red">
+                <div class="ib-row"><span class="ib-lbl red">⚠️ Action irréversible</span></div>
+                <div class="ib-val red" style="margin-top:4px">La bouteille sera définitivement archivée. Elle ne reviendra pas dans le parc.</div>
+            </div>`;
+            break;
     }
 
     document.getElementById('f-banner').innerHTML = banner;
@@ -609,53 +725,44 @@ function buildForm() {
 //  SUBMIT + VALIDATIONS
 // ══════════════════════════════════════════
 async function submitForm() {
+    const act   = ST.action;
     const tech  = document.getElementById('f-tech').value;
     const gest  = document.getElementById('f-gest').value;
+    const four  = document.getElementById('f-four').value;
     const poids = parseNum(document.getElementById('f-poids').value);
     const aff   = document.getElementById('f-aff').value.trim();
 
-    if (!tech)              { setFormErr('Sélectionnez un technicien.'); return; }
+    // Validations communes
     if (!gest)              { setFormErr('Sélectionnez un gestionnaire.'); return; }
     if (!poids || poids<=0) { setFormErr('Saisissez un poids valide (ex : 12.4).'); return; }
+    if ((act === 'sortie' || act === 'retour') && !tech) { setFormErr('Sélectionnez un technicien.'); return; }
+    if ((act === 'réception' || act === 'retour_fournisseur') && !four) { setFormErr('Sélectionnez un fournisseur.'); return; }
 
-    const tare         = parseNum(ST.bottle.tare);
-    const dernierPoids  = parseNum(ST.bottle.dernierPoids);
-    const isRec        = isRecType(ST.bottle);
-    const capMax       = ST.bottle.capaciteMax ? parseNum(ST.bottle.capaciteMax) : null;
+    const tare        = parseNum(ST.bottle.tare);
+    const dernierPoids = parseNum(ST.bottle.dernierPoids);
+    const isRec       = isRecType(ST.bottle);
+    const capMax      = ST.bottle.capaciteMax ? parseNum(ST.bottle.capaciteMax) : null;
 
-    // Règle universelle : jamais inférieur à la tare
-    if (poids < tare) {
-        setFormErr(`❌ Poids impossible — inférieur à la tare de la bouteille (${tare} kg).`);
-        return;
+    if (poids < tare) { setFormErr(`❌ Poids impossible — inférieur à la tare (${tare} kg).`); return; }
+
+    if (act === 'sortie' && !isRec && poids > dernierPoids) {
+        setFormErr(`❌ Poids impossible — bouteille neuve ne peut pas partir plus lourde (max ${dernierPoids} kg).`); return;
     }
-
-    if (ST.action === 'sortie') {
-        // Sortie Neuve : ne peut pas partir plus lourde
-        if (!isRec && poids > dernierPoids) {
-            setFormErr(`❌ Poids impossible — une bouteille neuve ne peut pas partir plus lourde que son dernier pesage (${dernierPoids} kg).`);
-            return;
-        }
+    if (act === 'retour' && !isRec && poids > dernierPoids) {
+        setFormErr(`❌ Poids impossible — bouteille neuve ne peut pas revenir plus lourde (départ ${dernierPoids} kg).`); return;
     }
-
-    if (ST.action === 'retour') {
-        // Retour Neuve : ne peut pas revenir plus lourde
-        if (!isRec && poids > dernierPoids) {
-            setFormErr(`❌ Poids impossible — une bouteille neuve ne peut pas revenir plus lourde qu'à son départ (${dernierPoids} kg).`);
-            return;
-        }
-        // Retour Récupération/Transfert : ne peut pas dépasser la capacité max
-        if (isRec && capMax && poids > tare + capMax) {
-            setFormErr(`❌ Bouteille saturée — la capacité max est ${capMax} kg de fluide (poids max : ${(tare+capMax).toFixed(2)} kg).`);
-            return;
-        }
+    if (act === 'retour' && isRec && capMax && poids > tare + capMax) {
+        setFormErr(`❌ Bouteille saturée — poids max ${(tare+capMax).toFixed(2)} kg (cap. ${capMax} kg de fluide).`); return;
     }
 
     showScreen('s-submitting');
+
     const payload = {
-        action: ST.action, bottleId: ST.bottleId,
+        action: act, bottleId: ST.bottleId,
         fluide: ST.bottle.fluide, typeBouteille: ST.bottle.type,
         technicien: tech, gestionnaire: gest,
-        poids, affaire: aff, date: new Date().toISOString(),
+        fournisseur: four, poids, affaire: aff,
+        date: new Date().toISOString(),
     };
 
     try {
@@ -663,10 +770,12 @@ async function submitForm() {
             await delay(800);
             const db = DEMO[ST.bottleId];
             if (db) {
-                db.statut      = ST.action==='sortie' ? 'En sortie' : 'Disponible';
+                const statusMap = { réception:'Stock', sortie:'Sortie', retour:'Stock', retour_fournisseur:'Retourné fournisseur' };
+                db.statut      = statusMap[act];
                 db.dernierPoids = poids;
-                db.technicien   = ST.action==='sortie' ? tech : null;
-                db.affaire      = ST.action==='sortie' ? (aff||null) : null;
+                db.technicien   = act === 'sortie' ? tech : null;
+                db.affaire      = act === 'sortie' ? (aff||null) : null;
+                db.fournisseur  = (act === 'réception' || act === 'retour_fournisseur') ? four : db.fournisseur;
             }
         } else {
             const url = new URL(CFG.SCRIPT_URL);
@@ -693,25 +802,34 @@ function setFormErr(msg) {
 //  SUCCESS
 // ══════════════════════════════════════════
 function renderSuccess(p) {
-    const isRet = p.action === 'retour';
+    const icons  = { réception:'📥', sortie:'↗', retour:'↙', retour_fournisseur:'📦' };
+    const titles = { réception:'Réception enregistrée', sortie:'Sortie enregistrée', retour:'Retour enregistré', retour_fournisseur:'Bouteille archivée' };
     const dt = new Date(p.date);
     const ds = dt.toLocaleDateString('fr-FR') + ' à ' + dt.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-    document.getElementById('succ-title').textContent = isRet ? 'Retour enregistré' : 'Sortie enregistrée';
+
+    document.getElementById('succ-icon').textContent  = icons[p.action]  || '✅';
+    document.getElementById('succ-title').textContent = titles[p.action] || 'Mouvement enregistré';
     document.getElementById('succ-sub').textContent   = ds;
-    document.getElementById('succ-detail').innerHTML = `
+
+    let rows = `
         <div class="succ-row"><span>Bouteille</span><span class="val">${p.bottleId}</span></div>
         <div class="succ-row"><span>Fluide</span><span class="val">${p.fluide}</span></div>
-        <div class="succ-row"><span>Type</span><span class="val">${p.typeBouteille}</span></div>
         <div class="succ-row"><span>Poids</span><span class="val">${p.poids} kg</span></div>
-        <div class="succ-row"><span>Technicien</span><span class="val">${p.technicien}</span></div>
-        <div class="succ-row"><span>Gestionnaire</span><span class="val">${p.gestionnaire}</span></div>
-        ${p.affaire?`<div class="succ-row"><span>Affaire</span><span class="val">${p.affaire}</span></div>`:''}`;
+        <div class="succ-row"><span>Gestionnaire</span><span class="val">${p.gestionnaire}</span></div>`;
+    if (p.technicien)  rows += `<div class="succ-row"><span>Technicien</span><span class="val">${p.technicien}</span></div>`;
+    if (p.fournisseur) rows += `<div class="succ-row"><span>Fournisseur</span><span class="val">${p.fournisseur}</span></div>`;
+    if (p.affaire)     rows += `<div class="succ-row"><span>Affaire</span><span class="val">${p.affaire}</span></div>`;
+    document.getElementById('succ-detail').innerHTML = rows;
+
     const conso = document.getElementById('succ-conso');
-    if (isRet && ST.bottle?.dernierPoids) {
+    if (p.action === 'retour' && ST.bottle?.dernierPoids) {
         const diff = parseNum(ST.bottle.dernierPoids) - p.poids;
         if (diff > 0.01) { document.getElementById('succ-conso-val').textContent = diff.toFixed(2)+' kg'; conso.style.display='block'; }
         else conso.style.display='none';
     } else conso.style.display='none';
+
+    // Hide "Nouveau mouvement" button if bottle is archived
+    document.getElementById('succ-btn').style.display = p.action === 'retour_fournisseur' ? 'none' : 'block';
 }
 
 // ══════════════════════════════════════════
