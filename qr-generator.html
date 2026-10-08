@@ -7,49 +7,76 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
-            --navy:#0D2137; --orange:#E05F00; --orange-bg:#FFF0E6;
+            --navy:#0D2137; --navy2:#1A3A5C;
             --green:#1A6E38; --green-bg:#E8F5EE;
-            --blue:#1A4DB5; --blue-bg:#EEF4FF;
+            --red:#9B1C1C;   --red-bg:#FEF2F2;
+            --blue:#1A4DB5;  --blue-bg:#EEF4FF;
+            --orange:#E05F00;--orange-bg:#FFF0E6;
             --bg:#EDF0F3; --card:#fff; --border:#D2D8DF;
-            --text:#0D2137; --muted:#6B7A8A;
+            --muted:#6B7A8A; --text:#0D2137;
         }
         *{box-sizing:border-box;margin:0;padding:0;}
-        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;background:var(--bg);color:var(--text);}
 
         /* Header */
-        .header{background:var(--navy);color:#fff;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-        .header h1{font-size:16px;font-weight:800;}
-        .header p{font-size:11px;opacity:.55;margin-top:2px;}
-        .btn-back{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;text-decoration:none;}
+        .header{background:var(--navy);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+        .header-left h1{font-size:16px;font-weight:800;}
+        .header-left p{font-size:11px;opacity:.5;margin-top:1px;letter-spacing:.06em;}
+        .btn-back{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 14px;border-radius:6px;font-size:12px;font-family:inherit;text-decoration:none;white-space:nowrap;}
         .btn-back:hover{background:rgba(255,255,255,.25);}
 
         /* Controls */
-        .controls{background:var(--card);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+        .controls{background:var(--card);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+        .search-wrap{position:relative;flex:1;min-width:200px;max-width:340px;}
+        .search-wrap input{width:100%;padding:8px 36px 8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--bg);}
+        .search-wrap input:focus{outline:none;border-color:var(--navy);}
+        .search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;display:none;}
         .filter-group{display:flex;gap:6px;flex-wrap:wrap;}
-        .filter-btn{padding:6px 14px;border-radius:6px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+        .filter-btn{padding:6px 12px;border-radius:6px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
         .filter-btn.active{border-color:var(--navy);background:var(--navy);color:#fff;}
-        .btn-print{margin-left:auto;padding:8px 20px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;}
-        .btn-print:hover{opacity:.9;}
-        .sel-info{font-size:12px;color:var(--muted);}
-        .btn-sel{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;font-size:12px;cursor:pointer;font-family:inherit;color:var(--muted);}
+        .filter-btn.f-neuf.active{border-color:var(--green);background:var(--green);}
+        .filter-btn.f-rec.active{border-color:var(--red);background:var(--red);}
+        .filter-btn.f-transf.active{border-color:var(--blue);background:var(--blue);}
+        .ctrl-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+        .sel-info{font-size:12px;color:var(--muted);white-space:nowrap;}
+        .btn-sel{padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:transparent;font-size:12px;cursor:pointer;font-family:inherit;color:var(--muted);}
         .btn-sel:hover{background:var(--bg);}
+        .btn-print{padding:8px 18px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+        .btn-print:hover{opacity:.9;}
 
         /* Grid */
-        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;padding:24px 28px;}
+        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:14px;padding:20px 24px;}
+        .no-result{grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:14px;}
 
         /* QR Card */
-        .qr-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:border-color .15s,box-shadow .15s;position:relative;}
+        .qr-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:box-shadow .15s,border-color .15s;position:relative;user-select:none;}
         .qr-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.1);}
-        .qr-card.selected{border-color:var(--navy);box-shadow:0 0 0 3px rgba(13,33,55,.15);}
-        .qr-check{position:absolute;top:10px;left:10px;width:20px;height:20px;border-radius:50%;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .12s;}
-        .qr-card.selected .qr-check{background:var(--navy);border-color:var(--navy);color:#fff;}
+        .qr-card.selected{box-shadow:0 0 0 2px rgba(13,33,55,.2);}
+
+        /* Color stripe by type */
+        .type-stripe{height:5px;}
+        [data-type="Neuf"]         .type-stripe{background:var(--green);}
+        [data-type="Récupération"] .type-stripe{background:var(--red);}
+        [data-type="Transfert"]    .type-stripe{background:var(--blue);}
+
+        .card-inner{padding:14px 14px 16px;text-align:center;}
+
+        /* Checkbox */
+        .qr-check{position:absolute;top:12px;left:10px;width:20px;height:20px;border-radius:50%;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .12s;z-index:2;}
+        .qr-card.selected .qr-check{color:#fff;}
+        [data-type="Neuf"].selected         .qr-check{background:var(--green);border-color:var(--green);}
+        [data-type="Récupération"].selected  .qr-check{background:var(--red);border-color:var(--red);}
+        [data-type="Transfert"].selected     .qr-check{background:var(--blue);border-color:var(--blue);}
+
         .qr-code-wrap{display:flex;justify-content:center;margin-bottom:12px;}
-        .qr-id{font-size:15px;font-weight:800;color:var(--navy);margin-bottom:4px;}
-        .qr-meta{font-size:11px;color:var(--muted);}
-        .pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-top:6px;}
-        .pill-stock,.pill-disponible{background:var(--green-bg);color:var(--green);}
-        .pill-sortie,.pill-en.sortie{background:var(--orange-bg);color:var(--orange);}
-        .pill-attendu{background:var(--blue-bg);color:var(--blue);}
+        .bottle-id{font-size:15px;font-weight:800;color:var(--navy);margin-bottom:4px;word-break:break-all;}
+        .bottle-fluid{font-size:16px;font-weight:700;color:var(--navy2);margin-bottom:8px;}
+
+        /* Type badge — large and colored */
+        .type-badge{display:inline-block;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;}
+        [data-type="Neuf"]         .type-badge{background:var(--green-bg);color:var(--green);}
+        [data-type="Récupération"] .type-badge{background:var(--red-bg);color:var(--red);}
+        [data-type="Transfert"]    .type-badge{background:var(--blue-bg);color:var(--blue);}
 
         /* Loading */
         .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:14px;color:var(--muted);}
@@ -63,27 +90,20 @@
             .grid{
                 display:grid;
                 grid-template-columns:repeat(3,1fr);
-                gap:6mm;
-                padding:6mm;
+                gap:5mm;
+                padding:5mm;
             }
-            .qr-card{
-                display:none;
-                border:1.5px dashed #aaa;
-                border-radius:4px;
-                padding:8mm;
-                break-inside:avoid;
-                page-break-inside:avoid;
-            }
-            .qr-card.selected{display:block!important;}
+            .qr-card{display:none;break-inside:avoid;page-break-inside:avoid;border:1.5px dashed #bbb;border-radius:4px;}
+            .qr-card.selected.visible-print{display:block!important;}
             .qr-check{display:none;}
-            .pill{border:1px solid #ccc;background:none!important;color:#333!important;}
+            .type-stripe{height:4px;}
         }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div>
+    <div class="header-left">
         <p>PAGANETTI THERMIQUE</p>
         <h1>🏷️ Générateur de QR Codes — Parc à Fluides</h1>
     </div>
@@ -91,19 +111,29 @@
 </div>
 
 <div class="controls" id="controls" style="display:none">
-    <div class="filter-group">
-        <button class="filter-btn active" onclick="applyFilter('all')">Toutes</button>
-        <button class="filter-btn" onclick="applyFilter('Stock')">En stock</button>
-        <button class="filter-btn" onclick="applyFilter('Sortie')">En sortie</button>
-        <button class="filter-btn" onclick="applyFilter('Attendu')">Attendu</button>
-        <button class="filter-btn" onclick="applyFilter('Neuf')">Neuves</button>
-        <button class="filter-btn" onclick="applyFilter('Récupération')">Récup.</button>
-        <button class="filter-btn" onclick="applyFilter('Transfert')">Transfert</button>
+    <!-- Recherche -->
+    <div class="search-wrap">
+        <input type="text" id="search-input"
+               placeholder="N° bouteille (ex : R410A-001, R32-002…)"
+               oninput="handleSearch()" />
+        <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
     </div>
-    <button class="btn-sel" onclick="selectAll()">✓ Tout sélectionner</button>
-    <button class="btn-sel" onclick="deselectAll()">✗ Tout désélectionner</button>
-    <span class="sel-info" id="sel-info">0 sélectionné(s)</span>
-    <button class="btn-print" onclick="window.print()">🖨️ Imprimer la sélection</button>
+
+    <!-- Filtres type -->
+    <div class="filter-group">
+        <button class="filter-btn active"    onclick="applyFilter('all',this)">Toutes</button>
+        <button class="filter-btn f-neuf"    onclick="applyFilter('Neuf',this)">🟢 Neuve</button>
+        <button class="filter-btn f-rec"     onclick="applyFilter('Récupération',this)">🔴 Récupération</button>
+        <button class="filter-btn f-transf"  onclick="applyFilter('Transfert',this)">🔵 Transfert</button>
+    </div>
+
+    <!-- Actions -->
+    <div class="ctrl-right">
+        <button class="btn-sel" onclick="selectAll()">✓ Tout</button>
+        <button class="btn-sel" onclick="deselectAll()">✗ Rien</button>
+        <span class="sel-info" id="sel-info">—</span>
+        <button class="btn-print" onclick="doPrint()">🖨️ Imprimer la sélection</button>
+    </div>
 </div>
 
 <div id="content">
@@ -111,14 +141,13 @@
 </div>
 
 <script>
-// ── Config ────────────────────────────────────────────────
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYoKD0FWNrQ87sbAMn3yLcE-Qej37VYDVwECZFAg65rtA5UdiWzjJMpYn1p-AccUYVnQ/exec';
 const APP_URL    = 'https://belletalan-pixel.github.io/parc-fluides/';
 
-let allBottles = [];
+let allBottles   = [];
 let currentFilter = 'all';
 
-// ── Load ─────────────────────────────────────────────────
+// ── Load ──────────────────────────────────────────────
 async function load() {
     try {
         const r = await fetch(`${SCRIPT_URL}?action=getDashboard`);
@@ -129,45 +158,56 @@ async function load() {
         renderGrid(allBottles);
     } catch(err) {
         document.getElementById('content').innerHTML =
-            `<div class="loading">❌ Impossible de charger : ${err.message}</div>`;
+            `<div class="loading">❌ ${err.message}</div>`;
     }
 }
 
-// ── Render grid ──────────────────────────────────────────
+// ── Render grid ───────────────────────────────────────
 function renderGrid(bottles) {
     const grid = document.createElement('div');
     grid.className = 'grid';
     grid.id = 'qr-grid';
 
-    bottles.forEach(b => {
-        const url = `${APP_URL}?id=${encodeURIComponent(b.id)}`;
-        const card = document.createElement('div');
-        card.className = 'qr-card selected';
-        card.id = 'card-' + b.id;
-        card.dataset.statut = b.statut;
-        card.dataset.type   = b.type;
-        card.onclick = () => toggleCard(b.id);
+    if (!bottles.length) {
+        grid.innerHTML = `<div class="no-result">Aucune bouteille trouvée.</div>`;
+        document.getElementById('content').innerHTML = '';
+        document.getElementById('content').appendChild(grid);
+        updateSelInfo();
+        return;
+    }
 
-        const pillCls = b.statut==='Stock'||b.statut==='Disponible' ? 'pill-stock'
-                      : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie'
-                      : 'pill-attendu';
+    bottles.forEach(b => {
+        const url  = `${APP_URL}?id=${encodeURIComponent(b.id)}`;
+        const card = document.createElement('div');
+        card.className    = 'qr-card selected visible-print';
+        card.id           = 'card-' + b.id;
+        card.dataset.id   = b.id.toLowerCase();
+        card.dataset.type = b.type;
+        card.onclick      = () => toggleCard(b.id);
+
+        const typeLabel = b.type === 'Neuf' ? 'Neuve'
+                        : b.type === 'Récupération' ? 'Récupération'
+                        : 'Transfert';
 
         card.innerHTML = `
-            <div class="qr-check">✓</div>
-            <div class="qr-code-wrap" id="qr-${b.id}"></div>
-            <div class="qr-id">${b.id}</div>
-            <div class="qr-meta">${b.fluide} · ${b.type}</div>
-            <span class="pill ${pillCls}">${b.statut}</span>`;
+            <div class="type-stripe"></div>
+            <div class="card-inner">
+                <div class="qr-check">✓</div>
+                <div class="qr-code-wrap" id="qr-${b.id}"></div>
+                <div class="bottle-id">${b.id}</div>
+                <div class="bottle-fluid">${b.fluide}</div>
+                <span class="type-badge">${typeLabel}</span>
+            </div>`;
 
         grid.appendChild(card);
 
-        // Generate QR code
         setTimeout(() => {
-            new QRCode(document.getElementById('qr-' + b.id), {
+            const el = document.getElementById('qr-' + b.id);
+            if (!el) return;
+            new QRCode(el, {
                 text: url,
                 width: 140, height: 140,
-                colorDark: '#0D2137',
-                colorLight: '#FFFFFF',
+                colorDark: '#0D2137', colorLight: '#FFFFFF',
                 correctLevel: QRCode.CorrectLevel.M,
             });
         }, 0);
@@ -178,19 +218,24 @@ function renderGrid(bottles) {
     updateSelInfo();
 }
 
-// ── Toggle card selection ────────────────────────────────
+// ── Toggle selection ──────────────────────────────────
 function toggleCard(id) {
-    document.getElementById('card-'+id).classList.toggle('selected');
+    const card = document.getElementById('card-' + id);
+    card.classList.toggle('selected');
     updateSelInfo();
 }
 
 function selectAll() {
-    document.querySelectorAll('.qr-card').forEach(c => c.classList.add('selected'));
+    document.querySelectorAll('.qr-card:not([style*="display: none"])').forEach(c => {
+        c.classList.add('selected','visible-print');
+    });
     updateSelInfo();
 }
 
 function deselectAll() {
-    document.querySelectorAll('.qr-card').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.qr-card').forEach(c => {
+        c.classList.remove('selected');
+    });
     updateSelInfo();
 }
 
@@ -199,28 +244,73 @@ function updateSelInfo() {
     document.getElementById('sel-info').textContent = n + ' sélectionné' + (n>1?'s':'');
 }
 
-// ── Filter ───────────────────────────────────────────────
-function applyFilter(filter) {
-    currentFilter = filter;
-    document.querySelectorAll('.filter-btn').forEach(b => {
-        b.classList.toggle('active', b.textContent.includes(filter) || (filter==='all' && b.textContent==='Toutes'));
-    });
+// ── Search ────────────────────────────────────────────
+function handleSearch() {
+    const raw   = document.getElementById('search-input').value.trim();
+    const clear = document.getElementById('search-clear');
+    clear.style.display = raw ? 'block' : 'none';
+
+    if (!raw) { showAll(); return; }
+
+    // Multiple IDs: comma / semicolon / space separated
+    const queries = raw.toLowerCase().split(/[,;\s]+/).filter(Boolean);
 
     document.querySelectorAll('.qr-card').forEach(card => {
-        const statut = card.dataset.statut || '';
-        const type   = card.dataset.type   || '';
-        let show = filter === 'all'
-            || filter === statut
-            || (filter === 'Stock'       && (statut==='Disponible'||statut==='Stock'))
-            || (filter === 'Sortie'      && (statut==='En sortie'||statut==='Sortie'))
-            || (filter === 'Neuf'        && type==='Neuf')
-            || (filter === 'Récupération'&& type==='Récupération')
-            || (filter === 'Transfert'   && type==='Transfert');
-        card.style.display = show ? '' : 'none';
-        if (!show) card.classList.remove('selected');
+        const id    = card.dataset.id || '';
+        const match = queries.some(q => id.includes(q));
+        card.style.display = match ? '' : 'none';
+        if (match) { card.classList.add('selected','visible-print'); }
+        else        { card.classList.remove('selected','visible-print'); }
     });
-
     updateSelInfo();
+}
+
+function clearSearch() {
+    document.getElementById('search-input').value = '';
+    document.getElementById('search-clear').style.display = 'none';
+    showAll();
+    applyCurrentFilter();
+}
+
+function showAll() {
+    document.querySelectorAll('.qr-card').forEach(c => {
+        c.style.display = '';
+        c.classList.add('selected','visible-print');
+    });
+    updateSelInfo();
+}
+
+// ── Filter ────────────────────────────────────────────
+function applyFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    document.getElementById('search-input').value = '';
+    document.getElementById('search-clear').style.display = 'none';
+
+    document.querySelectorAll('.qr-card').forEach(card => {
+        const type = card.dataset.type || '';
+        const show = filter === 'all' || type === filter;
+        card.style.display = show ? '' : 'none';
+        if (show) { card.classList.add('selected','visible-print'); }
+        else       { card.classList.remove('selected','visible-print'); }
+    });
+    updateSelInfo();
+}
+
+function applyCurrentFilter() {
+    const active = document.querySelector('.filter-btn.active');
+    if (active) applyFilter(currentFilter, active);
+}
+
+// ── Print ─────────────────────────────────────────────
+function doPrint() {
+    // Make sure visible-print matches selected
+    document.querySelectorAll('.qr-card').forEach(c => {
+        c.classList.toggle('visible-print', c.classList.contains('selected'));
+    });
+    window.print();
 }
 
 load();
