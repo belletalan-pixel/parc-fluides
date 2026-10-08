@@ -90,7 +90,7 @@
         .pill{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;}
         .pill-stock,.pill-disponible{background:var(--green-bg);color:var(--green);}
         .pill-sortie,.pill-en-sortie{background:var(--orange-bg);color:var(--orange);}
-        .pill-attendu{background:var(--blue-bg);color:var(--blue);}
+        .pill-neuve{background:var(--blue-bg);color:var(--blue);}
 
         /* Récup/Transfert table + section headers */
         .sub-section{margin:0;}
@@ -197,9 +197,9 @@ async function loadData() {
 // ─ Main render ────────────────────────────────────────
 function render(d) {
     const bs = d.stock?.byStatut || {};
-    const nbStock   = (bs['Stock']||0)+(bs['Disponible']||0);
+    const nbStock   = (bs['Stock']||0)+(bs['Disponible']||0)+(bs['Neuve']||0);
     const nbSortie  = (bs['Sortie']||0)+(bs['En sortie']||0);
-    const nbAttendu = bs['Attendu']||0;
+    const nbNeuve   = bs['Neuve']||0;   // affiché séparément pour info
     const nbAlertes = (d.alertes||[]).length;
 
     let html = '';
@@ -208,7 +208,7 @@ function render(d) {
     html += `<div class="stats">
         <div class="sc green"><div class="sc-lbl">En stock</div><div class="sc-val">${nbStock}</div></div>
         <div class="sc orange"><div class="sc-lbl">En sortie</div><div class="sc-val">${nbSortie}</div></div>
-        <div class="sc blue"><div class="sc-lbl">Attendu</div><div class="sc-val">${nbAttendu}</div></div>
+        <div class="sc blue"><div class="sc-lbl">Neuves</div><div class="sc-val">${nbNeuve}</div></div>
         <div class="sc ${nbAlertes>0?'red':'navy'}"><div class="sc-lbl">⚠️ Alertes</div><div class="sc-val">${nbAlertes}</div></div>
         <div class="sc navy"><div class="sc-lbl">Total parc</div><div class="sc-val">${d.stock?.total||0}</div></div>
     </div>`;
@@ -333,7 +333,7 @@ function renderNeuves(stockNeuf) {
         const metaSortie = nbSort ? `<span class="m-sortie"> · ${nbSort} en sortie</span>` : '';
         const detailRows = (data.bottles||[]).map(b => {
             const pillCls = b.statut==='Stock'||b.statut==='Disponible' ? 'pill-stock'
-                          : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie' : 'pill-attendu';
+                          : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie' : 'pill-neuve';
             const qtyCls  = b.statut==='Sortie'||b.statut==='En sortie' ? 'muted' : '';
             return `<div class="drow">
                 <span class="d-id">${b.id}</span>
@@ -361,7 +361,7 @@ function renderRecupTable(btls, kind) {
         <thead><tr><th>N° Bouteille</th><th>Fluide</th><th>Statut</th><th>Fluide actuel</th><th>Place disponible</th><th>Capacité max</th></tr></thead><tbody>`;
     btls.forEach(b => {
         const statCls = b.statut==='Stock'||b.statut==='Disponible' ? 'pill-stock'
-                      : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie' : 'pill-attendu';
+                      : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie' : 'pill-neuve';
         let placeHtml = '—';
         if (b.placeDisponible!==null && b.statut!=='Sortie' && b.statut!=='En sortie') {
             const cap  = parseFloat(b.capaciteMax)||0;
@@ -422,7 +422,7 @@ async function loadHistory() {
 function renderHistory(d, el) {
     const b = d.bottle || {};
     const statCls = b.statut==='Stock'||b.statut==='Disponible' ? 'pill-stock'
-                  : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie' : 'pill-attendu';
+                  : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie' : 'pill-neuve';
 
     let html = `<div class="hist-bottle-info">
         <span class="hist-info-item"><strong>${b.id}</strong></span>
