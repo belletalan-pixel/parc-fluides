@@ -295,6 +295,14 @@
             </div>
         </div>
 
+        <!-- Fluide (RETOUR Récupération/Transfert uniquement) -->
+        <div class="form-section" id="f-fluide-grp" style="display:none">
+            <label class="form-label">Fluide récupéré</label>
+            <div class="select-wrap">
+                <select class="form-select" id="f-fluide"><option value="">— Sélectionner le fluide —</option></select>
+            </div>
+        </div>
+
         <!-- Technicien (sortie + retour) — saisie libre avec suggestions -->
         <div class="form-section" id="f-tech-grp" style="display:none">
             <label class="form-label">Technicien</label>
@@ -445,8 +453,9 @@ async function loadConfig() {
 
 function populateAllSelects() {
     populateDatalist('list-tech', LCONFIG.techniciens);
-    populateSel('f-gest', LCONFIG.gestionnaires);
-    populateSel('f-four', LCONFIG.fournisseurs);
+    populateSel('f-gest',   LCONFIG.gestionnaires);
+    populateSel('f-four',   LCONFIG.fournisseurs);
+    populateSel('f-fluide', LCONFIG.fluides);
 }
 function populateSel(id, items) {
     const el = document.getElementById(id);
@@ -714,14 +723,22 @@ function buildForm() {
     const capMax      = b.capaciteMax ? parseNum(b.capaciteMax) : null;
 
     // Show/hide field groups
-    const showTech  = act === 'sortie' || act === 'retour';
-    const showFour  = act === 'réception' || act === 'retour_fournisseur';
-    document.getElementById('f-tech-grp').style.display = showTech ? 'block' : 'none';
-    document.getElementById('f-four-grp').style.display = showFour ? 'block' : 'none';
-    document.getElementById('f-aff-grp').style.display  = act === 'sortie' ? 'block' : 'none';
+    const showTech   = act === 'sortie' || act === 'retour';
+    const showFour   = act === 'réception' || act === 'retour_fournisseur';
+    const showFluide = act === 'retour' && isRec;
+    document.getElementById('f-tech-grp').style.display   = showTech   ? 'block' : 'none';
+    document.getElementById('f-four-grp').style.display   = showFour   ? 'block' : 'none';
+    document.getElementById('f-aff-grp').style.display    = act === 'sortie' ? 'block' : 'none';
+    document.getElementById('f-fluide-grp').style.display = showFluide ? 'block' : 'none';
 
     // Reset
     ['f-tech','f-gest','f-four'].forEach(id => document.getElementById(id).value = '');
+    // Pré-remplir le fluide si déjà connu sur la bouteille
+    if (showFluide) {
+        document.getElementById('f-fluide').value = ST.bottle.fluide || '';
+    } else {
+        document.getElementById('f-fluide').value = '';
+    }
     document.getElementById('f-poids').value = '';
     document.getElementById('f-aff').value = '';
 
@@ -806,22 +823,29 @@ function buildForm() {
 //  SUBMIT + VALIDATIONS
 // ══════════════════════════════════════════
 async function submitForm() {
-    const act   = ST.action;
-    const tech  = document.getElementById('f-tech').value;
-    const gest  = document.getElementById('f-gest').value;
-    const four  = document.getElementById('f-four').value;
-    const poids = parseNum(document.getElementById('f-poids').value);
-    const aff   = document.getElementById('f-aff').value.trim();
+    const act    = ST.action;
+    const tech   = document.getElementById('f-tech').value;
+    const gest   = document.getElementById('f-gest').value;
+    const four   = document.getElementById('f-four').value;
+    const poids  = parseNum(document.getElementById('f-poids').value);
+    const aff    = document.getElementById('f-aff').value.trim();
+    const isRec  = isRecType(ST.bottle);
+
+    // Fluide : pour Récup/Transfert au retour → sélectionné dans le formulaire
+    //          sinon → celui déjà connu de la bouteille
+    const fluide = (act === 'retour' && isRec)
+        ? document.getElementById('f-fluide').value
+        : ST.bottle.fluide;
 
     // Validations communes
     if (!gest)              { setFormErr('Sélectionnez un gestionnaire.'); return; }
     if (!poids || poids<=0) { setFormErr('Saisissez un poids valide (ex : 12.4).'); return; }
     if ((act === 'sortie' || act === 'retour') && !tech) { setFormErr('Sélectionnez un technicien.'); return; }
     if ((act === 'réception' || act === 'retour_fournisseur') && !four) { setFormErr('Sélectionnez un fournisseur.'); return; }
+    if (act === 'retour' && isRec && !fluide) { setFormErr('Sélectionnez le fluide récupéré.'); return; }
 
     const tare        = parseNum(ST.bottle.tare);
     const dernierPoids = parseNum(ST.bottle.dernierPoids);
-    const isRec       = isRecType(ST.bottle);
     const capMax      = ST.bottle.capaciteMax ? parseNum(ST.bottle.capaciteMax) : null;
 
     if (poids < tare) { setFormErr(`❌ Poids impossible — inférieur à la tare (${tare} kg).`); return; }
@@ -840,7 +864,7 @@ async function submitForm() {
 
     const payload = {
         action: act, bottleId: ST.bottleId,
-        fluide: ST.bottle.fluide, typeBouteille: ST.bottle.type,
+        fluide: fluide, typeBouteille: ST.bottle.type,
         technicien: tech, gestionnaire: gest,
         fournisseur: four, poids, affaire: aff,
         date: new Date().toISOString(),
