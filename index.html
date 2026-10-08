@@ -33,6 +33,8 @@
             --danger-bg: #FDEDEC;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        /* Bloque le pull-to-refresh sur mobile */
+        html { overscroll-behavior-y: none; }
         body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; max-width: 430px; margin: 0 auto; -webkit-font-smoothing: antialiased; }
 
         /* Header */
@@ -240,9 +242,9 @@
 
 <!-- Bottle detail -->
 <div id="s-bottle" class="screen">
+    <button class="btn-ghost" style="margin-bottom:10px;text-align:left;padding-left:0" onclick="goSearch()">← Autre bouteille</button>
     <div id="bottle-card" class="card"></div>
     <div id="action-buttons"></div>
-    <button class="btn-ghost" onclick="goSearch()">← Autre bouteille</button>
 </div>
 
 <!-- PIN -->
@@ -921,6 +923,16 @@ function reset() {
     if (id) { ST.bottleId=id.toUpperCase(); loadBottle(ST.bottleId); }
     else goSearch();
 }
+
+// ── Sécurité contre l'actualisation accidentelle ──────────────
+// Bloque la fermeture/actualisation si une saisie est en cours (PIN ou formulaire)
+window.addEventListener('beforeunload', e => {
+    const activeId = document.querySelector('.screen.active')?.id || '';
+    if (activeId === 's-form' || activeId === 's-pin') {
+        e.preventDefault();
+        e.returnValue = ''; // déclenche la boîte de confirmation du navigateur
+    }
+});
 </script>
 </body>
 </html>
