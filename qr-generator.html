@@ -53,30 +53,44 @@
         .qr-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.1);}
         .qr-card.selected{box-shadow:0 0 0 2px rgba(13,33,55,.2);}
 
-        /* Color stripe by type */
-        .type-stripe{height:5px;}
-        [data-type="Neuf"]         .type-stripe{background:var(--green);}
-        [data-type="Récupération"] .type-stripe{background:var(--red);}
-        [data-type="Transfert"]    .type-stripe{background:var(--blue);}
-
-        .card-inner{padding:14px 14px 16px;text-align:center;}
+        /* ── Couleurs par type — fond + bordure + badge ── */
+        [data-type="Neuf"] {
+            border: 2.5px solid var(--green);
+            background: linear-gradient(160deg, #C8EDD5 0%, #fff 72px);
+        }
+        [data-type="Récupération"] {
+            border: 2.5px solid var(--red);
+            background: linear-gradient(160deg, #FCCECE 0%, #fff 72px);
+        }
+        [data-type="Transfert"] {
+            border: 2.5px solid var(--blue);
+            background: linear-gradient(160deg, #BDD0F5 0%, #fff 72px);
+        }
 
         /* Checkbox */
-        .qr-check{position:absolute;top:12px;left:10px;width:20px;height:20px;border-radius:50%;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .12s;z-index:2;}
-        .qr-card.selected .qr-check{color:#fff;}
-        [data-type="Neuf"].selected         .qr-check{background:var(--green);border-color:var(--green);}
-        [data-type="Récupération"].selected  .qr-check{background:var(--red);border-color:var(--red);}
-        [data-type="Transfert"].selected     .qr-check{background:var(--blue);border-color:var(--blue);}
+        .qr-check{position:absolute;top:10px;left:10px;width:22px;height:22px;border-radius:50%;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;transition:all .12s;z-index:2;}
+        [data-type="Neuf"].selected          .qr-check{background:var(--green);border-color:var(--green);color:#fff;}
+        [data-type="Récupération"].selected   .qr-check{background:var(--red);border-color:var(--red);color:#fff;}
+        [data-type="Transfert"].selected      .qr-check{background:var(--blue);border-color:var(--blue);color:#fff;}
 
+        .card-inner{padding:14px 14px 16px;text-align:center;}
         .qr-code-wrap{display:flex;justify-content:center;margin-bottom:12px;}
         .bottle-id{font-size:15px;font-weight:800;color:var(--navy);margin-bottom:4px;word-break:break-all;}
-        .bottle-fluid{font-size:16px;font-weight:700;color:var(--navy2);margin-bottom:8px;}
+        .bottle-fluid{font-size:16px;font-weight:700;color:var(--navy2);margin-bottom:10px;}
 
-        /* Type badge — large and colored */
-        .type-badge{display:inline-block;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;}
-        [data-type="Neuf"]         .type-badge{background:var(--green-bg);color:var(--green);}
-        [data-type="Récupération"] .type-badge{background:var(--red-bg);color:var(--red);}
-        [data-type="Transfert"]    .type-badge{background:var(--blue-bg);color:var(--blue);}
+        /* Type badge — solide et visible */
+        .type-badge{display:inline-block;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;}
+        [data-type="Neuf"]         .type-badge{background:var(--green);}
+        [data-type="Récupération"] .type-badge{background:var(--red);}
+        [data-type="Transfert"]    .type-badge{background:var(--blue);}
+
+        /* Print : forcer les couleurs */
+        @media print {
+            [data-type="Neuf"],[data-type="Récupération"],[data-type="Transfert"] {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
 
         /* Loading */
         .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:14px;color:var(--muted);}
@@ -147,6 +161,16 @@ const APP_URL    = 'https://belletalan-pixel.github.io/parc-fluides/';
 let allBottles   = [];
 let currentFilter = 'all';
 
+// ── Normalisation du type (gère toutes les variantes du Sheet) ──
+function normalizeType(t) {
+    const s = String(t || '').trim().toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // retire accents pour comparer
+    if (s === 'neuf' || s === 'neuve') return 'Neuf';
+    if (s === 'recuperation' || s === 'récupération' || s === 'recup' || s === 'récup') return 'Récupération';
+    if (s === 'transfert' || s === 'transfer') return 'Transfert';
+    return String(t || '').trim(); // valeur brute si inconnue
+}
+
 // ── Load ──────────────────────────────────────────────
 async function load() {
     try {
@@ -177,20 +201,23 @@ function renderGrid(bottles) {
     }
 
     bottles.forEach(b => {
-        const url  = `${APP_URL}?id=${encodeURIComponent(b.id)}`;
+        const url      = `${APP_URL}?id=${encodeURIComponent(b.id)}`;
+
+        // Normalisation robuste du type (gère variantes de saisie)
+        const typeNorm = normalizeType(b.type);
+        const typeLabel = typeNorm === 'Neuf'          ? 'Neuve'
+                        : typeNorm === 'Récupération'  ? 'Récupération'
+                        : typeNorm === 'Transfert'     ? 'Transfert'
+                        : b.type || '?';
+
         const card = document.createElement('div');
         card.className    = 'qr-card selected visible-print';
         card.id           = 'card-' + b.id;
         card.dataset.id   = b.id.toLowerCase();
-        card.dataset.type = b.type;
+        card.dataset.type = typeNorm;   // ← valeur normalisée pour le CSS
         card.onclick      = () => toggleCard(b.id);
 
-        const typeLabel = b.type === 'Neuf' ? 'Neuve'
-                        : b.type === 'Récupération' ? 'Récupération'
-                        : 'Transfert';
-
         card.innerHTML = `
-            <div class="type-stripe"></div>
             <div class="card-inner">
                 <div class="qr-check">✓</div>
                 <div class="qr-code-wrap" id="qr-${b.id}"></div>
@@ -290,7 +317,7 @@ function applyFilter(filter, btn) {
     document.getElementById('search-clear').style.display = 'none';
 
     document.querySelectorAll('.qr-card').forEach(card => {
-        const type = card.dataset.type || '';
+        const type = normalizeType(card.dataset.type || '');
         const show = filter === 'all' || type === filter;
         card.style.display = show ? '' : 'none';
         if (show) { card.classList.add('selected','visible-print'); }
