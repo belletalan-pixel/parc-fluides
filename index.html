@@ -295,12 +295,14 @@
             </div>
         </div>
 
-        <!-- Technicien (sortie + retour) -->
+        <!-- Technicien (sortie + retour) — saisie libre avec suggestions -->
         <div class="form-section" id="f-tech-grp" style="display:none">
             <label class="form-label">Technicien</label>
-            <div class="select-wrap">
-                <select class="form-select" id="f-tech"><option value="">— Sélectionner —</option></select>
-            </div>
+            <input type="text" class="form-input" id="f-tech"
+                   list="list-tech"
+                   placeholder="Tapez le nom ou choisissez dans la liste…"
+                   autocomplete="off" autocapitalize="words" />
+            <datalist id="list-tech"></datalist>
         </div>
 
         <!-- Gestionnaire (toujours) -->
@@ -442,7 +444,7 @@ async function loadConfig() {
 }
 
 function populateAllSelects() {
-    populateSel('f-tech', LCONFIG.techniciens);
+    populateDatalist('list-tech', LCONFIG.techniciens);
     populateSel('f-gest', LCONFIG.gestionnaires);
     populateSel('f-four', LCONFIG.fournisseurs);
 }
@@ -450,6 +452,11 @@ function populateSel(id, items) {
     const el = document.getElementById(id);
     el.innerHTML = '<option value="">— Sélectionner —</option>';
     (items||[]).forEach(n => el.innerHTML += `<option value="${n}">${n}</option>`);
+}
+function populateDatalist(id, items) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = (items||[]).map(n => `<option value="${n}">`).join('');
 }
 
 // ══════════════════════════════════════════
