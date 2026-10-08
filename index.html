@@ -62,7 +62,7 @@
         .status-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
         .pill-stock    { background: var(--green-bg);  color: var(--green); }
         .pill-sortie   { background: var(--orange-bg); color: var(--orange); }
-        .pill-attendu  { background: var(--blue-bg);   color: var(--blue); }
+        .pill-neuve    { background: var(--blue-bg);   color: var(--blue); }
         .pill-archived { background: var(--grey-bg);   color: var(--grey); }
         .info-grid { margin-top: 16px; }
         .info-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
@@ -369,7 +369,7 @@ const PIN_CODE = '1858';
 // ══════════════════════════════════════════
 const IS_DEMO = CFG.SCRIPT_URL.includes('VOTRE_ID_ICI');
 const DEMO = {
-    'TEST-01': { id:'TEST-01', fluide:'R410A', type:'Neuf',        tare:8.5,  statut:'Attendu',               dernierPoids:null, technicien:null,          affaire:null,       capaciteMax:13,  fournisseur:'FRITEC' },
+    'TEST-01': { id:'TEST-01', fluide:'R410A', type:'Neuf',        tare:8.5,  statut:'Neuve',               dernierPoids:null, technicien:null,          affaire:null,       capaciteMax:13,  fournisseur:'FRITEC' },
     'TEST-02': { id:'TEST-02', fluide:'R134A', type:'Neuf',        tare:12.8, statut:'Sortie',                dernierPoids:25.5, technicien:'Julien BREON', affaire:'2025-047', capaciteMax:18,  fournisseur:null },
     'TEST-03': { id:'TEST-03', fluide:'R32',   type:'Récupération',tare:5.5,  statut:'Stock',                 dernierPoids:8.2,  technicien:null,          affaire:null,       capaciteMax:15,  fournisseur:null },
     'TEST-04': { id:'TEST-04', fluide:'R404A', type:'Transfert',   tare:7.2,  statut:'Retourné fournisseur',  dernierPoids:7.2,  technicien:null,          affaire:null,       capaciteMax:20,  fournisseur:'GFF' },
@@ -396,7 +396,7 @@ const ACTION_LABELS = {
     retour_fournisseur: '📦 RETOUR FOURNISSEUR',
 };
 const STATUS_PILL = {
-    'Attendu':               'pill-attendu',
+    'Neuve':                 'pill-neuve',
     'Stock':                 'pill-stock',
     'Sortie':                'pill-sortie',
     'Retourné fournisseur':  'pill-archived',
@@ -516,7 +516,8 @@ async function loadBottle(id) {
             'en sortie':'Sortie', 'En sortie':'Sortie', 'EN SORTIE':'Sortie',
             'stock':'Stock',
             'sortie':'Sortie',
-            'attendu':'Attendu',
+            'neuve':'Neuve', 'Neuve':'Neuve',
+            'attendu':'Neuve', 'Attendu':'Neuve',  // ancien nom → Neuve
             'retourné fournisseur':'Retourné fournisseur',
         };
         const statLower = String(data.statut || '').trim().toLowerCase();
@@ -637,12 +638,8 @@ function renderBottle(b) {
     // Action buttons
     const btns = document.getElementById('action-buttons');
     switch(b.statut) {
-        case 'Attendu':
-            btns.innerHTML = `<div class="action-row one">
-                <button class="action-btn btn-reception" onclick="startAction('réception')"><span class="icon">✅</span><span>RÉCEPTION</span></button>
-            </div>`;
-            break;
-        case 'Stock':
+        case 'Neuve':   // bouteille neuve en parc → peut être sortie
+        case 'Stock':   // bouteille disponible en parc
             btns.innerHTML = `<div class="action-row two">
                 <button class="action-btn btn-sortie" onclick="startAction('sortie')"><span class="icon">↗</span><span>SORTIE</span></button>
                 <button class="action-btn btn-archive" onclick="startAction('retour_fournisseur')"><span class="icon">📦</span><span>RETOUR FOURNISSEUR</span></button>
@@ -656,7 +653,7 @@ function renderBottle(b) {
         default:
             btns.innerHTML = `<div style="background:#FFF8E1;border:1px solid #FFE082;border-radius:10px;padding:14px 16px;font-size:13px;color:#7B5800;text-align:center;margin-top:4px">
                 ⚠️ Statut non reconnu : <strong>${b.statut || '(vide)'}</strong><br>
-                <span style="font-size:11px;opacity:0.8">Corrige la colonne E dans l'onglet Stock du Sheet<br>(valeurs acceptées : Attendu · Stock · Sortie · Retourné fournisseur)</span>
+                <span style="font-size:11px;opacity:0.8">Corrige la colonne E dans l'onglet Stock du Sheet<br>(valeurs acceptées : Neuve · Stock · Sortie · Retourné fournisseur)</span>
             </div>`;
     }
 }
