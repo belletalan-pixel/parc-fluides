@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur QR Codes — Parc Fluides</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --navy:#0D2137; --orange:#E05F00; --orange-bg:#FFF0E6;
+            --green:#1A6E38; --green-bg:#E8F5EE;
+            --blue:#1A4DB5; --blue-bg:#EEF4FF;
+            --bg:#EDF0F3; --card:#fff; --border:#D2D8DF;
+            --text:#0D2137; --muted:#6B7A8A;
+        }
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);}
+
+        /* Header */
+        .header{background:var(--navy);color:#fff;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+        .header h1{font-size:16px;font-weight:800;}
+        .header p{font-size:11px;opacity:.55;margin-top:2px;}
+        .btn-back{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;text-decoration:none;}
+        .btn-back:hover{background:rgba(255,255,255,.25);}
+
+        /* Controls */
+        .controls{background:var(--card);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+        .filter-group{display:flex;gap:6px;flex-wrap:wrap;}
+        .filter-btn{padding:6px 14px;border-radius:6px;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+        .filter-btn.active{border-color:var(--navy);background:var(--navy);color:#fff;}
+        .btn-print{margin-left:auto;padding:8px 20px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;}
+        .btn-print:hover{opacity:.9;}
+        .sel-info{font-size:12px;color:var(--muted);}
+        .btn-sel{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;font-size:12px;cursor:pointer;font-family:inherit;color:var(--muted);}
+        .btn-sel:hover{background:var(--bg);}
+
+        /* Grid */
+        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;padding:24px 28px;}
+
+        /* QR Card */
+        .qr-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:border-color .15s,box-shadow .15s;position:relative;}
+        .qr-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.1);}
+        .qr-card.selected{border-color:var(--navy);box-shadow:0 0 0 3px rgba(13,33,55,.15);}
+        .qr-check{position:absolute;top:10px;left:10px;width:20px;height:20px;border-radius:50%;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .12s;}
+        .qr-card.selected .qr-check{background:var(--navy);border-color:var(--navy);color:#fff;}
+        .qr-code-wrap{display:flex;justify-content:center;margin-bottom:12px;}
+        .qr-id{font-size:15px;font-weight:800;color:var(--navy);margin-bottom:4px;}
+        .qr-meta{font-size:11px;color:var(--muted);}
+        .pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-top:6px;}
+        .pill-stock,.pill-disponible{background:var(--green-bg);color:var(--green);}
+        .pill-sortie,.pill-en.sortie{background:var(--orange-bg);color:var(--orange);}
+        .pill-attendu{background:var(--blue-bg);color:var(--blue);}
+
+        /* Loading */
+        .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:14px;color:var(--muted);}
+        .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;}
+        @keyframes spin{to{transform:rotate(360deg);}}
+
+        /* ═══ PRINT ════════════════════════════════════════ */
+        @media print {
+            .header,.controls{display:none!important;}
+            body{background:#fff;}
+            .grid{
+                display:grid;
+                grid-template-columns:repeat(3,1fr);
+                gap:6mm;
+                padding:6mm;
+            }
+            .qr-card{
+                display:none;
+                border:1.5px dashed #aaa;
+                border-radius:4px;
+                padding:8mm;
+                break-inside:avoid;
+                page-break-inside:avoid;
+            }
+            .qr-card.selected{display:block!important;}
+            .qr-check{display:none;}
+            .pill{border:1px solid #ccc;background:none!important;color:#333!important;}
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <p>PAGANETTI THERMIQUE</p>
+        <h1>🏷️ Générateur de QR Codes — Parc à Fluides</h1>
+    </div>
+    <a href="dashboard.html" class="btn-back">← Tableau de bord</a>
+</div>
+
+<div class="controls" id="controls" style="display:none">
+    <div class="filter-group">
+        <button class="filter-btn active" onclick="applyFilter('all')">Toutes</button>
+        <button class="filter-btn" onclick="applyFilter('Stock')">En stock</button>
+        <button class="filter-btn" onclick="applyFilter('Sortie')">En sortie</button>
+        <button class="filter-btn" onclick="applyFilter('Attendu')">Attendu</button>
+        <button class="filter-btn" onclick="applyFilter('Neuf')">Neuves</button>
+        <button class="filter-btn" onclick="applyFilter('Récupération')">Récup.</button>
+        <button class="filter-btn" onclick="applyFilter('Transfert')">Transfert</button>
+    </div>
+    <button class="btn-sel" onclick="selectAll()">✓ Tout sélectionner</button>
+    <button class="btn-sel" onclick="deselectAll()">✗ Tout désélectionner</button>
+    <span class="sel-info" id="sel-info">0 sélectionné(s)</span>
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimer la sélection</button>
+</div>
+
+<div id="content">
+    <div class="loading"><div class="spinner"></div><div>Chargement des bouteilles…</div></div>
+</div>
+
+<script>
+// ── Config ────────────────────────────────────────────────
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYoKD0FWNrQ87sbAMn3yLcE-Qej37VYDVwECZFAg65rtA5UdiWzjJMpYn1p-AccUYVnQ/exec';
+const APP_URL    = 'https://belletalan-pixel.github.io/parc-fluides/';
+
+let allBottles = [];
+let currentFilter = 'all';
+
+// ── Load ─────────────────────────────────────────────────
+async function load() {
+    try {
+        const r = await fetch(`${SCRIPT_URL}?action=getDashboard`);
+        const d = await r.json();
+        if (d.error) throw new Error(d.error);
+        allBottles = d.allBottles || [];
+        document.getElementById('controls').style.display = 'flex';
+        renderGrid(allBottles);
+    } catch(err) {
+        document.getElementById('content').innerHTML =
+            `<div class="loading">❌ Impossible de charger : ${err.message}</div>`;
+    }
+}
+
+// ── Render grid ──────────────────────────────────────────
+function renderGrid(bottles) {
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+    grid.id = 'qr-grid';
+
+    bottles.forEach(b => {
+        const url = `${APP_URL}?id=${encodeURIComponent(b.id)}`;
+        const card = document.createElement('div');
+        card.className = 'qr-card selected';
+        card.id = 'card-' + b.id;
+        card.dataset.statut = b.statut;
+        card.dataset.type   = b.type;
+        card.onclick = () => toggleCard(b.id);
+
+        const pillCls = b.statut==='Stock'||b.statut==='Disponible' ? 'pill-stock'
+                      : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie'
+                      : 'pill-attendu';
+
+        card.innerHTML = `
+            <div class="qr-check">✓</div>
+            <div class="qr-code-wrap" id="qr-${b.id}"></div>
+            <div class="qr-id">${b.id}</div>
+            <div class="qr-meta">${b.fluide} · ${b.type}</div>
+            <span class="pill ${pillCls}">${b.statut}</span>`;
+
+        grid.appendChild(card);
+
+        // Generate QR code
+        setTimeout(() => {
+            new QRCode(document.getElementById('qr-' + b.id), {
+                text: url,
+                width: 140, height: 140,
+                colorDark: '#0D2137',
+                colorLight: '#FFFFFF',
+                correctLevel: QRCode.CorrectLevel.M,
+            });
+        }, 0);
+    });
+
+    document.getElementById('content').innerHTML = '';
+    document.getElementById('content').appendChild(grid);
+    updateSelInfo();
+}
+
+// ── Toggle card selection ────────────────────────────────
+function toggleCard(id) {
+    document.getElementById('card-'+id).classList.toggle('selected');
+    updateSelInfo();
+}
+
+function selectAll() {
+    document.querySelectorAll('.qr-card').forEach(c => c.classList.add('selected'));
+    updateSelInfo();
+}
+
+function deselectAll() {
+    document.querySelectorAll('.qr-card').forEach(c => c.classList.remove('selected'));
+    updateSelInfo();
+}
+
+function updateSelInfo() {
+    const n = document.querySelectorAll('.qr-card.selected').length;
+    document.getElementById('sel-info').textContent = n + ' sélectionné' + (n>1?'s':'');
+}
+
+// ── Filter ───────────────────────────────────────────────
+function applyFilter(filter) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.toggle('active', b.textContent.includes(filter) || (filter==='all' && b.textContent==='Toutes'));
+    });
+
+    document.querySelectorAll('.qr-card').forEach(card => {
+        const statut = card.dataset.statut || '';
+        const type   = card.dataset.type   || '';
+        let show = filter === 'all'
+            || filter === statut
+            || (filter === 'Stock'       && (statut==='Disponible'||statut==='Stock'))
+            || (filter === 'Sortie'      && (statut==='En sortie'||statut==='Sortie'))
+            || (filter === 'Neuf'        && type==='Neuf')
+            || (filter === 'Récupération'&& type==='Récupération')
+            || (filter === 'Transfert'   && type==='Transfert');
+        card.style.display = show ? '' : 'none';
+        if (!show) card.classList.remove('selected');
+    });
+
+    updateSelInfo();
+}
+
+load();
+</script>
+</body>
+</html>
