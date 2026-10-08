@@ -7,15 +7,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --navy:#0D2137; --navy2:#1A3A5C;
-            --orange:#E05F00; --orange-bg:#FFF0E6;
-            --green:#1A6E38;  --green-bg:#E8F5EE;
-            --blue:#1A4DB5;   --blue-bg:#EEF4FF;
-            --red:#C0392B;    --red-bg:#FDEDEC;
-            --amber:#B45309;  --amber-bg:#FFFBEB;
-            --bg:#EDF0F3; --card:#fff; --border:#D2D8DF;
-            --text:#0D2137; --muted:#6B7A8A;
+        :root{
+            --navy:#0D2137;--navy2:#1A3A5C;
+            --orange:#E05F00;--orange-bg:#FFF0E6;
+            --green:#1A6E38;--green-bg:#E8F5EE;
+            --blue:#1A4DB5;--blue-bg:#EEF4FF;
+            --red:#9B1C1C;--red-bg:#FEF2F2;
+            --amber:#B45309;--amber-bg:#FFFBEB;
+            --bg:#EDF0F3;--card:#fff;--border:#D2D8DF;
+            --text:#0D2137;--muted:#6B7A8A;
         }
         *{box-sizing:border-box;margin:0;padding:0;}
         body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
@@ -24,29 +24,28 @@
         .header{background:var(--navy);color:#fff;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
         .header-left h1{font-size:17px;font-weight:800;}
         .header-left p{font-size:11px;opacity:.55;margin-top:2px;letter-spacing:.06em;}
-        .header-right{display:flex;align-items:center;gap:12px;font-size:12px;opacity:.8;}
-        .btn-header{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;text-decoration:none;white-space:nowrap;}
-        .btn-header:hover{background:rgba(255,255,255,.25);}
+        .header-right{display:flex;align-items:center;gap:10px;font-size:12px;opacity:.85;}
+        .btn-h{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;text-decoration:none;white-space:nowrap;}
+        .btn-h:hover{background:rgba(255,255,255,.25);}
 
         /* Content */
         .content{max-width:1100px;margin:0 auto;padding:24px 20px;}
 
         /* Stats */
         .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:20px;}
-        .stat-card{background:var(--card);border-radius:12px;padding:18px 20px;border:1px solid var(--border);}
-        .stat-lbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
-        .stat-val{font-size:38px;font-weight:800;line-height:1;}
-        .sc-green .stat-lbl{color:var(--green);} .sc-green .stat-val{color:var(--green);}
-        .sc-orange .stat-lbl{color:var(--orange);} .sc-orange .stat-val{color:var(--orange);}
-        .sc-blue .stat-lbl{color:var(--blue);} .sc-blue .stat-val{color:var(--blue);}
-        .sc-red .stat-lbl{color:var(--red);} .sc-red .stat-val{color:var(--red);}
-        .sc-navy .stat-lbl{color:var(--muted);} .sc-navy .stat-val{color:var(--navy);}
+        .sc{background:var(--card);border-radius:12px;padding:18px 20px;border:1px solid var(--border);}
+        .sc-lbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
+        .sc-val{font-size:38px;font-weight:800;line-height:1;}
+        .green .sc-lbl{color:var(--green);}.green .sc-val{color:var(--green);}
+        .orange .sc-lbl{color:var(--orange);}.orange .sc-val{color:var(--orange);}
+        .blue .sc-lbl{color:var(--blue);}.blue .sc-val{color:var(--blue);}
+        .red .sc-lbl{color:var(--red);}.red .sc-val{color:var(--red);}
+        .navy .sc-lbl{color:var(--muted);}.navy .sc-val{color:var(--navy);}
 
         /* Action bar */
-        .action-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
-        .btn-action{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer;border:none;font-family:inherit;}
-        .btn-primary{background:var(--navy);color:#fff;}
-        .btn-primary:hover{background:var(--navy2);}
+        .action-bar{margin-bottom:20px;}
+        .btn-action{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:var(--navy);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;}
+        .btn-action:hover{background:var(--navy2);}
 
         /* Section */
         .section{background:var(--card);border-radius:14px;border:1px solid var(--border);margin-bottom:20px;overflow:hidden;}
@@ -60,51 +59,80 @@
         .sb-navy{background:var(--bg);color:var(--navy);}
 
         /* Tabs */
-        .tabs{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 20px;background:#FAFBFC;}
-        .tab-btn{padding:10px 18px;font-size:13px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;margin-bottom:-1px;}
+        .tabs{display:flex;border-bottom:1px solid var(--border);padding:0 20px;background:#FAFBFC;overflow-x:auto;}
+        .tab-btn{padding:10px 16px;font-size:13px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2.5px solid transparent;font-family:inherit;margin-bottom:-1px;white-space:nowrap;}
         .tab-btn.active{color:var(--navy);border-bottom-color:var(--navy);}
 
         /* Fluid cards (Neuves) */
-        .fluid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;padding:20px;}
-        .fluid-card{border:1.5px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;transition:box-shadow .15s,border-color .15s;user-select:none;}
-        .fluid-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.09);}
+        .fluid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:14px;padding:20px;}
+        .fluid-card{border:1.5px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:box-shadow .15s;}
+        .fluid-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.09);}
         .fluid-card.open{border-color:var(--navy);}
-        .fluid-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
-        .fluid-name{font-size:19px;font-weight:800;color:var(--navy);}
-        .fluid-arrow{font-size:14px;color:var(--muted);transition:transform .2s;}
-        .fluid-card.open .fluid-arrow{transform:rotate(180deg);}
-        .fluid-qty{font-size:32px;font-weight:800;color:var(--green);line-height:1;}
-        .fluid-qty-unit{font-size:14px;font-weight:600;color:var(--green);}
-        .fluid-meta{font-size:12px;color:var(--muted);margin-top:6px;}
-        .meta-sortie{color:var(--orange);font-weight:600;}
-        .meta-zero{color:var(--red);font-weight:600;}
-        .fluid-detail{margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:none;}
+        .fluid-hdr{display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;}
+        .fluid-name{font-size:18px;font-weight:800;color:var(--navy);}
+        .fluid-arr{font-size:13px;color:var(--muted);transition:transform .2s;}
+        .fluid-card.open .fluid-arr{transform:rotate(180deg);}
+        .fluid-qty{font-size:30px;font-weight:800;color:var(--green);line-height:1;}
+        .fluid-unit{font-size:13px;font-weight:600;color:var(--green);}
+        .fluid-meta{font-size:12px;color:var(--muted);margin-top:5px;}
+        .m-sortie{color:var(--orange);font-weight:600;}
+        .m-zero{color:var(--red);font-weight:600;}
+        .fluid-detail{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:none;}
         .fluid-card.open .fluid-detail{display:block;}
-        .detail-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;gap:8px;}
-        .detail-row:last-child{border-bottom:none;}
-        .detail-id{font-weight:700;color:var(--navy);}
-        .detail-qty{font-weight:600;color:var(--green);}
-        .empty-fluid{text-align:center;color:var(--muted);font-size:12px;padding:12px 0;font-style:italic;}
+        .drow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;gap:6px;}
+        .drow:last-child{border-bottom:none;}
+        .d-id{font-weight:700;color:var(--navy);}
+        .d-qty{font-weight:700;color:var(--green);}
+        .d-qty.muted{color:var(--muted);}
+        .empty-fl{font-size:12px;color:var(--muted);font-style:italic;text-align:center;padding:10px 0;}
 
-        /* Status pills */
-        .pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;}
+        /* Pills */
+        .pill{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;}
         .pill-stock,.pill-disponible{background:var(--green-bg);color:var(--green);}
-        .pill-sortie,.pill-en.sortie{background:var(--orange-bg);color:var(--orange);}
+        .pill-sortie,.pill-en-sortie{background:var(--orange-bg);color:var(--orange);}
         .pill-attendu{background:var(--blue-bg);color:var(--blue);}
 
-        /* Récup table */
+        /* Récup/Transfert table + section headers */
+        .sub-section{margin:0;}
+        .sub-hdr{display:flex;align-items:center;gap:10px;padding:12px 20px 8px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+        .sub-hdr.rec{color:var(--red);}
+        .sub-hdr.transf{color:var(--blue);}
+        .sub-divider{height:1px;background:var(--border);margin:0 20px 0;}
+
+        /* Tables */
         .table-wrap{overflow-x:auto;}
         table{width:100%;border-collapse:collapse;font-size:13px;}
         th{text-align:left;padding:10px 16px;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap;}
-        td{padding:11px 16px;border-bottom:1px solid var(--border);vertical-align:middle;}
+        td{padding:10px 16px;border-bottom:1px solid var(--border);vertical-align:middle;}
         tr:last-child td{border-bottom:none;}
         .qty-bar-wrap{display:flex;align-items:center;gap:8px;}
-        .qty-bar{background:#DDE3EA;border-radius:4px;height:8px;flex:1;max-width:80px;overflow:hidden;}
-        .qty-fill{height:100%;background:var(--orange);border-radius:4px;}
+        .qty-bar{background:#DDE3EA;border-radius:4px;height:7px;flex:1;max-width:70px;overflow:hidden;}
+        .qty-fill-rec{height:100%;background:var(--orange);border-radius:4px;}
+        .qty-fill-transf{height:100%;background:var(--blue);border-radius:4px;}
         .qty-val{font-weight:700;font-size:13px;white-space:nowrap;}
         .qty-green{color:var(--green);}
         .qty-muted{color:var(--muted);}
         .tot-row td{background:var(--bg);font-weight:700;}
+
+        /* Historique */
+        .hist-controls{padding:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--border);}
+        .hist-select{flex:1;min-width:200px;max-width:380px;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:var(--card);-webkit-appearance:none;}
+        .hist-select:focus{outline:none;border-color:var(--navy);}
+        .btn-load{padding:10px 20px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+        .btn-load:hover{background:var(--navy2);}
+        .hist-content{padding:0;}
+        .hist-empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:13px;font-style:italic;}
+        .hist-bottle-info{display:flex;gap:14px;flex-wrap:wrap;padding:14px 20px;background:#FAFBFC;border-bottom:1px solid var(--border);}
+        .hist-info-item{font-size:13px;} .hist-info-item strong{color:var(--navy);margin-right:4px;}
+        .action-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;}
+        .ab-reception{background:var(--blue-bg);color:var(--blue);}
+        .ab-sortie{background:var(--orange-bg);color:var(--orange);}
+        .ab-retour{background:var(--green-bg);color:var(--green);}
+        .ab-retour_fournisseur{background:var(--red-bg);color:var(--red);}
+
+        /* En sortie */
+        .dur-warn{color:var(--red);font-weight:700;}
+        tr.row-warn td{background:var(--red-bg);}
 
         /* Alert items */
         .alert-item{display:flex;align-items:flex-start;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);font-size:13px;}
@@ -112,15 +140,7 @@
         .alert-item.warn{background:var(--amber-bg);}
         .alert-id{font-weight:700;min-width:110px;}
         .empty-msg{padding:20px;color:var(--muted);font-size:13px;font-style:italic;text-align:center;}
-
-        /* En sortie table */
-        .dur-warn{color:var(--red);font-weight:700;}
-        tr.row-warn td{background:var(--red-bg);}
-
-        /* Footer */
         .footer{text-align:center;padding:20px;font-size:11px;color:var(--muted);}
-
-        /* Loading */
         .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;color:var(--muted);}
         .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;}
         @keyframes spin{to{transform:rotate(360deg);}}
@@ -128,8 +148,8 @@
         @media(max-width:600px){
             .header{padding:14px 16px;}
             .content{padding:16px 12px;}
-            .fluid-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:14px;}
-            .stat-val{font-size:28px;}
+            .sc-val{font-size:28px;}
+            .fluid-grid{padding:14px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
         }
     </style>
 </head>
@@ -142,7 +162,7 @@
     </div>
     <div class="header-right">
         <span id="last-update">—</span>
-        <button class="btn-header" onclick="loadData()">⟳ Actualiser</button>
+        <button class="btn-h" onclick="loadData()">⟳ Actualiser</button>
     </div>
 </div>
 
@@ -155,30 +175,30 @@
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYoKD0FWNrQ87sbAMn3yLcE-Qej37VYDVwECZFAg65rtA5UdiWzjJMpYn1p-AccUYVnQ/exec';
 
-// ─ State ─────────────────────────────────────────────
 let CURRENT_TAB = 'neuf';
+let DASH_DATA   = null;
 
-// ─ Load ──────────────────────────────────────────────
+// ─ Load dashboard ─────────────────────────────────────
 async function loadData() {
     document.getElementById('last-update').textContent = 'Chargement…';
     try {
         const r = await fetch(`${SCRIPT_URL}?action=getDashboard`);
-        const d = await r.json();
-        if (d.error) throw new Error(d.error);
-        render(d);
-        document.getElementById('last-update').textContent = 'Mis à jour : ' + d.updatedAt;
+        DASH_DATA = await r.json();
+        if (DASH_DATA.error) throw new Error(DASH_DATA.error);
+        render(DASH_DATA);
+        document.getElementById('last-update').textContent = 'Mis à jour : ' + DASH_DATA.updatedAt;
     } catch(err) {
         document.getElementById('content').innerHTML =
-            `<div class="loading"><div>❌ Erreur<br><small>${err.message}</small></div></div>`;
+            `<div class="loading">❌ ${err.message}</div>`;
         document.getElementById('last-update').textContent = 'Erreur';
     }
 }
 
-// ─ Main render ───────────────────────────────────────
+// ─ Main render ────────────────────────────────────────
 function render(d) {
     const bs = d.stock?.byStatut || {};
-    const nbStock  = (bs['Stock']||0) + (bs['Disponible']||0);
-    const nbSortie = (bs['Sortie']||0) + (bs['En sortie']||0);
+    const nbStock   = (bs['Stock']||0)+(bs['Disponible']||0);
+    const nbSortie  = (bs['Sortie']||0)+(bs['En sortie']||0);
     const nbAttendu = bs['Attendu']||0;
     const nbAlertes = (d.alertes||[]).length;
 
@@ -186,40 +206,50 @@ function render(d) {
 
     // Stats
     html += `<div class="stats">
-        <div class="stat-card sc-green"><div class="stat-lbl">En stock</div><div class="stat-val">${nbStock}</div></div>
-        <div class="stat-card sc-orange"><div class="stat-lbl">En sortie</div><div class="stat-val">${nbSortie}</div></div>
-        <div class="stat-card sc-blue"><div class="stat-lbl">Attendu</div><div class="stat-val">${nbAttendu}</div></div>
-        <div class="stat-card ${nbAlertes>0?'sc-red':'sc-navy'}"><div class="stat-lbl">⚠️ Alertes</div><div class="stat-val">${nbAlertes}</div></div>
-        <div class="stat-card sc-navy"><div class="stat-lbl">Total parc</div><div class="stat-val">${d.stock?.total||0}</div></div>
+        <div class="sc green"><div class="sc-lbl">En stock</div><div class="sc-val">${nbStock}</div></div>
+        <div class="sc orange"><div class="sc-lbl">En sortie</div><div class="sc-val">${nbSortie}</div></div>
+        <div class="sc blue"><div class="sc-lbl">Attendu</div><div class="sc-val">${nbAttendu}</div></div>
+        <div class="sc ${nbAlertes>0?'red':'navy'}"><div class="sc-lbl">⚠️ Alertes</div><div class="sc-val">${nbAlertes}</div></div>
+        <div class="sc navy"><div class="sc-lbl">Total parc</div><div class="sc-val">${d.stock?.total||0}</div></div>
     </div>`;
 
     // Action bar
     html += `<div class="action-bar">
-        <a href="qr-generator.html" target="_blank" class="btn-action btn-primary">🏷️ Générer les QR codes</a>
+        <a href="qr-generator.html" target="_blank" class="btn-action">🏷️ Générateur QR codes</a>
     </div>`;
 
-    // ── État du Stock ────────────────────────────────
+    // ── État du stock ───────────────────────────────────
     const neufFluides = Object.keys(d.stockNeuf||{}).sort();
-    const recupBtls   = d.stockRecup||[];
+    const recupBtls   = (d.stockRecup||[]).filter(b => b.type==='Récupération');
+    const transfBtls  = (d.stockRecup||[]).filter(b => b.type==='Transfert');
+
     html += `<div class="section">
         <div class="section-header">
             <span>📦</span>
             <span class="section-title">État du Stock</span>
-            <span class="s-badge sb-navy" style="margin-left:auto">Fluides : ${neufFluides.length} · Récup/Transf : ${recupBtls.length}</span>
         </div>
         <div class="tabs">
-            <button class="tab-btn ${CURRENT_TAB==='neuf'?'active':''}" onclick="switchTab('neuf')">🔵 Fluides neufs (${neufFluides.length})</button>
-            <button class="tab-btn ${CURRENT_TAB==='recup'?'active':''}" onclick="switchTab('recup')">🔄 Récupération / Transfert (${recupBtls.length})</button>
+            <button class="tab-btn ${CURRENT_TAB==='neuf'?'active':''}" onclick="switchTab('neuf')">
+                🟢 Fluides neufs (${neufFluides.length})
+            </button>
+            <button class="tab-btn ${CURRENT_TAB==='rec'?'active':''}" onclick="switchTab('rec')">
+                🔴 Récupération (${recupBtls.length})
+            </button>
+            <button class="tab-btn ${CURRENT_TAB==='transf'?'active':''}" onclick="switchTab('transf')">
+                🔵 Transfert (${transfBtls.length})
+            </button>
+            <button class="tab-btn ${CURRENT_TAB==='hist'?'active':''}" onclick="switchTab('hist')">
+                📋 Historique
+            </button>
         </div>
-        <div id="panel-neuf" style="display:${CURRENT_TAB==='neuf'?'block':'none'}">
-            ${renderNeuves(d.stockNeuf||{})}
-        </div>
-        <div id="panel-recup" style="display:${CURRENT_TAB==='recup'?'block':'none'}">
-            ${renderRecup(recupBtls)}
-        </div>
+
+        <div id="p-neuf"   style="display:${CURRENT_TAB==='neuf'?'block':'none'}">${renderNeuves(d.stockNeuf||{})}</div>
+        <div id="p-rec"    style="display:${CURRENT_TAB==='rec'?'block':'none'}">${renderRecupTable(recupBtls,'rec')}</div>
+        <div id="p-transf" style="display:${CURRENT_TAB==='transf'?'block':'none'}">${renderRecupTable(transfBtls,'transf')}</div>
+        <div id="p-hist"   style="display:${CURRENT_TAB==='hist'?'block':'none'}">${renderHistPanel(d.allBottles||[])}</div>
     </div>`;
 
-    // ── Alertes ──────────────────────────────────────
+    // ── Alertes ─────────────────────────────────────────
     const alertes = d.alertes||[];
     html += `<div class="section">
         <div class="section-header">
@@ -227,36 +257,37 @@ function render(d) {
             ${alertes.length?`<span class="s-badge sb-red">${alertes.length}</span>`:''}
         </div>`;
     if (!alertes.length) {
-        html += `<div class="empty-msg">✅ Aucune alerte — tout est nominal.</div>`;
+        html += `<div class="empty-msg">✅ Aucune alerte.</div>`;
     } else {
         alertes.forEach(a => {
             html += `<div class="alert-item warn">⚠️
                 <span class="alert-id">${a.id}</span>
-                <span>${a.fluide}</span>
+                <span style="margin-right:8px">${a.fluide}</span>
                 <span style="color:var(--muted)">${a.message}</span>
             </div>`;
         });
     }
     html += `</div>`;
 
-    // ── En sortie ────────────────────────────────────
+    // ── En sortie ───────────────────────────────────────
     const enSortie = d.enSortie||[];
     html += `<div class="section">
         <div class="section-header">
             <span>↗</span><span class="section-title">Bouteilles en sortie</span>
             <span class="s-badge sb-orange">${enSortie.length}</span>
-            <span style="font-size:11px;color:var(--muted);margin-left:auto">Alerte si > ${d.thresholds?.seuilSortieJours||30} j</span>
+            <span style="font-size:11px;color:var(--muted);margin-left:auto">Alerte > ${d.thresholds?.seuilSortieJours||30} j</span>
         </div>`;
     if (!enSortie.length) {
-        html += `<div class="empty-msg">Aucune bouteille en sortie actuellement.</div>`;
+        html += `<div class="empty-msg">Aucune bouteille en sortie.</div>`;
     } else {
         html += `<div class="table-wrap"><table>
-            <thead><tr><th>N° Bouteille</th><th>Fluide</th><th>Type</th><th>Technicien</th><th>Affaire</th><th>Date sortie</th><th>Durée</th><th>Fluide (kg)</th></tr></thead><tbody>`;
+            <thead><tr><th>Bouteille</th><th>Fluide</th><th>Technicien</th><th>Affaire</th><th>Date sortie</th><th>Durée</th><th>Fluide (kg)</th></tr></thead><tbody>`;
         enSortie.forEach(b => {
-            const cls = b.alerte ? ' class="row-warn"' : '';
+            const cls = b.alerte?' class="row-warn"':'';
             html += `<tr${cls}>
-                <td><strong>${b.id}</strong></td><td>${b.fluide}</td><td>${b.type}</td>
-                <td>${b.technicien||'—'}</td><td>${b.affaire||'—'}</td><td>${b.dateSortie}</td>
+                <td><strong>${b.id}</strong></td><td>${b.fluide}</td>
+                <td>${b.technicien||'—'}</td><td>${b.affaire||'—'}</td>
+                <td>${b.dateSortie}</td>
                 <td class="${b.alerte?'dur-warn':''}">${b.dureeJours!=null?b.dureeJours+'j':'—'}${b.alerte?' ⚠️':''}</td>
                 <td>${b.fluideCharge} kg</td>
             </tr>`;
@@ -265,7 +296,7 @@ function render(d) {
     }
     html += `</div>`;
 
-    // ── F-Gaz ────────────────────────────────────────
+    // ── F-Gaz ───────────────────────────────────────────
     const fgazFluides = Object.keys(d.fgaz||{}).sort();
     html += `<div class="section">
         <div class="section-header">
@@ -278,7 +309,7 @@ function render(d) {
         let ts=0,tc=0;
         html += `<div class="table-wrap"><table><thead><tr><th>Fluide</th><th>Nb sorties</th><th>Consommation calculée (kg)</th></tr></thead><tbody>`;
         fgazFluides.forEach(f => {
-            const fg = d.fgaz[f]; ts+=fg.sorties; tc+=fg.conso;
+            const fg=d.fgaz[f]; ts+=fg.sorties; tc+=fg.conso;
             html += `<tr><td><strong>${f}</strong></td><td>${fg.sorties}</td><td>${fg.conso.toFixed(3)} kg</td></tr>`;
         });
         html += `</tbody><tfoot><tr class="tot-row"><td>TOTAL</td><td>${ts}</td><td>${tc.toFixed(3)} kg</td></tr></tfoot></table></div>
@@ -289,102 +320,155 @@ function render(d) {
     document.getElementById('content').innerHTML = html;
 }
 
-// ─ Neuves fluid cards ────────────────────────────────
+// ─ Neuves cards ───────────────────────────────────────
 function renderNeuves(stockNeuf) {
     const fluides = Object.keys(stockNeuf).sort();
-    if (!fluides.length) return `<div class="empty-msg">Aucune bouteille neuve enregistrée.</div>`;
-
+    if (!fluides.length) return `<div class="empty-msg">Aucune bouteille neuve.</div>`;
     let html = `<div class="fluid-grid">`;
-    fluides.forEach(fluide => {
-        const data = stockNeuf[fluide];
-        const nbSortie = (data.bottles||[]).filter(b => b.statut==='Sortie'||b.statut==='En sortie').length;
-        const nbStock  = data.nb;
-        const total    = typeof data.totalKg === 'number' ? data.totalKg.toFixed(2) : '—';
-
-        const metaLine = nbStock
-            ? `${nbStock} bouteille${nbStock>1?'s':''} disponible${nbStock>1?'s':''}`
-            : `<span class="meta-zero">0 disponible</span>`;
-        const metaSortie = nbSortie ? `<span class="meta-sortie"> · ${nbSortie} en sortie</span>` : '';
-
+    fluides.forEach(f => {
+        const data    = stockNeuf[f];
+        const nbSort  = (data.bottles||[]).filter(b=>b.statut==='Sortie'||b.statut==='En sortie').length;
+        const nbStock = data.nb;
+        const total   = typeof data.totalKg==='number' ? data.totalKg.toFixed(2) : '—';
+        const metaSortie = nbSort ? `<span class="m-sortie"> · ${nbSort} en sortie</span>` : '';
         const detailRows = (data.bottles||[]).map(b => {
             const pillCls = b.statut==='Stock'||b.statut==='Disponible' ? 'pill-stock'
-                          : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie'
-                          : 'pill-attendu';
-            const qtyCls  = b.statut==='Sortie'||b.statut==='En sortie' ? 'qty-muted' : 'detail-qty';
-            return `<div class="detail-row">
-                <span class="detail-id">${b.id}</span>
-                <span class="${qtyCls}">${b.quantite} kg</span>
+                          : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie' : 'pill-attendu';
+            const qtyCls  = b.statut==='Sortie'||b.statut==='En sortie' ? 'muted' : '';
+            return `<div class="drow">
+                <span class="d-id">${b.id}</span>
+                <span class="d-qty ${qtyCls}">${b.quantite} kg</span>
                 <span class="pill ${pillCls}">${b.statut}</span>
             </div>`;
         }).join('');
-
-        html += `<div class="fluid-card" id="fc-${fluide}" onclick="toggleFluid('${fluide}')">
-            <div class="fluid-header">
-                <span class="fluid-name">${fluide}</span>
-                <span class="fluid-arrow">▾</span>
-            </div>
-            <div class="fluid-qty">${nbStock>0?total:'0.00'} <span class="fluid-qty-unit">kg</span></div>
-            <div class="fluid-meta">${metaLine}${metaSortie}</div>
-            <div class="fluid-detail">${detailRows||`<div class="empty-fluid">Aucune bouteille</div>`}</div>
+        html += `<div class="fluid-card" id="fc-${f}" onclick="toggleFluid('${f}')">
+            <div class="fluid-hdr"><span class="fluid-name">${f}</span><span class="fluid-arr">▾</span></div>
+            <div class="fluid-qty">${nbStock>0?total:'0'} <span class="fluid-unit">kg</span></div>
+            <div class="fluid-meta">${nbStock} dispo${metaSortie}</div>
+            <div class="fluid-detail">${detailRows||`<div class="empty-fl">Aucune bouteille</div>`}</div>
         </div>`;
     });
-    html += `</div>`;
-    return html;
+    return html + `</div>`;
 }
 
-function toggleFluid(fluide) {
-    document.getElementById('fc-'+fluide).classList.toggle('open');
-}
+function toggleFluid(f) { document.getElementById('fc-'+f)?.classList.toggle('open'); }
 
-// ─ Récup / Transfert table ───────────────────────────
-function renderRecup(btls) {
-    if (!btls.length) return `<div class="empty-msg">Aucune bouteille de récupération ou transfert.</div>`;
-
+// ─ Récup / Transfert table ────────────────────────────
+function renderRecupTable(btls, kind) {
+    if (!btls.length) return `<div class="empty-msg">Aucune bouteille de ce type.</div>`;
+    const fillCls = kind==='rec' ? 'qty-fill-rec' : 'qty-fill-transf';
     let html = `<div class="table-wrap"><table>
-        <thead><tr>
-            <th>N° Bouteille</th><th>Fluide</th><th>Type</th><th>Statut</th>
-            <th>Fluide actuel</th><th>Place disponible</th><th>Capacité max</th>
-        </tr></thead><tbody>`;
-
+        <thead><tr><th>N° Bouteille</th><th>Fluide</th><th>Statut</th><th>Fluide actuel</th><th>Place disponible</th><th>Capacité max</th></tr></thead><tbody>`;
     btls.forEach(b => {
         const statCls = b.statut==='Stock'||b.statut==='Disponible' ? 'pill-stock'
-                      : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie'
-                      : 'pill-attendu';
-
+                      : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie' : 'pill-attendu';
         let placeHtml = '—';
-        if (b.placeDisponible !== null && b.statut !== 'Sortie' && b.statut !== 'En sortie') {
-            const capMax = parseFloat(b.capaciteMax)||0;
-            const place  = parseFloat(b.placeDisponible)||0;
-            const pct    = capMax>0 ? Math.min(100,(place/capMax)*100).toFixed(0) : 0;
-            placeHtml = `<div class="qty-bar-wrap">
-                <div class="qty-bar"><div class="qty-fill" style="width:${100-pct}%"></div></div>
+        if (b.placeDisponible!==null && b.statut!=='Sortie' && b.statut!=='En sortie') {
+            const cap  = parseFloat(b.capaciteMax)||0;
+            const place= parseFloat(b.placeDisponible)||0;
+            const pct  = cap>0 ? Math.min(100,(place/cap)*100).toFixed(0) : 0;
+            placeHtml  = `<div class="qty-bar-wrap">
+                <div class="qty-bar"><div class="${fillCls}" style="width:${100-pct}%"></div></div>
                 <span class="qty-val qty-green">${b.placeDisponible} kg</span>
             </div>`;
         } else if (b.statut==='Sortie'||b.statut==='En sortie') {
-            placeHtml = `<span style="color:var(--muted);font-size:12px">En sortie (${b.technicien||'—'})</span>`;
+            placeHtml = `<span style="font-size:12px;color:var(--muted)">En sortie (${b.technicien||'—'})</span>`;
         }
-
         html += `<tr>
-            <td><strong>${b.id}</strong></td>
-            <td>${b.fluide}</td>
-            <td>${b.type}</td>
+            <td><strong>${b.id}</strong></td><td>${b.fluide}</td>
             <td><span class="pill ${statCls}">${b.statut}</span></td>
-            <td>${b.statut!=='Sortie'&&b.statut!=='En sortie' ? b.fluideActuel+' kg' : '—'}</td>
+            <td>${b.statut!=='Sortie'&&b.statut!=='En sortie'?b.fluideActuel+' kg':'—'}</td>
             <td>${placeHtml}</td>
-            <td>${b.capaciteMax ? b.capaciteMax+' kg' : '—'}</td>
+            <td>${b.capaciteMax?b.capaciteMax+' kg':'—'}</td>
         </tr>`;
     });
-
-    html += `</tbody></table></div>`;
-    return html;
+    return html + `</tbody></table></div>`;
 }
 
-// ─ Tab switch ────────────────────────────────────────
+// ─ Historique panel ───────────────────────────────────
+function renderHistPanel(allBottles) {
+    const opts = [...allBottles]
+        .sort((a,b) => a.id.localeCompare(b.id, 'fr', {numeric:true}))
+        .map(b => `<option value="${b.id}">${b.id} — ${b.fluide} ${b.type}</option>`)
+        .join('');
+    return `
+        <div class="hist-controls">
+            <select class="hist-select" id="hist-select">
+                <option value="">— Sélectionner une bouteille —</option>
+                ${opts}
+            </select>
+            <button class="btn-load" onclick="loadHistory()">Afficher</button>
+        </div>
+        <div class="hist-content" id="hist-content">
+            <div class="hist-empty">Sélectionnez une bouteille pour voir ses mouvements.</div>
+        </div>`;
+}
+
+async function loadHistory() {
+    const id = document.getElementById('hist-select')?.value;
+    if (!id) return;
+    const el = document.getElementById('hist-content');
+    el.innerHTML = `<div class="hist-empty"><div class="spinner" style="margin:0 auto 8px"></div>Chargement…</div>`;
+    try {
+        const r = await fetch(`${SCRIPT_URL}?action=getBottleHistory&id=${encodeURIComponent(id)}`);
+        const d = await r.json();
+        if (d.error) throw new Error(d.error);
+        renderHistory(d, el);
+    } catch(err) {
+        el.innerHTML = `<div class="hist-empty">❌ ${err.message}</div>`;
+    }
+}
+
+function renderHistory(d, el) {
+    const b = d.bottle || {};
+    const statCls = b.statut==='Stock'||b.statut==='Disponible' ? 'pill-stock'
+                  : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie' : 'pill-attendu';
+
+    let html = `<div class="hist-bottle-info">
+        <span class="hist-info-item"><strong>${b.id}</strong></span>
+        <span class="hist-info-item"><strong>Fluide :</strong>${b.fluide}</span>
+        <span class="hist-info-item"><strong>Type :</strong>${b.type}</span>
+        <span class="hist-info-item"><strong>Tare :</strong>${b.tare} kg</span>
+        ${b.dernierPoids?`<span class="hist-info-item"><strong>Dernier poids :</strong>${b.dernierPoids} kg</span>`:''}
+        <span class="hist-info-item"><span class="pill ${statCls}">${b.statut}</span></span>
+    </div>`;
+
+    const mvts = d.mouvements || [];
+    if (!mvts.length) {
+        html += `<div class="hist-empty">Aucun mouvement enregistré pour cette bouteille.</div>`;
+    } else {
+        const actionLabel = {
+            réception:'Réception', sortie:'Sortie',
+            retour:'Retour', retour_fournisseur:'Retour fournisseur',
+        };
+        html += `<div class="table-wrap"><table>
+            <thead><tr><th>Date</th><th>Action</th><th>Venant de</th><th>Vers</th><th>Gestionnaire</th><th>Poids (kg)</th><th>Conso (kg)</th><th>Affaire</th></tr></thead><tbody>`;
+        mvts.forEach(m => {
+            const aCls = `ab-${m.action}`;
+            const lbl  = actionLabel[m.action] || m.action;
+            html += `<tr>
+                <td style="white-space:nowrap">${m.date}</td>
+                <td><span class="action-badge ${aCls}">${lbl}</span></td>
+                <td>${m.venantDe}</td><td>${m.vers}</td>
+                <td>${m.gestionnaire}</td>
+                <td>${m.poids}</td>
+                <td>${m.conso||'—'}</td>
+                <td>${m.affaire||'—'}</td>
+            </tr>`;
+        });
+        html += `</tbody></table></div>`;
+    }
+    el.innerHTML = html;
+}
+
+// ─ Tab switch ─────────────────────────────────────────
 function switchTab(tab) {
     CURRENT_TAB = tab;
-    document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', ['neuf','recup'][i]===tab));
-    document.getElementById('panel-neuf').style.display  = tab==='neuf'  ? 'block' : 'none';
-    document.getElementById('panel-recup').style.display = tab==='recup' ? 'block' : 'none';
+    ['neuf','rec','transf','hist'].forEach(t => {
+        document.querySelector(`.tab-btn:nth-child(${['neuf','rec','transf','hist'].indexOf(t)+1})`)?.classList.toggle('active', t===tab);
+        const p = document.getElementById('p-'+t);
+        if (p) p.style.display = t===tab ? 'block' : 'none';
+    });
 }
 
 loadData();
