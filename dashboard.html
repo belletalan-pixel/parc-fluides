@@ -306,14 +306,39 @@ function render(d) {
     if (!fgazFluides.length) {
         html += `<div class="empty-msg">Aucun mouvement en ${d.annee}.</div>`;
     } else {
-        let ts=0,tc=0;
-        html += `<div class="table-wrap"><table><thead><tr><th>Fluide</th><th>Nb sorties</th><th>Consommation calculée (kg)</th></tr></thead><tbody>`;
+        let tCharge=0, tRecup=0, tTransf=0;
+        html += `<div class="table-wrap"><table>
+            <thead><tr>
+                <th>Fluide</th>
+                <th style="color:var(--green)">🟢 Chargé chez client (kg)</th>
+                <th style="color:var(--orange)">🟠 Récupéré (kg)</th>
+                <th style="color:var(--blue)">🔵 Transféré (kg)</th>
+            </tr></thead><tbody>`;
         fgazFluides.forEach(f => {
-            const fg=d.fgaz[f]; ts+=fg.sorties; tc+=fg.conso;
-            html += `<tr><td><strong>${f}</strong></td><td>${fg.sorties}</td><td>${fg.conso.toFixed(3)} kg</td></tr>`;
+            const fg = d.fgaz[f];
+            const charge    = (fg.charge    || 0);
+            const recupere  = (fg.recupere  || 0);
+            const transfere = (fg.transfere || 0);
+            tCharge += charge; tRecup += recupere; tTransf += transfere;
+            html += `<tr>
+                <td><strong>${f}</strong></td>
+                <td>${charge    > 0 ? charge.toFixed(3)    + ' kg' : '—'}</td>
+                <td>${recupere  > 0 ? recupere.toFixed(3)  + ' kg' : '—'}</td>
+                <td>${transfere > 0 ? transfere.toFixed(3) + ' kg' : '—'}</td>
+            </tr>`;
         });
-        html += `</tbody><tfoot><tr class="tot-row"><td>TOTAL</td><td>${ts}</td><td>${tc.toFixed(3)} kg</td></tr></tfoot></table></div>
-        <div style="padding:10px 20px;font-size:11px;color:var(--muted);font-style:italic">Données indicatives · Source officielle : portail Fluido Apave.</div>`;
+        html += `</tbody><tfoot><tr class="tot-row">
+            <td>TOTAL</td>
+            <td>${tCharge.toFixed(3)} kg</td>
+            <td>${tRecup.toFixed(3)} kg</td>
+            <td>${tTransf.toFixed(3)} kg</td>
+        </tr></tfoot></table></div>
+        <div style="padding:10px 20px;font-size:11px;color:var(--muted);font-style:italic">
+            Chargé : fluide neuf injecté chez le client &nbsp;·&nbsp;
+            Récupéré : fluide tiré d'un équipement &nbsp;·&nbsp;
+            Transféré : résiduel en bouteille Transfert &nbsp;·&nbsp;
+            Source officielle : portail Fluido Apave.
+        </div>`;
     }
     html += `</div>`;
 
