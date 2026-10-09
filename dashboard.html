@@ -79,10 +79,10 @@
         .m-zero{color:var(--red);font-weight:600;}
         .fluid-detail{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:none;}
         .fluid-card.open .fluid-detail{display:block;}
-        .drow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;gap:6px;}
+        .drow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;gap:6px;min-height:24px;}
         .drow:last-child{border-bottom:none;}
-        .d-id{font-weight:700;color:var(--navy);}
-        .d-qty{font-weight:700;color:var(--green);}
+        .d-id{font-weight:700;color:var(--navy);white-space:nowrap;}
+        .d-qty{font-weight:700;color:var(--green);white-space:nowrap;}
         .d-qty.muted{color:var(--muted);}
         .empty-fl{font-size:12px;color:var(--muted);font-style:italic;text-align:center;padding:10px 0;}
 
@@ -383,6 +383,14 @@ function renderRecupTable(btls, kind) {
     if (!btls.length) return `<div class="empty-msg">Aucune bouteille de ce type.</div>`;
     const fillCls = kind==='rec' ? 'qty-fill-rec' : 'qty-fill-transf';
     let html = `<div class="table-wrap"><table>
+        <colgroup>
+            <col style="width:110px;min-width:110px">
+            <col style="width:80px;min-width:80px">
+            <col style="width:90px;min-width:90px">
+            <col style="width:110px;min-width:110px">
+            <col style="min-width:160px">
+            <col style="width:110px;min-width:110px">
+        </colgroup>
         <thead><tr><th>N° Bouteille</th><th>Fluide</th><th>Statut</th><th>Fluide actuel</th><th>Place disponible</th><th>Capacité max</th></tr></thead><tbody>`;
     btls.forEach(b => {
         const statCls = b.statut==='Stock'||b.statut==='Disponible' ? 'pill-stock'
@@ -400,11 +408,12 @@ function renderRecupTable(btls, kind) {
             placeHtml = `<span style="font-size:12px;color:var(--muted)">En sortie (${b.technicien||'—'})</span>`;
         }
         html += `<tr>
-            <td><strong>${b.id}</strong></td><td>${b.fluide}</td>
+            <td style="white-space:nowrap"><strong>${b.id}</strong></td>
+            <td style="white-space:nowrap">${b.fluide||'—'}</td>
             <td><span class="pill ${statCls}">${b.statut}</span></td>
-            <td>${b.statut!=='Sortie'&&b.statut!=='En sortie'?b.fluideActuel+' kg':'—'}</td>
+            <td style="white-space:nowrap">${b.statut!=='Sortie'&&b.statut!=='En sortie'?b.fluideActuel+' kg':'—'}</td>
             <td>${placeHtml}</td>
-            <td>${b.capaciteMax?b.capaciteMax+' kg':'—'}</td>
+            <td style="white-space:nowrap">${b.capaciteMax?b.capaciteMax+' kg':'—'}</td>
         </tr>`;
     });
     return html + `</tbody></table></div>`;
