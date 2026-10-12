@@ -63,6 +63,7 @@
         .pill-stock    { background: var(--green-bg);  color: var(--green); }
         .pill-sortie   { background: var(--orange-bg); color: var(--orange); }
         .pill-neuve    { background: var(--blue-bg);   color: var(--blue); }
+        .pill-reservee { background: #FFFBEB; color: #B45309; }
         .pill-archived { background: var(--grey-bg);   color: var(--grey); }
         .info-grid { margin-top: 16px; }
         .info-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
@@ -408,6 +409,7 @@ const ACTION_LABELS = {
 const STATUS_PILL = {
     'Neuve':                 'pill-neuve',
     'Stock':                 'pill-stock',
+    'Réservée':              'pill-reservee',
     'Sortie':                'pill-sortie',
     'Retourné fournisseur':  'pill-archived',
 };
@@ -533,7 +535,8 @@ async function loadBottle(id) {
             'stock':'Stock',
             'sortie':'Sortie',
             'neuve':'Neuve', 'Neuve':'Neuve',
-            'attendu':'Neuve', 'Attendu':'Neuve',  // ancien nom → Neuve
+            'attendu':'Neuve', 'Attendu':'Neuve',
+            'réservée':'Réservée', 'Réservée':'Réservée',
             'retourné fournisseur':'Retourné fournisseur',
         };
         const statLower = String(data.statut || '').trim().toLowerCase();
@@ -654,6 +657,17 @@ function renderBottle(b) {
     // Action buttons
     const btns = document.getElementById('action-buttons');
     switch(b.statut) {
+        case 'Réservée': {
+            const res = b.reservation || {};
+            const infoBanner = `<div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:13px">
+                🔒 <strong>Bouteille réservée</strong><br>
+                <span style="color:#6B7A8A">Affaire : ${res.affaire||'—'} · Sortie prévue : ${res.datePrevu||'—'} · Par : ${res.gestionnaire||'—'}</span>
+            </div>`;
+            btns.innerHTML = infoBanner + `<div class="action-row one">
+                <button class="action-btn btn-sortie" onclick="startAction('sortie')"><span class="icon">↗</span><span>SORTIE</span></button>
+            </div>`;
+            break;
+        }
         case 'Neuve':   // bouteille neuve en parc → peut être sortie
         case 'Stock':   // bouteille disponible en parc
             btns.innerHTML = `<div class="action-row two">
