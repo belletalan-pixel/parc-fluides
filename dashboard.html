@@ -48,6 +48,37 @@
         .btn-action:hover{background:var(--navy2);}
         .btn-action.secondary{background:var(--green);}
         .btn-action.secondary:hover{opacity:.9;}
+        /* Réservations overlay */
+        .res-overlay{position:fixed;inset:0;background:rgba(13,33,55,.55);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;}
+        .res-panel{background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.25);}
+        .res-panel-header{background:#B45309;color:#fff;padding:16px 20px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;}
+        .res-panel-header h2{font-size:15px;font-weight:800;}
+        .res-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+        .res-body{padding:20px;}
+        /* PIN dans overlay */
+        .res-pin-dots{display:flex;gap:14px;justify-content:center;margin:20px 0 8px;}
+        .res-pin-dot{width:14px;height:14px;border-radius:50%;border:2.5px solid #D2D8DF;background:transparent;transition:all .12s;}
+        .res-pin-dot.filled{background:#B45309;border-color:#B45309;}
+        .res-numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
+        .res-np{background:#EDF0F3;border:1.5px solid #D2D8DF;border-radius:10px;padding:14px 8px;font-size:20px;font-weight:700;cursor:pointer;text-align:center;font-family:inherit;color:#0D2137;}
+        .res-np:active{transform:scale(.94);}
+        .res-np.del{font-size:16px;color:#C0392B;border-color:transparent;background:transparent;}
+        .res-np.empty{opacity:0;pointer-events:none;}
+        .res-pin-err{text-align:center;font-size:12px;color:#C0392B;min-height:16px;margin-bottom:12px;}
+        /* Reservation cards */
+        .res-card{border:1.5px solid #FDE68A;background:#FFFBEB;border-radius:10px;padding:14px;margin-bottom:10px;}
+        .res-card-id{font-size:15px;font-weight:800;color:#0D2137;}
+        .res-card-meta{font-size:12px;color:#6B7A8A;margin-top:4px;}
+        .btn-cancel-res{margin-top:10px;padding:6px 14px;background:#FEF2F2;border:1px solid #FECACA;color:#9B1C1C;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
+        /* Reservation form */
+        .res-form-row{margin-bottom:14px;}
+        .res-form-label{display:block;font-size:11px;font-weight:700;color:#6B7A8A;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
+        .res-form-input,.res-form-select{width:100%;padding:11px 14px;border:1.5px solid #D2D8DF;border-radius:8px;font-size:14px;font-family:inherit;background:#fff;-webkit-appearance:none;}
+        .res-form-input:focus,.res-form-select:focus{outline:none;border-color:#B45309;}
+        .btn-create-res{width:100%;padding:14px;background:#B45309;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:6px;}
+        .btn-create-res:hover{opacity:.9;}
+        .res-section-title{font-size:13px;font-weight:700;color:#0D2137;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid #D2D8DF;}
+
         /* Filtre Récupération */
         .recup-filter-bar{padding:12px 16px;border-bottom:1px solid var(--border);background:#FAFBFC;}
         .recup-filter{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);min-width:220px;-webkit-appearance:none;appearance:none;}
@@ -222,6 +253,7 @@ function render(d) {
     html += `<div class="action-bar">
         <a href="qr-generator.html" target="_blank" class="btn-action">🏷️ Générateur QR codes</a>
         <a href="https://belletalan-pixel.github.io/parc-fluides/" target="_blank" class="btn-action secondary">🧊 Ouvrir l'app</a>
+        <button class="btn-action" style="background:#B45309;border:none;cursor:pointer;font-family:inherit" onclick="openReservations()">📋 Réservations</button>
     </div>`;
 
     // ── État du stock ───────────────────────────────────
@@ -290,10 +322,13 @@ function render(d) {
             <thead><tr><th>Bouteille</th><th>Fluide</th><th>Type</th><th>Technicien</th><th>Affaire</th><th>Date sortie</th><th>Durée</th><th>Fluide (kg)</th></tr></thead><tbody>`;
         enSortie.forEach(b => {
             const cls = b.alerte?' class="row-warn"':'';
-            const typeCode = b.type==='Neuf' ? '<span class="pill pill-neuve">Neuf</span>'
-                           : b.type==='Récupération' ? '<span class="pill" style="background:#FEF2F2;color:#9B1C1C">Récup.</span>'
-                           : b.type==='Transfert'    ? '<span class="pill pill-stock" style="background:var(--blue-bg);color:var(--blue)">Transf.</span>'
-                           : b.type||'—';
+            const typeCode = b.type==='Neuf'
+                ? '<span class="pill pill-stock">Neuf</span>'
+                : b.type==='Récupération'
+                ? '<span class="pill" style="background:#FEF2F2;color:#9B1C1C">Récup.</span>'
+                : b.type==='Transfert'
+                ? '<span class="pill pill-neuve">Transf.</span>'
+                : b.type||'—';
             html += `<tr${cls}>
                 <td style="white-space:nowrap"><strong>${b.id}</strong></td>
                 <td style="white-space:nowrap">${b.fluide||'—'}</td>
@@ -549,6 +584,233 @@ function switchTab(tab) {
 
 loadData();
 setInterval(loadData, 5*60*1000);
+
+// ══════════════════════════════════════════
+//  RÉSERVATIONS — overlay PIN + gestion
+// ══════════════════════════════════════════
+const RES_PIN  = '1858';
+let resPin     = '';
+let resData    = null; // { reservations, availableBottles, gestionnaires }
+
+function openReservations() {
+    resPin = '';
+    // Create overlay if not exists
+    if (!document.getElementById('res-overlay')) buildResOverlay();
+    document.getElementById('res-overlay').style.display = 'flex';
+    document.getElementById('res-pin-phase').style.display = 'block';
+    document.getElementById('res-mgmt-phase').style.display = 'none';
+    updateResPinDots();
+    document.getElementById('res-pin-err').textContent = '';
+}
+
+function buildResOverlay() {
+    const el = document.createElement('div');
+    el.id = 'res-overlay';
+    el.className = 'res-overlay';
+    el.style.display = 'none';
+    el.innerHTML = `
+        <div class="res-panel">
+            <div class="res-panel-header">
+                <h2>📋 Réservations</h2>
+                <button class="res-close" onclick="closeResOverlay()">✕</button>
+            </div>
+            <div class="res-body">
+                <!-- PIN phase -->
+                <div id="res-pin-phase">
+                    <div style="text-align:center;font-size:13px;color:var(--muted);margin-bottom:4px">Saisissez le code d'accès</div>
+                    <div class="res-pin-dots" id="res-pin-dots">
+                        <div class="res-pin-dot" id="rpd1"></div>
+                        <div class="res-pin-dot" id="rpd2"></div>
+                        <div class="res-pin-dot" id="rpd3"></div>
+                        <div class="res-pin-dot" id="rpd4"></div>
+                    </div>
+                    <div class="res-pin-err" id="res-pin-err"></div>
+                    <div class="res-numpad">
+                        <button class="res-np" onclick="pressResPin('1')">1</button>
+                        <button class="res-np" onclick="pressResPin('2')">2</button>
+                        <button class="res-np" onclick="pressResPin('3')">3</button>
+                        <button class="res-np" onclick="pressResPin('4')">4</button>
+                        <button class="res-np" onclick="pressResPin('5')">5</button>
+                        <button class="res-np" onclick="pressResPin('6')">6</button>
+                        <button class="res-np" onclick="pressResPin('7')">7</button>
+                        <button class="res-np" onclick="pressResPin('8')">8</button>
+                        <button class="res-np" onclick="pressResPin('9')">9</button>
+                        <button class="res-np empty" disabled></button>
+                        <button class="res-np" onclick="pressResPin('0')">0</button>
+                        <button class="res-np del" onclick="deleteResPin()">⌫</button>
+                    </div>
+                </div>
+                <!-- Management phase -->
+                <div id="res-mgmt-phase" style="display:none">
+                    <div id="res-mgmt-content">Chargement…</div>
+                </div>
+            </div>
+        </div>`;
+    document.body.appendChild(el);
+}
+
+function closeResOverlay() {
+    const el = document.getElementById('res-overlay');
+    if (el) el.style.display = 'none';
+}
+
+// ── PIN réservations ──────────────────────
+function pressResPin(d) {
+    if (resPin.length >= 4) return;
+    resPin += d;
+    updateResPinDots();
+    document.getElementById('res-pin-err').textContent = '';
+    if (resPin.length === 4) setTimeout(checkResPin, 160);
+}
+function deleteResPin() { resPin = resPin.slice(0,-1); updateResPinDots(); }
+function updateResPinDots() {
+    for (let i=1;i<=4;i++) {
+        const el = document.getElementById('rpd'+i);
+        if (el) el.classList.toggle('filled', i<=resPin.length);
+    }
+}
+function checkResPin() {
+    if (resPin === RES_PIN) {
+        document.getElementById('res-pin-phase').style.display = 'none';
+        document.getElementById('res-mgmt-phase').style.display = 'block';
+        loadResData();
+    } else {
+        const dots = document.getElementById('res-pin-dots');
+        dots.style.animation = 'pshake .4s ease';
+        setTimeout(() => {
+            resPin = ''; updateResPinDots();
+            dots.style.animation = '';
+            document.getElementById('res-pin-err').textContent = 'Code incorrect';
+        }, 420);
+    }
+}
+
+// ── Charger données réservations ──────────
+async function loadResData() {
+    document.getElementById('res-mgmt-content').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div>';
+    try {
+        const r = await fetch(`${SCRIPT_URL}?action=getReservations`);
+        resData = await r.json();
+        if (resData.error) throw new Error(resData.error);
+        renderResMgmt();
+    } catch(err) {
+        document.getElementById('res-mgmt-content').innerHTML = `<div style="color:var(--red);padding:16px">❌ ${err.message}</div>`;
+    }
+}
+
+function renderResMgmt() {
+    const d = resData;
+    const active = d.reservations || [];
+    let html = '';
+
+    // ── Nouvelle réservation ──────────────
+    html += `<div class="res-section-title">Nouvelle réservation</div>
+        <div class="res-form-row">
+            <label class="res-form-label">Bouteille</label>
+            <select class="res-form-select" id="rf-bottle" onchange="onResBottleChange()">
+                <option value="">— Sélectionner —</option>
+                ${(d.availableBottles||[]).map(b=>`<option value="${b.id}" data-fluide="${b.fluide}" data-type="${b.type}">${b.id} — ${b.fluide||'?'} (${b.type})</option>`).join('')}
+            </select>
+        </div>
+        <div class="res-form-row">
+            <label class="res-form-label">N° Affaire</label>
+            <input type="text" class="res-form-input" id="rf-affaire" placeholder="ex : 2025-047" autocomplete="off"/>
+        </div>
+        <div class="res-form-row">
+            <label class="res-form-label">Date de sortie prévue</label>
+            <input type="date" class="res-form-input" id="rf-date"/>
+        </div>
+        <div class="res-form-row">
+            <label class="res-form-label">Gestionnaire</label>
+            <select class="res-form-select" id="rf-gest">
+                <option value="">— Sélectionner —</option>
+                ${(d.gestionnaires||[]).map(g=>`<option value="${g}">${g}</option>`).join('')}
+            </select>
+        </div>
+        <div id="rf-error" style="color:var(--red);font-size:12px;margin-bottom:8px"></div>
+        <button class="btn-create-res" onclick="submitReservation()">✔ Créer la réservation</button>`;
+
+    // ── Réservations actives ──────────────
+    html += `<div class="res-section-title">Réservations actives (${active.length})</div>`;
+    if (!active.length) {
+        html += `<div style="color:var(--muted);font-size:13px;font-style:italic;padding:8px 0">Aucune réservation active.</div>`;
+    } else {
+        active.forEach(res => {
+            html += `<div class="res-card">
+                <div class="res-card-id">${res.bottleId} — ${res.fluide||'?'} (${res.type})</div>
+                <div class="res-card-meta">
+                    📋 Affaire : <strong>${res.affaire}</strong> &nbsp;·&nbsp;
+                    📅 Prévue le : <strong>${res.datePrevu}</strong><br>
+                    👤 ${res.gestionnaire} &nbsp;·&nbsp; Créée le ${res.dateCreation}
+                </div>
+                <button class="btn-cancel-res" onclick="confirmCancelRes('${res.id}','${res.bottleId}')">Annuler la réservation</button>
+            </div>`;
+        });
+    }
+
+    document.getElementById('res-mgmt-content').innerHTML = html;
+}
+
+function onResBottleChange() {
+    // Pré-remplir le fluide (info only)
+}
+
+async function submitReservation() {
+    const bottleEl = document.getElementById('rf-bottle');
+    const bottleId = bottleEl.value;
+    const affaire  = document.getElementById('rf-affaire').value.trim();
+    const date     = document.getElementById('rf-date').value;
+    const gest     = document.getElementById('rf-gest').value;
+    const errEl    = document.getElementById('rf-error');
+
+    if (!bottleId) { errEl.textContent = 'Sélectionnez une bouteille.'; return; }
+    if (!affaire)  { errEl.textContent = 'Saisissez un N° affaire.'; return; }
+    if (!date)     { errEl.textContent = 'Saisissez une date de sortie prévue.'; return; }
+    if (!gest)     { errEl.textContent = 'Sélectionnez un gestionnaire.'; return; }
+    errEl.textContent = '';
+
+    const sel = bottleEl.options[bottleEl.selectedIndex];
+    const payload = {
+        bottleId,
+        fluide:      sel.dataset.fluide || '',
+        type:        sel.dataset.type   || '',
+        affaire,
+        datePrevu:   date,
+        gestionnaire:gest,
+    };
+
+    document.getElementById('res-mgmt-content').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Enregistrement…</div>';
+    try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action', 'createReservation');
+        url.searchParams.set('data', JSON.stringify(payload));
+        const r = await fetch(url.toString());
+        const res = await r.json();
+        if (res.error) throw new Error(res.error);
+        await loadResData(); // Rafraîchir
+        loadData();          // Rafraîchir le dashboard
+    } catch(err) {
+        document.getElementById('rf-error').textContent = '❌ ' + err.message;
+    }
+}
+
+async function confirmCancelRes(resId, bottleId) {
+    if (!confirm(`Annuler la réservation de la bouteille ${bottleId} ?`)) return;
+    document.getElementById('res-mgmt-content').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Annulation…</div>';
+    try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action', 'cancelReservation');
+        url.searchParams.set('id', resId);
+        const r = await fetch(url.toString());
+        const res = await r.json();
+        if (res.error) throw new Error(res.error);
+        await loadResData();
+        loadData();
+    } catch(err) {
+        alert('❌ ' + err.message);
+        await loadResData();
+    }
+}
 </script>
 </body>
 </html>
