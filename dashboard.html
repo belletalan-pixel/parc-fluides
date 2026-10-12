@@ -46,9 +46,14 @@
         .action-bar{margin-bottom:20px;}
         .btn-action{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:var(--navy);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;}
         .btn-action:hover{background:var(--navy2);}
+        .btn-action.secondary{background:var(--green);}
+        .btn-action.secondary:hover{opacity:.9;}
+        /* Filtre Récupération */
+        .recup-filter-bar{padding:12px 16px;border-bottom:1px solid var(--border);background:#FAFBFC;}
+        .recup-filter{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);min-width:220px;-webkit-appearance:none;appearance:none;}
 
         /* Section */
-        .section{background:var(--card);border-radius:14px;border:1px solid var(--border);margin-bottom:20px;overflow:hidden;}
+        .section{background:var(--card);border-radius:14px;border:1px solid var(--border);margin-bottom:20px;}
         .section-header{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--border);background:#FAFBFC;}
         .section-title{font-size:14px;font-weight:700;}
         .s-badge{font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;}
@@ -59,7 +64,7 @@
         .sb-navy{background:var(--bg);color:var(--navy);}
 
         /* Tabs */
-        .tabs{display:flex;border-bottom:1px solid var(--border);padding:0 20px;background:#FAFBFC;overflow-x:auto;}
+        .tabs{display:flex;border-bottom:1px solid var(--border);padding:0 20px;background:#FAFBFC;overflow-x:auto;position:sticky;top:64px;z-index:15;border-radius:0;box-shadow:0 2px 6px rgba(0,0,0,.06);}
         .tab-btn{padding:10px 16px;font-size:13px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2.5px solid transparent;font-family:inherit;margin-bottom:-1px;white-space:nowrap;}
         .tab-btn.active{color:var(--navy);border-bottom-color:var(--navy);}
 
@@ -216,6 +221,7 @@ function render(d) {
     // Action bar
     html += `<div class="action-bar">
         <a href="qr-generator.html" target="_blank" class="btn-action">🏷️ Générateur QR codes</a>
+        <a href="https://belletalan-pixel.github.io/parc-fluides/" target="_blank" class="btn-action secondary">🧊 Ouvrir l'app</a>
     </div>`;
 
     // ── État du stock ───────────────────────────────────
@@ -281,15 +287,21 @@ function render(d) {
         html += `<div class="empty-msg">Aucune bouteille en sortie.</div>`;
     } else {
         html += `<div class="table-wrap"><table>
-            <thead><tr><th>Bouteille</th><th>Fluide</th><th>Technicien</th><th>Affaire</th><th>Date sortie</th><th>Durée</th><th>Fluide (kg)</th></tr></thead><tbody>`;
+            <thead><tr><th>Bouteille</th><th>Fluide</th><th>Type</th><th>Technicien</th><th>Affaire</th><th>Date sortie</th><th>Durée</th><th>Fluide (kg)</th></tr></thead><tbody>`;
         enSortie.forEach(b => {
             const cls = b.alerte?' class="row-warn"':'';
+            const typeCode = b.type==='Neuf' ? '<span class="pill pill-neuve">Neuf</span>'
+                           : b.type==='Récupération' ? '<span class="pill" style="background:#FEF2F2;color:#9B1C1C">Récup.</span>'
+                           : b.type==='Transfert'    ? '<span class="pill pill-stock" style="background:var(--blue-bg);color:var(--blue)">Transf.</span>'
+                           : b.type||'—';
             html += `<tr${cls}>
-                <td><strong>${b.id}</strong></td><td>${b.fluide}</td>
+                <td style="white-space:nowrap"><strong>${b.id}</strong></td>
+                <td style="white-space:nowrap">${b.fluide||'—'}</td>
+                <td>${typeCode}</td>
                 <td>${b.technicien||'—'}</td><td>${b.affaire||'—'}</td>
-                <td>${b.dateSortie}</td>
+                <td style="white-space:nowrap">${b.dateSortie}</td>
                 <td class="${b.alerte?'dur-warn':''}">${b.dureeJours!=null?b.dureeJours+'j':'—'}${b.alerte?' ⚠️':''}</td>
-                <td>${b.fluideCharge} kg</td>
+                <td style="white-space:nowrap">${b.fluideCharge} kg</td>
             </tr>`;
         });
         html += `</tbody></table></div>`;
@@ -381,8 +393,30 @@ function toggleFluid(f) { document.getElementById('fc-'+f)?.classList.toggle('op
 // ─ Récup / Transfert table ────────────────────────────
 function renderRecupTable(btls, kind) {
     if (!btls.length) return `<div class="empty-msg">Aucune bouteille de ce type.</div>`;
-    const fillCls = kind==='rec' ? 'qty-fill-rec' : 'qty-fill-transf';
-    let html = `<div class="table-wrap"><table>
+
+    // Tri : place disponible décroissante (bouteille la plus vide en premier)
+    const sorted = [...btls].sort((a, b) => {
+        const pa = parseFloat(a.placeDisponible) ?? -1;
+        const pb = parseFloat(b.placeDisponible) ?? -1;
+        if (pa < 0 && pb < 0) return 0;
+        if (pa < 0) return 1;
+        if (pb < 0) return -1;
+        return pb - pa;
+    });
+
+    // Fluides uniques pour le filtre
+    const fluides = [...new Set(sorted.map(b=>b.fluide).filter(Boolean))].sort();
+    const fillCls  = kind==='rec' ? 'qty-fill-rec' : 'qty-fill-transf';
+    const filterId = `filter-${kind}`;
+
+    let html = `
+        <div class="recup-filter-bar">
+            <select class="recup-filter" id="${filterId}" onchange="filterRecup('${kind}',this.value)">
+                <option value="">Tous les fluides — triés par place disponible ↓</option>
+                ${fluides.map(f=>`<option value="${f}">${f}</option>`).join('')}
+            </select>
+        </div>
+        <div class="table-wrap"><table>
         <colgroup>
             <col style="width:110px;min-width:110px">
             <col style="width:80px;min-width:80px">
@@ -391,23 +425,24 @@ function renderRecupTable(btls, kind) {
             <col style="min-width:160px">
             <col style="width:110px;min-width:110px">
         </colgroup>
-        <thead><tr><th>N° Bouteille</th><th>Fluide</th><th>Statut</th><th>Fluide actuel</th><th>Place disponible</th><th>Capacité max</th></tr></thead><tbody>`;
-    btls.forEach(b => {
+        <thead><tr><th>N° Bouteille</th><th>Fluide</th><th>Statut</th><th>Fluide actuel</th><th>Place disponible ↓</th><th>Capacité max</th></tr></thead><tbody>`;
+
+    sorted.forEach(b => {
         const statCls = b.statut==='Stock'||b.statut==='Disponible' ? 'pill-stock'
                       : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie' : 'pill-neuve';
         let placeHtml = '—';
         if (b.placeDisponible!==null && b.statut!=='Sortie' && b.statut!=='En sortie') {
-            const cap  = parseFloat(b.capaciteMax)||0;
-            const place= parseFloat(b.placeDisponible)||0;
-            const pct  = cap>0 ? Math.min(100,(place/cap)*100).toFixed(0) : 0;
-            placeHtml  = `<div class="qty-bar-wrap">
+            const cap   = parseFloat(b.capaciteMax)||0;
+            const place = parseFloat(b.placeDisponible)||0;
+            const pct   = cap>0 ? Math.min(100,(place/cap)*100).toFixed(0) : 0;
+            placeHtml   = `<div class="qty-bar-wrap">
                 <div class="qty-bar"><div class="${fillCls}" style="width:${100-pct}%"></div></div>
                 <span class="qty-val qty-green">${b.placeDisponible} kg</span>
             </div>`;
         } else if (b.statut==='Sortie'||b.statut==='En sortie') {
             placeHtml = `<span style="font-size:12px;color:var(--muted)">En sortie (${b.technicien||'—'})</span>`;
         }
-        html += `<tr>
+        html += `<tr data-kind="${kind}" data-fluide="${b.fluide||''}">
             <td style="white-space:nowrap"><strong>${b.id}</strong></td>
             <td style="white-space:nowrap">${b.fluide||'—'}</td>
             <td><span class="pill ${statCls}">${b.statut}</span></td>
@@ -417,6 +452,13 @@ function renderRecupTable(btls, kind) {
         </tr>`;
     });
     return html + `</tbody></table></div>`;
+}
+
+// Filtre client-side par fluide dans l'onglet Récup/Transfert
+function filterRecup(kind, fluide) {
+    document.querySelectorAll(`tr[data-kind="${kind}"]`).forEach(row => {
+        row.style.display = (!fluide || row.dataset.fluide === fluide) ? '' : 'none';
+    });
 }
 
 // ─ Historique panel ───────────────────────────────────
