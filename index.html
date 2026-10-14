@@ -126,6 +126,8 @@
         .pin-hero-tag.retour          { background: var(--green-bg);  color: var(--green); }
         .pin-hero-tag.réception       { background: var(--blue-bg);   color: var(--blue); }
         .pin-hero-tag.retour_fournisseur { background: var(--red-bg);  color: var(--red); }
+        .pin-hero-tag.créer           { background: var(--green-bg);  color: var(--green); }
+        .btn-create-bottle { width:100%;padding:14px;background:var(--green);color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px; }
         .pin-hero-sub { font-size: 12px; color: var(--muted); margin-top: 8px; }
         .pin-dots { display: flex; gap: 18px; justify-content: center; margin: 22px 0 8px; }
         .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2.5px solid var(--border); background: transparent; transition: all 0.12s; }
@@ -238,6 +240,7 @@
         <div id="search-error"></div>
         <button class="btn-primary" style="margin-top:14px" onclick="searchBottle()">Rechercher</button>
     </div>
+    <button class="btn-create-bottle" onclick="openCreate()">➕ Nouvelle bouteille</button>
     <div id="demo-list" style="display:none"></div>
 </div>
 
@@ -340,6 +343,78 @@
     <button class="btn-ghost" onclick="showScreen('s-bottle')">Annuler</button>
 </div>
 
+<!-- Création bouteille -->
+<div id="s-create" class="screen">
+    <div class="card">
+        <div class="form-header">
+            <div class="form-bottle-id" style="font-size:15px">Nouvelle bouteille</div>
+            <span class="form-tag créer">➕ CRÉATION</span>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label">N° de bouteille</label>
+            <input type="text" class="form-input" id="c-id"
+                   placeholder="ex : R410A-01" autocapitalize="characters" autocomplete="off"/>
+            <div class="form-hint">Format : XXXX-XX</div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label">Type de bouteille</label>
+            <div class="select-wrap">
+                <select class="form-select" id="c-type" onchange="onCreateTypeChange()">
+                    <option value="">— Sélectionner —</option>
+                    <option value="Neuf">Neuf</option>
+                    <option value="Récupération">Récupération</option>
+                    <option value="Transfert">Transfert</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Fluide — Neuf uniquement -->
+        <div class="form-section" id="c-fluide-grp" style="display:none">
+            <label class="form-label">Fluide</label>
+            <div class="select-wrap">
+                <select class="form-select" id="c-fluide"><option value="">— Sélectionner —</option></select>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label">Tare (kg) — poids à vide</label>
+            <input type="number" class="form-input" id="c-tare" placeholder="ex : 8.500" step="0.001" min="0" inputmode="decimal"/>
+        </div>
+
+        <!-- Poids chargé — Neuf uniquement -->
+        <div class="form-section" id="c-poids-grp" style="display:none">
+            <label class="form-label">Poids actuel chargé (kg)</label>
+            <input type="number" class="form-input" id="c-poids" placeholder="ex : 18.500" step="0.001" min="0" inputmode="decimal"/>
+            <div class="form-hint">Poids total = Tare + Fluide chargé</div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label">Capacité max fluide (kg)</label>
+            <input type="number" class="form-input" id="c-capmax" placeholder="ex : 13.000" step="0.001" min="0" inputmode="decimal"/>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label">Fournisseur</label>
+            <div class="select-wrap">
+                <select class="form-select" id="c-four"><option value="">— Sélectionner —</option></select>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label">Gestionnaire</label>
+            <div class="select-wrap">
+                <select class="form-select" id="c-gest"><option value="">— Sélectionner —</option></select>
+            </div>
+        </div>
+    </div>
+
+    <div id="create-error"></div>
+    <button class="btn-primary" onclick="submitCreate()">✔ Créer la bouteille</button>
+    <button class="btn-ghost" onclick="goSearch()">Annuler</button>
+</div>
+
 <!-- Submitting -->
 <div id="s-submitting" class="screen">
     <div class="loading-wrap" style="min-height:50vh"><div class="spinner"></div><div>Enregistrement…</div></div>
@@ -405,6 +480,7 @@ const ACTION_LABELS = {
     sortie:             '↗ SORTIE',
     retour:             '↙ RETOUR',
     retour_fournisseur: '📦 RETOUR FOURNISSEUR',
+    créer:              '➕ NOUVELLE BOUTEILLE',
 };
 const STATUS_PILL = {
     'Neuve':                 'pill-neuve',
@@ -458,6 +534,9 @@ function populateAllSelects() {
     populateSel('f-gest',   LCONFIG.gestionnaires);
     populateSel('f-four',   LCONFIG.fournisseurs);
     populateSel('f-fluide', LCONFIG.fluides);
+    populateSel('c-fluide', LCONFIG.fluides);
+    populateSel('c-four',   LCONFIG.fournisseurs);
+    populateSel('c-gest',   LCONFIG.gestionnaires);
 }
 function populateSel(id, items) {
     const el = document.getElementById(id);
@@ -709,7 +788,11 @@ function pressPin(d) {
 }
 function deletePin() { ST.pin = ST.pin.slice(0,-1); updatePinDots(); }
 function checkPin() {
-    if (ST.pin === PIN_CODE) { buildForm(); return; }
+    if (ST.pin === PIN_CODE) {
+        if (ST.action === 'créer') buildCreateForm();
+        else buildForm();
+        return;
+    }
     const dots = document.getElementById('pin-dots');
     dots.classList.add('pshake');
     setTimeout(() => { ST.pin=''; updatePinDots(); dots.classList.remove('pshake'); document.getElementById('pin-err').textContent='Code incorrect — réessayez'; }, 420);
@@ -954,6 +1037,132 @@ function renderSuccess(p) {
 // ══════════════════════════════════════════
 //  UTILS
 // ══════════════════════════════════════════
+// ══════════════════════════════════════════
+//  CRÉATION DE BOUTEILLE
+// ══════════════════════════════════════════
+function openCreate() {
+    ST.action = 'créer';
+    ST.bottleId = null;
+    ST.pin = '';
+    updatePinDots();
+    document.getElementById('pin-err').textContent = '';
+    document.getElementById('pin-bottle-id').textContent = 'Nouvelle bouteille';
+    const tag = document.getElementById('pin-action-tag');
+    tag.textContent = '➕ CRÉATION';
+    tag.className = 'pin-hero-tag créer';
+    showScreen('s-pin');
+}
+
+function buildCreateForm() {
+    // Reset all fields
+    ['c-id','c-tare','c-poids','c-capmax'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    ['c-type','c-fluide','c-four','c-gest'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    document.getElementById('c-fluide-grp').style.display = 'none';
+    document.getElementById('c-poids-grp').style.display  = 'none';
+    document.getElementById('create-error').innerHTML = '';
+    showScreen('s-create');
+    setTimeout(() => document.getElementById('c-id').focus(), 200);
+}
+
+function onCreateTypeChange() {
+    const type  = document.getElementById('c-type').value;
+    const isRec = type === 'Récupération' || type === 'Transfert';
+    document.getElementById('c-fluide-grp').style.display = (!isRec && type) ? 'block' : 'none';
+    document.getElementById('c-poids-grp').style.display  = (!isRec && type) ? 'block' : 'none';
+}
+
+async function submitCreate() {
+    const id     = document.getElementById('c-id').value.trim().toUpperCase();
+    const type   = document.getElementById('c-type').value;
+    const fluide = document.getElementById('c-fluide').value;
+    const tare   = parseNum(document.getElementById('c-tare').value);
+    const poids  = parseNum(document.getElementById('c-poids').value);
+    const capmax = parseNum(document.getElementById('c-capmax').value);
+    const four   = document.getElementById('c-four').value;
+    const gest   = document.getElementById('c-gest').value;
+    const isRec  = type === 'Récupération' || type === 'Transfert';
+
+    const errEl = document.getElementById('create-error');
+    errEl.innerHTML = '';
+
+    // Validations
+    if (!id)                      { setCreateErr('Saisissez le numéro de bouteille.'); return; }
+    if (!/^[A-Z0-9]+-[A-Z0-9]+$/i.test(id)) { setCreateErr('Format invalide — attendu : XXXX-XX (ex : R410A-01).'); return; }
+    if (!type)                    { setCreateErr('Sélectionnez le type de bouteille.'); return; }
+    if (!isRec && !fluide)        { setCreateErr('Sélectionnez le fluide.'); return; }
+    if (!tare || tare <= 0)       { setCreateErr('Saisissez la tare (poids à vide).'); return; }
+    if (!isRec && (!poids || poids <= tare)) { setCreateErr(`Le poids chargé (${poids} kg) doit être supérieur à la tare (${tare} kg).`); return; }
+    if (!capmax || capmax <= 0)   { setCreateErr('Saisissez la capacité max.'); return; }
+    if (!four)                    { setCreateErr('Sélectionnez le fournisseur.'); return; }
+    if (!gest)                    { setCreateErr('Sélectionnez le gestionnaire.'); return; }
+
+    showScreen('s-submitting');
+
+    const payload = {
+        id, type, fluide, tare,
+        poidsActuel: isRec ? tare : poids,
+        capaciteMax: capmax,
+        fournisseur: four,
+        gestionnaire: gest,
+        date: new Date().toISOString(),
+    };
+
+    try {
+        if (IS_DEMO) {
+            await delay(800);
+            DEMO[id] = {
+                id, fluide: isRec ? '' : fluide, type, tare,
+                statut: 'Neuve', dernierPoids: isRec ? tare : poids,
+                technicien: null, affaire: null, capaciteMax: capmax, fournisseur: four,
+            };
+        } else {
+            const url = new URL(CFG.SCRIPT_URL);
+            url.searchParams.set('action', 'createBottle');
+            url.searchParams.set('data', JSON.stringify(payload));
+            const r = await fetch(url.toString());
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            const res = await r.json();
+            if (res.error) throw new Error(res.error);
+        }
+
+        // Écran de succès personnalisé
+        document.getElementById('succ-icon').textContent  = '✅';
+        document.getElementById('succ-title').textContent = 'Bouteille créée';
+        document.getElementById('succ-sub').textContent   = id + ' — ' + type + (fluide ? ' · ' + fluide : '');
+        document.getElementById('succ-detail').innerHTML  = `
+            <div class="succ-row"><span>N° Bouteille</span><span class="val">${id}</span></div>
+            <div class="succ-row"><span>Type</span><span class="val">${type}</span></div>
+            ${fluide ? `<div class="succ-row"><span>Fluide</span><span class="val">${fluide}</span></div>` : ''}
+            <div class="succ-row"><span>Tare</span><span class="val">${tare} kg</span></div>
+            <div class="succ-row"><span>Capacité max</span><span class="val">${capmax} kg</span></div>
+            <div class="succ-row"><span>Fournisseur</span><span class="val">${four}</span></div>
+            <div style="background:var(--blue-bg);border-radius:8px;padding:12px;margin-top:12px;font-size:12px;color:var(--blue);text-align:center">
+                ℹ️ Pensez à générer le QR code pour cette bouteille
+            </div>`;
+        document.getElementById('succ-conso').style.display = 'none';
+        document.getElementById('succ-btn').textContent = 'Créer une autre bouteille';
+        document.getElementById('succ-btn').onclick = () => {
+            document.getElementById('succ-btn').textContent = 'Nouveau mouvement';
+            document.getElementById('succ-btn').onclick = reset;
+            buildCreateForm();
+        };
+        showScreen('s-success');
+    } catch(err) {
+        showScreen('s-create');
+        setCreateErr('❌ ' + err.message);
+    }
+}
+
+function setCreateErr(msg) {
+    document.getElementById('create-error').innerHTML = `<div class="error-box">${msg}</div>`;
+}
+
 function goSearch() {
     ST = {bottleId:null,bottle:null,action:null,pin:''};
     document.getElementById('manual-id').value='';
