@@ -390,9 +390,11 @@
             <div class="form-hint">Poids total = Tare + Fluide chargé</div>
         </div>
 
-        <div class="form-section">
+        <!-- Capacité max — Récupération/Transfert uniquement -->
+        <div class="form-section" id="c-capmax-grp" style="display:none">
             <label class="form-label">Capacité max fluide (kg)</label>
-            <input type="number" class="form-input" id="c-capmax" placeholder="ex : 13.000" step="0.001" min="0" inputmode="decimal"/>
+            <input type="number" class="form-input" id="c-capmax" placeholder="ex : 20.000" step="0.001" min="0" inputmode="decimal"/>
+            <div class="form-hint">Quantité maximale de fluide que la bouteille peut contenir</div>
         </div>
 
         <div class="form-section">
@@ -1073,8 +1075,11 @@ function buildCreateForm() {
 function onCreateTypeChange() {
     const type  = document.getElementById('c-type').value;
     const isRec = type === 'Récupération' || type === 'Transfert';
-    document.getElementById('c-fluide-grp').style.display = (!isRec && type) ? 'block' : 'none';
-    document.getElementById('c-poids-grp').style.display  = (!isRec && type) ? 'block' : 'none';
+    document.getElementById('c-fluide-grp').style.display  = (!isRec && type) ? 'block' : 'none';
+    document.getElementById('c-poids-grp').style.display   = (!isRec && type) ? 'block' : 'none';
+    // Capacité max : uniquement pour Récup/Transfert (Neuf = calculé auto)
+    document.getElementById('c-capmax-grp').style.display  = (isRec && type)  ? 'block' : 'none';
+    document.getElementById('c-capmax').value = '';
 }
 
 async function submitCreate() {
@@ -1098,7 +1103,9 @@ async function submitCreate() {
     if (!isRec && !fluide)        { setCreateErr('Sélectionnez le fluide.'); return; }
     if (!tare || tare <= 0)       { setCreateErr('Saisissez la tare (poids à vide).'); return; }
     if (!isRec && (!poids || poids <= tare)) { setCreateErr(`Le poids chargé (${poids} kg) doit être supérieur à la tare (${tare} kg).`); return; }
-    if (!capmax || capmax <= 0)   { setCreateErr('Saisissez la capacité max.'); return; }
+    // Capacité max : calculée auto pour Neuf, saisie obligatoire pour Récup/Transfert
+    const effectiveCapmax = isRec ? capmax : Math.max(0, poids - tare);
+    if (isRec && (!capmax || capmax <= 0)) { setCreateErr('Saisissez la capacité max.'); return; }
     if (!four)                    { setCreateErr('Sélectionnez le fournisseur.'); return; }
     if (!gest)                    { setCreateErr('Sélectionnez le gestionnaire.'); return; }
 
@@ -1107,7 +1114,7 @@ async function submitCreate() {
     const payload = {
         id, type, fluide, tare,
         poidsActuel: isRec ? tare : poids,
-        capaciteMax: capmax,
+        capaciteMax: effectiveCapmax,
         fournisseur: four,
         gestionnaire: gest,
         date: new Date().toISOString(),
@@ -1140,7 +1147,7 @@ async function submitCreate() {
             <div class="succ-row"><span>Type</span><span class="val">${type}</span></div>
             ${fluide ? `<div class="succ-row"><span>Fluide</span><span class="val">${fluide}</span></div>` : ''}
             <div class="succ-row"><span>Tare</span><span class="val">${tare} kg</span></div>
-            <div class="succ-row"><span>Capacité max</span><span class="val">${capmax} kg</span></div>
+            <div class="succ-row"><span>Capacité max</span><span class="val">${effectiveCapmax.toFixed(3)} kg${!isRec?' (calculée auto)':''}</span></div>
             <div class="succ-row"><span>Fournisseur</span><span class="val">${four}</span></div>
             <div style="background:var(--blue-bg);border-radius:8px;padding:12px;margin-top:12px;font-size:12px;color:var(--blue);text-align:center">
                 ℹ️ Pensez à générer le QR code pour cette bouteille
