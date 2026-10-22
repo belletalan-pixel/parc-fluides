@@ -79,6 +79,39 @@
         .btn-create-res:hover{opacity:.9;}
         .res-section-title{font-size:13px;font-weight:700;color:#0D2137;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid #D2D8DF;}
 
+        /* Cerfa overlay */
+        .cerfa-panel-header{background:#7B4C00;}
+        .cerfa-bottle{border:1px solid #D2D8DF;border-radius:10px;margin-bottom:10px;overflow:hidden;}
+        .cerfa-bottle-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#FAFBFC;cursor:pointer;user-select:none;}
+        .cerfa-bottle-hdr:hover{background:#f0f0f0;}
+        .cerfa-bottle-title{font-size:14px;font-weight:700;color:var(--navy);}
+        .cerfa-bottle-sub{font-size:12px;color:var(--muted);}
+        .cerfa-bottle-arr{font-size:13px;color:var(--muted);transition:transform .2s;}
+        .cerfa-bottle.open .cerfa-bottle-arr{transform:rotate(180deg);}
+        .cerfa-bottle-body{display:none;border-top:1px solid var(--border);}
+        .cerfa-bottle.open .cerfa-bottle-body{display:block;}
+        .cerfa-mvt{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;gap:10px;}
+        .cerfa-mvt:last-child{border-bottom:none;}
+        .cerfa-mvt:hover{background:#FFFBEB;}
+        .cerfa-mvt-left{flex:1;}
+        .cerfa-mvt-date{font-size:13px;font-weight:600;color:var(--navy);}
+        .cerfa-mvt-meta{font-size:11px;color:var(--muted);margin-top:2px;}
+        .cerfa-mvt-sens{font-size:14px;font-weight:800;white-space:nowrap;}
+        .sens-neg{color:var(--green);}
+        .sens-pos{color:var(--orange);}
+        .cerfa-badge-ok{background:var(--green-bg);color:var(--green);padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap;}
+        .cerfa-badge-ko{background:#FFFBEB;color:#B45309;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap;}
+        .cerfa-form-wrap{padding:14px;background:#FFFBEB;border-top:1px solid #FDE68A;}
+        .cerfa-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+        .cerfa-form-full{grid-column:1/-1;}
+        .cerfa-fl{display:block;font-size:11px;font-weight:700;color:#7B4C00;letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px;}
+        .cerfa-fi{width:100%;padding:9px 12px;border:1.5px solid #FDE68A;border-radius:8px;font-size:14px;font-family:inherit;background:#fff;}
+        .cerfa-fi:focus{outline:none;border-color:#7B4C00;}
+        .cerfa-ecart{padding:10px 12px;border-radius:8px;font-size:13px;font-weight:700;text-align:center;margin-top:8px;}
+        .cerfa-ecart.ok{background:var(--green-bg);color:var(--green);}
+        .cerfa-ecart.warn{background:var(--red-bg);color:var(--red);}
+        .btn-save-cerfa{padding:9px 20px;background:#7B4C00;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;}
+
         /* Filtre Récupération */
         .recup-filter-bar{padding:12px 16px;border-bottom:1px solid var(--border);background:#FAFBFC;}
         .recup-filter{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);min-width:220px;-webkit-appearance:none;appearance:none;}
@@ -254,6 +287,7 @@ function render(d) {
         <a href="qr-generator.html" target="_blank" class="btn-action">🏷️ Générateur QR codes</a>
         <a href="https://belletalan-pixel.github.io/parc-fluides/" target="_blank" class="btn-action secondary">🧊 Ouvrir l'app</a>
         <button class="btn-action" style="background:#B45309;border:none;cursor:pointer;font-family:inherit" onclick="openReservations()">📋 Réservations</button>
+        <button class="btn-action" style="background:#7B4C00;border:none;cursor:pointer;font-family:inherit" onclick="openCerfa()">📑 Cerfa</button>
     </div>`;
 
     // ── État du stock ───────────────────────────────────
@@ -584,6 +618,275 @@ function switchTab(tab) {
 
 loadData();
 setInterval(loadData, 5*60*1000);
+
+// ══════════════════════════════════════════
+//  CERFA — overlay PIN + gestion
+// ══════════════════════════════════════════
+let cerfaPin  = '';
+let cerfaData = null;
+
+function openCerfa() {
+    cerfaPin = '';
+    if (!document.getElementById('cerfa-overlay')) buildCerfaOverlay();
+    document.getElementById('cerfa-overlay').style.display = 'flex';
+    document.getElementById('cerfa-pin-phase').style.display = 'block';
+    document.getElementById('cerfa-mgmt-phase').style.display = 'none';
+    updateCerfaPinDots();
+    document.getElementById('cerfa-pin-err').textContent = '';
+}
+
+function buildCerfaOverlay() {
+    const el = document.createElement('div');
+    el.id = 'cerfa-overlay';
+    el.className = 'res-overlay';
+    el.style.display = 'none';
+    el.innerHTML = `
+        <div class="res-panel">
+            <div class="res-panel-header cerfa-panel-header">
+                <h2>📑 Données Cerfa</h2>
+                <button class="res-close" onclick="closeCerfaOverlay()">✕</button>
+            </div>
+            <div class="res-body">
+                <div id="cerfa-pin-phase">
+                    <div style="text-align:center;font-size:13px;color:var(--muted);margin-bottom:4px">Saisissez le code d'accès</div>
+                    <div class="res-pin-dots" id="cerfa-pin-dots">
+                        <div class="res-pin-dot" id="cpd1"></div>
+                        <div class="res-pin-dot" id="cpd2"></div>
+                        <div class="res-pin-dot" id="cpd3"></div>
+                        <div class="res-pin-dot" id="cpd4"></div>
+                    </div>
+                    <div class="res-pin-err" id="cerfa-pin-err"></div>
+                    <div class="res-numpad">
+                        <button class="res-np" onclick="pressCerfaPin('1')">1</button>
+                        <button class="res-np" onclick="pressCerfaPin('2')">2</button>
+                        <button class="res-np" onclick="pressCerfaPin('3')">3</button>
+                        <button class="res-np" onclick="pressCerfaPin('4')">4</button>
+                        <button class="res-np" onclick="pressCerfaPin('5')">5</button>
+                        <button class="res-np" onclick="pressCerfaPin('6')">6</button>
+                        <button class="res-np" onclick="pressCerfaPin('7')">7</button>
+                        <button class="res-np" onclick="pressCerfaPin('8')">8</button>
+                        <button class="res-np" onclick="pressCerfaPin('9')">9</button>
+                        <button class="res-np empty" disabled></button>
+                        <button class="res-np" onclick="pressCerfaPin('0')">0</button>
+                        <button class="res-np del" onclick="deleteCerfaPin()">⌫</button>
+                    </div>
+                </div>
+                <div id="cerfa-mgmt-phase" style="display:none">
+                    <div id="cerfa-mgmt-content"><div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div></div>
+                </div>
+            </div>
+        </div>`;
+    document.body.appendChild(el);
+}
+
+function closeCerfaOverlay() {
+    const el = document.getElementById('cerfa-overlay');
+    if (el) el.style.display = 'none';
+}
+
+// ── PIN Cerfa ─────────────────────────────
+function pressCerfaPin(d) {
+    if (cerfaPin.length >= 4) return;
+    cerfaPin += d;
+    updateCerfaPinDots();
+    document.getElementById('cerfa-pin-err').textContent = '';
+    if (cerfaPin.length === 4) setTimeout(checkCerfaPin, 160);
+}
+function deleteCerfaPin() { cerfaPin = cerfaPin.slice(0,-1); updateCerfaPinDots(); }
+function updateCerfaPinDots() {
+    for (let i=1;i<=4;i++) {
+        const el = document.getElementById('cpd'+i);
+        if (el) el.classList.toggle('filled', i<=cerfaPin.length);
+    }
+}
+function checkCerfaPin() {
+    if (cerfaPin === RES_PIN) {
+        document.getElementById('cerfa-pin-phase').style.display = 'none';
+        document.getElementById('cerfa-mgmt-phase').style.display = 'block';
+        loadCerfaData();
+    } else {
+        const dots = document.getElementById('cerfa-pin-dots');
+        dots.style.animation = 'pshake .4s ease';
+        setTimeout(() => {
+            cerfaPin = ''; updateCerfaPinDots();
+            dots.style.animation = '';
+            document.getElementById('cerfa-pin-err').textContent = 'Code incorrect';
+        }, 420);
+    }
+}
+
+// ── Charger données Cerfa ─────────────────
+async function loadCerfaData() {
+    document.getElementById('cerfa-mgmt-content').innerHTML =
+        '<div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div>';
+    try {
+        const r = await fetch(`${SCRIPT_URL}?action=getCerfaData`);
+        cerfaData = await r.json();
+        if (cerfaData.error) throw new Error(cerfaData.error);
+        renderCerfaMgmt();
+    } catch(err) {
+        document.getElementById('cerfa-mgmt-content').innerHTML =
+            `<div style="color:var(--red);padding:16px">❌ ${err.message}</div>`;
+    }
+}
+
+function renderCerfaMgmt() {
+    const bottles = cerfaData.bottles || [];
+    if (!bottles.length) {
+        document.getElementById('cerfa-mgmt-content').innerHTML =
+            '<div style="color:var(--muted);font-size:13px;font-style:italic;padding:16px">Aucun mouvement avec variation de fluide.</div>';
+        return;
+    }
+
+    const manquants = bottles.reduce((s,b) => s + b.movements.filter(m=>!m.cerfaSaisi).length, 0);
+    let html = `<div style="font-size:12px;color:var(--muted);margin-bottom:14px">
+        ${bottles.length} bouteille(s) · <span style="color:#B45309;font-weight:700">${manquants} Cerfa manquant(s)</span>
+    </div>`;
+
+    bottles.forEach((b, bi) => {
+        const nbManq = b.movements.filter(m=>!m.cerfaSaisi).length;
+        html += `<div class="cerfa-bottle" id="cb-${bi}">
+            <div class="cerfa-bottle-hdr" onclick="toggleCerfaBottle(${bi})">
+                <div>
+                    <div class="cerfa-bottle-title">${b.id} — ${b.fluide||'?'} <span style="font-size:11px;color:var(--muted)">(${b.type})</span></div>
+                    <div class="cerfa-bottle-sub">${b.movements.length} mouvement(s)
+                        ${nbManq > 0 ? `· <span style="color:#B45309">${nbManq} Cerfa manquant(s)</span>` : '· <span style="color:var(--green)">Cerfa complets ✓</span>'}
+                    </div>
+                </div>
+                <span class="cerfa-bottle-arr">▾</span>
+            </div>
+            <div class="cerfa-bottle-body" id="cb-body-${bi}">`;
+
+        b.movements.forEach((m, mi) => {
+            const isPos  = m.sens.startsWith('+');
+            const sensCls = isPos ? 'sens-pos' : 'sens-neg';
+            const badge  = m.cerfaSaisi
+                ? '<span class="cerfa-badge-ok">✓ Cerfa saisi</span>'
+                : '<span class="cerfa-badge-ko">Cerfa manquant</span>';
+            html += `<div class="cerfa-mvt" onclick="toggleCerfaForm(${bi},${mi})">
+                <div class="cerfa-mvt-left">
+                    <div class="cerfa-mvt-date">${m.date}</div>
+                    <div class="cerfa-mvt-meta">
+                        📋 ${m.affaire} &nbsp;·&nbsp; 👤 ${m.technicien}
+                        ${m.cerfaSaisi && m.cerfa ? ` &nbsp;·&nbsp; N° ${m.cerfa.noCerfa}` : ''}
+                    </div>
+                </div>
+                <span class="cerfa-mvt-sens ${sensCls}">${m.sens}</span>
+                ${badge}
+            </div>
+            <div id="cf-form-${bi}-${mi}" style="display:none">
+                ${buildCerfaForm(b, m, bi, mi)}
+            </div>`;
+        });
+
+        html += `</div></div>`;
+    });
+
+    document.getElementById('cerfa-mgmt-content').innerHTML = html;
+}
+
+function toggleCerfaBottle(bi) {
+    const el = document.getElementById('cb-'+bi);
+    if (el) el.classList.toggle('open');
+}
+
+function toggleCerfaForm(bi, mi) {
+    // Fermer tous les autres formulaires de la même bouteille
+    document.querySelectorAll(`[id^="cf-form-${bi}-"]`).forEach(el => {
+        if (el.id !== `cf-form-${bi}-${mi}`) el.style.display = 'none';
+    });
+    const form = document.getElementById(`cf-form-${bi}-${mi}`);
+    if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    // Ouvrir l'accordéon si pas déjà ouvert
+    const bottle = document.getElementById('cb-'+bi);
+    if (bottle && !bottle.classList.contains('open')) bottle.classList.add('open');
+}
+
+function buildCerfaForm(b, m, bi, mi) {
+    const isRec = b.type === 'Récupération' || b.type === 'Transfert';
+    const c = m.cerfa || {};
+    return `<div class="cerfa-form-wrap">
+        <div class="cerfa-form-grid">
+            <div class="cerfa-form-full">
+                <label class="cerfa-fl">N° Cerfa</label>
+                <input class="cerfa-fi" id="cfi-nocerfa-${bi}-${mi}" value="${c.noCerfa||''}" placeholder="ex : 2025-147" autocomplete="off"/>
+            </div>
+            <div class="cerfa-form-full">
+                <label class="cerfa-fl">Motif d'intervention</label>
+                <input class="cerfa-fi" id="cfi-motif-${bi}-${mi}" value="${c.motif||''}" placeholder="ex : Recharge, Récupération, Fuite…" autocomplete="off"/>
+            </div>
+            <div>
+                <label class="cerfa-fl">Qté récupérée Cerfa (kg)</label>
+                <input class="cerfa-fi" id="cfi-recup-${bi}-${mi}" type="number" step="0.001" min="0"
+                    value="${c.qtRecup||''}" placeholder="0.000"
+                    style="${!isRec?'opacity:.4':''}" ${!isRec?'tabindex="-1"':''}/>
+            </div>
+            <div>
+                <label class="cerfa-fl">Qté rechargée Cerfa (kg)</label>
+                <input class="cerfa-fi" id="cfi-recharge-${bi}-${mi}" type="number" step="0.001" min="0"
+                    value="${c.qtRecharge||''}" placeholder="0.000"
+                    style="${isRec?'opacity:.4':''}" ${isRec?'tabindex="-1"':''}/>
+            </div>
+            <div class="cerfa-form-full">
+                <label class="cerfa-fl">Opérateur (technicien)</label>
+                <input class="cerfa-fi" id="cfi-ope-${bi}-${mi}" value="${c.operateur||m.technicien}" autocomplete="off"/>
+            </div>
+        </div>
+        <div id="cfi-ecart-${bi}-${mi}"></div>
+        <div id="cfi-err-${bi}-${mi}" style="color:var(--red);font-size:12px;margin-top:6px"></div>
+        <button class="btn-save-cerfa" onclick="submitCerfa(${bi},${mi})">✔ Enregistrer le Cerfa</button>
+    </div>`;
+}
+
+async function submitCerfa(bi, mi) {
+    const b   = (cerfaData.bottles||[])[bi];
+    const m   = b ? b.movements[mi] : null;
+    if (!b || !m) return;
+
+    const noCerfa   = document.getElementById(`cfi-nocerfa-${bi}-${mi}`)?.value.trim();
+    const motif     = document.getElementById(`cfi-motif-${bi}-${mi}`)?.value.trim();
+    const qtRecup   = parseFloat(document.getElementById(`cfi-recup-${bi}-${mi}`)?.value) || 0;
+    const qtRecharge= parseFloat(document.getElementById(`cfi-recharge-${bi}-${mi}`)?.value) || 0;
+    const operateur = document.getElementById(`cfi-ope-${bi}-${mi}`)?.value.trim();
+    const errEl     = document.getElementById(`cfi-err-${bi}-${mi}`);
+
+    if (!noCerfa)   { errEl.textContent = 'Saisissez le N° Cerfa.'; return; }
+    if (!motif)     { errEl.textContent = 'Saisissez le motif.'; return; }
+    if (!operateur) { errEl.textContent = 'Saisissez l\'opérateur.'; return; }
+    errEl.textContent = '';
+
+    const isRec = b.type === 'Récupération' || b.type === 'Transfert';
+    const ecart = isRec
+        ? parseFloat((qtRecup - m.conso).toFixed(3))
+        : parseFloat((m.conso - qtRecharge).toFixed(3));
+
+    // Afficher écart avant envoi
+    const ecartEl = document.getElementById(`cfi-ecart-${bi}-${mi}`);
+    const ecartCls = Math.abs(ecart) > 0.5 ? 'warn' : 'ok';
+    ecartEl.innerHTML = `<div class="cerfa-ecart ${ecartCls}">
+        Écart théorique / Cerfa : <strong>${ecart > 0 ? '+' : ''}${ecart.toFixed(3)} kg</strong>
+        ${Math.abs(ecart) > 0.5 ? ' ⚠️ Écart > 0.5 kg' : ' ✓ OK'}
+    </div>`;
+
+    const payload = {
+        ref: m.ref, bottleId: b.id, fluide: b.fluide, type: b.type,
+        date: m.date, affaire: m.affaire, technicien: m.technicien,
+        consoTheo: m.conso, noCerfa, motif, qtRecup, qtRecharge, operateur,
+    };
+
+    try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action', 'saveCerfa');
+        url.searchParams.set('data', JSON.stringify(payload));
+        const r = await fetch(url.toString());
+        const res = await r.json();
+        if (res.error) throw new Error(res.error);
+        // Rafraîchir
+        await loadCerfaData();
+    } catch(err) {
+        errEl.textContent = '❌ ' + err.message;
+    }
+}
 
 // ══════════════════════════════════════════
 //  RÉSERVATIONS — overlay PIN + gestion
