@@ -366,12 +366,20 @@ function buildForm(b, m, bi, mi) {
             <span style="font-weight:400;color:var(--muted)"> · Conso théorique : ${m.sens}</span>
         </div>
         <div class="form-grid">
-            <div class="form-full">
-                <label class="fl">N° Cerfa <span style="font-weight:400;font-style:italic">(peut être partagé entre plusieurs mouvements)</span></label>
+            <div>
+                <label class="fl">N° fiche Cerfa <span style="font-weight:400;font-style:italic">(partageable entre mouvements)</span></label>
                 <input class="fi" id="fi-no-${bi}-${mi}" value="${c.noCerfa||''}" placeholder="ex : 2025-147" autocomplete="off"/>
             </div>
+            <div>
+                <label class="fl">Date du Cerfa</label>
+                <input class="fi" id="fi-date-${bi}-${mi}" type="date" value="${c.dateCerfa||''}"/>
+            </div>
             <div class="form-full">
-                <label class="fl">Motif d'intervention</label>
+                <label class="fl">Détenteur de l'installation (client)</label>
+                <input class="fi" id="fi-det-${bi}-${mi}" value="${c.detenteur||''}" placeholder="ex : TOTAL Normandie, Client XYZ…" autocomplete="off"/>
+            </div>
+            <div class="form-full">
+                <label class="fl">Nature de l'intervention</label>
                 <input class="fi" id="fi-motif-${bi}-${mi}" value="${c.motif||''}" placeholder="ex : Recharge, Récupération avant réparation…" autocomplete="off"/>
             </div>
             <div>
@@ -382,14 +390,14 @@ function buildForm(b, m, bi, mi) {
                 ${!isRec?'<div style="font-size:11px;color:var(--muted);margin-top:4px">Non applicable pour une bouteille Neuf</div>':''}
             </div>
             <div>
-                <label class="fl">Qté rechargée Cerfa (kg)</label>
+                <label class="fl">Qté chargée Cerfa (kg)</label>
                 <input class="fi ${isRec?'dimmed':''}" id="fi-recharge-${bi}-${mi}" type="number"
                     step="0.001" min="0" value="${c.qtRecharge||''}" placeholder="0.000"
                     ${isRec?'tabindex="-1"':''}/>
                 ${isRec?'<div style="font-size:11px;color:var(--muted);margin-top:4px">Non applicable pour ce type</div>':''}
             </div>
             <div class="form-full">
-                <label class="fl">Opérateur (technicien ayant réalisé l'intervention)</label>
+                <label class="fl">Technicien manipulant</label>
                 <input class="fi" id="fi-ope-${bi}-${mi}" value="${c.operateur||m.technicien}" autocomplete="off"/>
             </div>
         </div>
@@ -408,6 +416,8 @@ async function submitCerfa(bi, mi) {
     if (!b || !m) return;
 
     const noCerfa    = document.getElementById(`fi-no-${bi}-${mi}`)?.value.trim();
+    const dateCerfa  = document.getElementById(`fi-date-${bi}-${mi}`)?.value;
+    const detenteur  = document.getElementById(`fi-det-${bi}-${mi}`)?.value.trim();
     const motif      = document.getElementById(`fi-motif-${bi}-${mi}`)?.value.trim();
     const qtRecup    = parseFloat(document.getElementById(`fi-recup-${bi}-${mi}`)?.value) || 0;
     const qtRecharge = parseFloat(document.getElementById(`fi-recharge-${bi}-${mi}`)?.value) || 0;
@@ -415,27 +425,29 @@ async function submitCerfa(bi, mi) {
     const errEl      = document.getElementById(`fi-err-${bi}-${mi}`);
     const ecartEl    = document.getElementById(`fi-ecart-${bi}-${mi}`);
 
-    if (!noCerfa)   { errEl.textContent = 'Saisissez le N° Cerfa.'; return; }
-    if (!motif)     { errEl.textContent = 'Saisissez le motif.'; return; }
-    if (!operateur) { errEl.textContent = "Saisissez l'opérateur."; return; }
+    if (!noCerfa)   { errEl.textContent = 'Saisissez le N° fiche Cerfa.'; return; }
+    if (!dateCerfa) { errEl.textContent = 'Saisissez la date du Cerfa.'; return; }
+    if (!detenteur) { errEl.textContent = "Saisissez le détenteur de l'installation."; return; }
+    if (!motif)     { errEl.textContent = "Saisissez la nature de l'intervention."; return; }
+    if (!operateur) { errEl.textContent = "Saisissez le technicien manipulant."; return; }
     errEl.textContent = '';
 
+    // Consommation Cerfa = Qté chargée − Qté récupérée
     const isRec = b.type === 'Récupération' || b.type === 'Transfert';
-    const ecart = isRec
-        ? parseFloat((qtRecup - m.conso).toFixed(3))
-        : parseFloat((m.conso - qtRecharge).toFixed(3));
+    const ecart = parseFloat((qtRecharge - qtRecup).toFixed(3));
 
     // Afficher l'écart
-    const ecartCls = Math.abs(ecart) > 0.5 ? 'ecart-warn' : 'ecart-ok';
+    const ecartCls = ecart < -0.5 ? 'ecart-warn' : 'ecart-ok';
     ecartEl.innerHTML = `<div class="ecart-box ${ecartCls}" style="margin-top:12px">
-        Écart théorique / Cerfa : <strong>${ecart>=0?'+':''}${ecart.toFixed(3)} kg</strong>
-        ${Math.abs(ecart) > 0.5 ? ' ⚠️ Écart supérieur à 0.5 kg — à vérifier' : ' ✓ Cohérent'}
+        Consommation Cerfa (chargé − récupéré) : <strong>${ecart>=0?'+':''}${ecart.toFixed(3)} kg</strong>
+        ${ecart < -0.5 ? ' ⚠️ Récupération supérieure à la charge — à vérifier' : ' ✓ Cohérent'}
     </div>`;
 
     const payload = {
         ref: m.ref, bottleId: b.id, fluide: b.fluide, type: b.type,
         date: m.date, affaire: m.affaire, technicien: m.technicien,
-        consoTheo: m.conso, noCerfa, motif, qtRecup, qtRecharge, operateur,
+        consoTheo: m.conso, noCerfa, dateCerfa, detenteur, motif,
+        qtRecup, qtRecharge, operateur,
     };
 
     const btn = document.querySelector(`#form-${bi}-${mi} .btn-save`);
