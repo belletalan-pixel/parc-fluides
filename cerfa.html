@@ -370,6 +370,9 @@ function buildForm(b, m, bi, mi) {
     const isRec = b.type === 'Récupération' || b.type === 'Transfert';
     const c = m.cerfa || {};
     return `<div class="cerfa-form">
+        ${m.cerfaSaisi ? `<div style="background:var(--orange-bg);border:1px solid #FFD0A8;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--orange);font-weight:600;">
+            ⚠️ Ce Cerfa a déjà été enregistré. La modification écrasera les données existantes.
+        </div>` : ''}
         <div class="cerfa-form-title">
             📑 Données Cerfa — ${m.date} · ${m.affaire}
             <span style="font-weight:400;color:var(--muted)"> · Conso théorique : ${m.sens}</span>
@@ -389,7 +392,14 @@ function buildForm(b, m, bi, mi) {
             </div>
             <div class="form-full">
                 <label class="fl">Nature de l'intervention</label>
-                <input class="fi" id="fi-motif-${bi}-${mi}" value="${c.motif||''}" placeholder="ex : Recharge, Récupération avant réparation…" autocomplete="off"/>
+                <select class="fi" id="fi-motif-${bi}-${mi}">
+                    <option value="">— Sélectionner —</option>
+                    ${['Mise en service','Maintenance préventive','Maintenance curative / Réparation',
+                       'Récupération','Recharge','Contrôle d\'étanchéité',
+                       'Dépose d\'équipement','Autre']
+                      .map(o => `<option value="${o}" ${c.motif===o?'selected':''}>${o}</option>`)
+                      .join('')}
+                </select>
             </div>
             <div>
                 <label class="fl">Qté récupérée Cerfa (kg)</label>
