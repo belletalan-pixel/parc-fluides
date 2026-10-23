@@ -112,6 +112,9 @@
         @keyframes spin{to{transform:rotate(360deg);}}
 
         .empty-msg{text-align:center;padding:40px;color:var(--muted);font-size:13px;font-style:italic;}
+        .btn-remind{padding:4px 12px;background:#EEF4FF;border:1px solid #BDD0F5;color:#1A4DB5;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+        .btn-remind:hover{background:#BDD0F5;}
+        .btn-remind.sent{background:var(--green-bg);border-color:var(--green);color:var(--green);cursor:default;}
 
         @media(max-width:600px){
             .header{padding:14px 16px;}
@@ -310,6 +313,11 @@ function renderAll() {
             const cerfaInfo  = m.cerfaSaisi && m.cerfa
                 ? `N° ${m.cerfa.noCerfa} · ${m.cerfa.motif}`
                 : '';
+            const remindBtn = !m.cerfaSaisi
+                ? `<button class="btn-remind" id="remind-${bi}-${mi}"
+                     onclick="event.stopPropagation();sendReminder(${bi},${mi})"
+                     title="Envoyer un mail de relance au technicien">📧 Relancer</button>`
+                : '';
 
             html += `<div class="mvt-row" onclick="toggleForm(${bi},${mi})">
                 <div>
@@ -319,6 +327,7 @@ function renderAll() {
                 </div>
                 <span class="mvt-sens ${sensCls}">${m.sens}</span>
                 <span class="mvt-status ${statusCls}">${statusLabel}</span>
+                ${remindBtn}
             </div>
             <div id="form-${bi}-${mi}" style="display:none">
                 ${buildForm(b, m, bi, mi)}
@@ -408,6 +417,43 @@ function buildForm(b, m, bi, mi) {
             <span class="form-err" id="fi-err-${bi}-${mi}"></span>
         </div>
     </div>`;
+}
+
+async function sendReminder(bi, mi) {
+    const b   = (cerfaData.bottles||[])[bi];
+    const m   = b ? b.movements[mi] : null;
+    if (!b || !m) return;
+
+    const btn = document.getElementById(`remind-${bi}-${mi}`);
+    if (btn) { btn.disabled = true; btn.textContent = 'Envoi…'; }
+
+    const payload = {
+        bottleId:   b.id,
+        fluide:     b.fluide,
+        type:       b.type,
+        technicien: m.technicien,
+        date:       m.date,
+        affaire:    m.affaire,
+        sens:       m.sens,
+    };
+
+    try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action', 'sendCerfaReminder');
+        url.searchParams.set('data', JSON.stringify(payload));
+        const r   = await fetch(url.toString());
+        const res = await r.json();
+        if (res.error) throw new Error(res.error);
+
+        if (btn) {
+            btn.classList.add('sent');
+            btn.textContent = '✓ Mail envoyé à ' + res.email;
+            btn.disabled = false;
+        }
+    } catch(err) {
+        if (btn) { btn.disabled = false; btn.textContent = '📧 Relancer'; }
+        alert('❌ ' + err.message);
+    }
 }
 
 async function submitCerfa(bi, mi) {
