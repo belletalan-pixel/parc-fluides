@@ -490,11 +490,6 @@ async function submitCerfa(bi, mi) {
     if (!operateur) { errEl.textContent = "Saisissez le technicien manipulant."; return; }
     errEl.textContent = '';
 
-    // Consommation Cerfa = Qté chargée − Qté récupérée
-    const isRec = b.type === 'Récupération' || b.type === 'Transfert';
-    const ecart = parseFloat((qtRecharge - qtRecup).toFixed(3));
-
-    // Afficher l'écart
     // Calcul consommation selon le type
     let ecart, ecartCls, ecartMsg;
     if (b.type === 'Neuf') {
