@@ -185,8 +185,8 @@
 
         /* Historique */
         .hist-controls{padding:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--border);}
-        .hist-select{flex:1;min-width:200px;max-width:380px;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:var(--card);-webkit-appearance:none;}
-        .hist-select:focus{outline:none;border-color:var(--navy);}
+        .hist-input{flex:1;min-width:200px;max-width:420px;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:var(--card);}
+        .hist-input:focus{outline:none;border-color:var(--navy);}
         .btn-load{padding:10px 20px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
         .btn-load:hover{background:var(--navy2);}
         .hist-content{padding:0;}
@@ -532,25 +532,38 @@ function filterRecup(kind, fluide) {
 
 // ─ Historique panel ───────────────────────────────────
 function renderHistPanel(allBottles) {
-    const opts = [...allBottles]
-        .sort((a,b) => a.id.localeCompare(b.id, 'fr', {numeric:true}))
-        .map(b => `<option value="${b.id}">${b.id} — ${b.fluide} ${b.type}</option>`)
+    const sorted = [...allBottles]
+        .sort((a,b) => a.id.localeCompare(b.id, 'fr', {numeric:true}));
+    const opts = sorted
+        .map(b => `<option value="${b.id} — ${b.fluide||'?'} ${b.type}">`)
         .join('');
     return `
         <div class="hist-controls">
-            <select class="hist-select" id="hist-select">
-                <option value="">— Sélectionner une bouteille —</option>
-                ${opts}
-            </select>
+            <input  type="text"
+                    class="hist-input"
+                    id="hist-input"
+                    list="hist-list"
+                    placeholder="Tapez le numéro, le fluide ou le type…"
+                    autocomplete="off"
+                    autocapitalize="off"
+                    oninput="onHistInput()"/>
+            <datalist id="hist-list">${opts}</datalist>
             <button class="btn-load" onclick="loadHistory()">Afficher</button>
         </div>
         <div class="hist-content" id="hist-content">
-            <div class="hist-empty">Sélectionnez une bouteille pour voir ses mouvements.</div>
+            <div class="hist-empty">Tapez un numéro de bouteille ou sélectionnez dans la liste.</div>
         </div>`;
 }
 
+function onHistInput() {
+    const val = (document.getElementById('hist-input')?.value || '').trim();
+    // Déclenchement automatique si une option complète est sélectionnée (contient ' — ')
+    if (val.includes(' — ')) loadHistory();
+}
+
 async function loadHistory() {
-    const id = document.getElementById('hist-select')?.value;
+    const val = (document.getElementById('hist-input')?.value || '').trim();
+    const id  = val.split(' — ')[0].trim();
     if (!id) return;
     const el = document.getElementById('hist-content');
     el.innerHTML = `<div class="hist-empty"><div class="spinner" style="margin:0 auto 8px"></div>Chargement…</div>`;
