@@ -409,11 +409,13 @@ function buildForm(b, m, bi, mi) {
                 ${!isRec?'<div style="font-size:11px;color:var(--muted);margin-top:4px">Non applicable pour une bouteille Neuf</div>':''}
             </div>
             <div>
-                <label class="fl">Qté chargée Cerfa (kg)</label>
-                <input class="fi ${isRec?'dimmed':''}" id="fi-recharge-${bi}-${mi}" type="number"
+                <label class="fl">Qté chargée Cerfa (kg)
+                    ${b.type==='Transfert'?' <span style="color:var(--brown);font-size:10px">(fluide réinjecté dans l\'installation)</span>':''}
+                </label>
+                <input class="fi ${b.type==='Récupération'?'dimmed':''}" id="fi-recharge-${bi}-${mi}" type="number"
                     step="0.001" min="0" value="${c.qtRecharge||''}" placeholder="0.000"
-                    ${isRec?'tabindex="-1"':''}/>
-                ${isRec?'<div style="font-size:11px;color:var(--muted);margin-top:4px">Non applicable pour ce type</div>':''}
+                    ${b.type==='Récupération'?'tabindex="-1"':''}/>
+                ${b.type==='Récupération'?'<div style="font-size:11px;color:var(--muted);margin-top:4px">Non applicable pour une Récupération</div>':''}
             </div>
             <div class="form-full">
                 <label class="fl">Technicien manipulant</label>
@@ -493,20 +495,26 @@ async function submitCerfa(bi, mi) {
     const ecart = parseFloat((qtRecharge - qtRecup).toFixed(3));
 
     // Afficher l'écart
-    let ecartCls, ecartMsg;
-    if (isRec) {
-        // Récup/Transfert : résultat négatif = normal (plus récupéré que chargé)
-        // Alerte uniquement si chargé > récupéré (inhabituel pour ce type)
-        ecartCls = ecart > 0.5 ? 'ecart-warn' : 'ecart-ok';
-        const netRecup = Math.abs(ecart).toFixed(3);
-        ecartMsg = ecart <= 0
-            ? `Fluide net récupéré : <strong>${netRecup} kg</strong> ✓ (résultat normal pour une Récupération)`
-            : `Fluide net chargé : <strong>+${ecart.toFixed(3)} kg</strong>${ecart > 0.5 ? ' ⚠️ Plus chargé que récupéré — à vérifier' : ' ✓'}`;
-    } else {
-        // Neuf : résultat négatif = anormal
+    // Calcul consommation selon le type
+    let ecart, ecartCls, ecartMsg;
+    if (b.type === 'Neuf') {
+        // Neuf : chargé − récupéré = consommation nette
+        ecart    = parseFloat((qtRecharge - qtRecup).toFixed(3));
         ecartCls = ecart < -0.5 ? 'ecart-warn' : 'ecart-ok';
         ecartMsg = `Consommation Cerfa (chargé − récupéré) : <strong>${ecart>=0?'+':''}${ecart.toFixed(3)} kg</strong>
             ${ecart < -0.5 ? ' ⚠️ Récupération supérieure à la charge — à vérifier' : ' ✓ Cohérent'}`;
+    } else if (b.type === 'Récupération') {
+        // Récupération : tout reste dans la bouteille
+        ecart    = parseFloat((qtRecup - qtRecharge).toFixed(3));
+        ecartCls = ecart < 0 ? 'ecart-warn' : 'ecart-ok';
+        ecartMsg = `Fluide net récupéré : <strong>${ecart.toFixed(3)} kg</strong>
+            ${ecart < 0 ? ' ⚠️ Valeur négative — à vérifier' : ' ✓ Normal pour une Récupération'}`;
+    } else {
+        // Transfert : récupéré − réinjecté = résiduel dans la bouteille
+        ecart    = parseFloat((qtRecup - qtRecharge).toFixed(3));
+        ecartCls = ecart < -0.5 ? 'ecart-warn' : 'ecart-ok';
+        ecartMsg = `Résiduel dans la bouteille (récupéré − réinjecté) : <strong>${ecart>=0?'+':''}${ecart.toFixed(3)} kg</strong>
+            ${ecart < -0.5 ? ' ⚠️ Plus réinjecté que récupéré — impossible, à vérifier' : ' ✓ Cohérent'}`;
     }
     ecartEl.innerHTML = `<div class="ecart-box ${ecartCls}" style="margin-top:12px">${ecartMsg}</div>`;
 
