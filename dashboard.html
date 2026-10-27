@@ -174,8 +174,8 @@
         th{text-align:left;padding:10px 16px;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap;}
         td{padding:10px 16px;border-bottom:1px solid var(--border);vertical-align:middle;}
         tr:last-child td{border-bottom:none;}
-        .qty-bar-wrap{display:flex;align-items:center;gap:8px;}
-        .qty-bar{background:#DDE3EA;border-radius:4px;height:7px;flex:1;max-width:70px;overflow:hidden;}
+        .qty-bar-wrap{display:flex;align-items:center;gap:10px;width:100%;}
+        .qty-bar{background:#DDE3EA;border-radius:4px;height:7px;flex:1;overflow:hidden;}
         .qty-fill-rec{height:100%;background:var(--orange);border-radius:4px;}
         .qty-fill-transf{height:100%;background:var(--blue);border-radius:4px;}
         .qty-val{font-weight:700;font-size:13px;white-space:nowrap;}
@@ -501,13 +501,13 @@ function renderRecupTable(btls, kind) {
                 ${fluides.map(f=>`<option value="${f}">${f}</option>`).join('')}
             </select>
         </div>
-        <div class="table-wrap"><table>
+        <div class="table-wrap"><table style="width:100%">
         <colgroup>
-            <col style="width:120px;min-width:120px">
-            <col style="width:90px;min-width:90px">
-            <col style="width:100px;min-width:100px">
-            <col style="width:130px;min-width:130px">
-            <col style="min-width:220px">
+            <col style="width:14%">
+            <col style="width:12%">
+            <col style="width:11%">
+            <col style="width:14%">
+            <col>
         </colgroup>
         <thead><tr><th>N° Bouteille</th><th>Fluide</th><th>Statut</th><th>Fluide actuel</th><th>Place disponible ↓</th></tr></thead><tbody>`;
 
@@ -519,9 +519,10 @@ function renderRecupTable(btls, kind) {
             const cap   = parseFloat(b.capaciteMax)||0;
             const place = parseFloat(b.placeDisponible)||0;
             if (cap > 0) {
-                const pct = Math.min(100,(place/cap)*100).toFixed(0);
+                const pct     = Math.min(100,(place/cap)*100);
+                const fillPct = Math.max(0, 100 - pct);
                 placeHtml = `<div class="qty-bar-wrap">
-                    <div class="qty-bar"><div class="${fillCls}" style="width:${100-pct}%"></div></div>
+                    <div class="qty-bar"><div class="${fillCls}" style="width:${fillPct.toFixed(1)}%"></div></div>
                     <span class="qty-val qty-green">${b.placeDisponible} kg</span>
                 </div>`;
             } else {
