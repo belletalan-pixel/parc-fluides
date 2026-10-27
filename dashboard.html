@@ -321,26 +321,6 @@ function render(d) {
         <div id="p-hist"   style="display:${CURRENT_TAB==='hist'?'block':'none'}">${renderHistPanel(d.allBottles||[])}</div>
     </div>`;
 
-    // ── Alertes ─────────────────────────────────────────
-    const alertes = d.alertes||[];
-    html += `<div class="section">
-        <div class="section-header">
-            <span>⚠️</span><span class="section-title">Alertes</span>
-            ${alertes.length?`<span class="s-badge sb-red">${alertes.length}</span>`:''}
-        </div>`;
-    if (!alertes.length) {
-        html += `<div class="empty-msg">✅ Aucune alerte.</div>`;
-    } else {
-        alertes.forEach(a => {
-            html += `<div class="alert-item warn">⚠️
-                <span class="alert-id">${a.id}</span>
-                <span style="margin-right:8px">${a.fluide}</span>
-                <span style="color:var(--muted)">${a.message}</span>
-            </div>`;
-        });
-    }
-    html += `</div>`;
-
     // ── En sortie ───────────────────────────────────────
     const enSortie = d.enSortie||[];
     html += `<div class="section">
@@ -423,6 +403,42 @@ function render(d) {
     }
     html += `</div>`;
 
+    // ── Alertes (en fin de page) ─────────────────────────
+    const alertes = d.alertes||[];
+    html += `<div class="section">
+        <div class="section-header">
+            <span>⚠️</span><span class="section-title">Alertes</span>
+            ${alertes.length ? `<span class="s-badge sb-red">${alertes.length}</span>` : ''}
+        </div>`;
+    if (!alertes.length) {
+        html += `<div class="empty-msg">✅ Aucune alerte.</div>`;
+    } else {
+        html += `<div class="table-wrap"><table>
+            <thead><tr>
+                <th>N° Bouteille</th>
+                <th>Fluide</th>
+                <th>Type</th>
+                <th>Description de l'alerte</th>
+            </tr></thead><tbody>`;
+        alertes.forEach(a => {
+            const typeCls = a.type==='Neuf' ? 'pill-stock'
+                : a.type==='Récupération' ? '' : 'pill-neuve';
+            const typeBadge = a.type==='Neuf'
+                ? `<span class="pill pill-stock">Neuf</span>`
+                : a.type==='Récupération'
+                ? `<span class="pill" style="background:#FEF2F2;color:#9B1C1C">Récup.</span>`
+                : `<span class="pill pill-neuve">Transf.</span>`;
+            html += `<tr class="row-warn">
+                <td style="white-space:nowrap"><strong>${a.id}</strong></td>
+                <td style="white-space:nowrap">${a.fluide||'—'}</td>
+                <td>${typeBadge}</td>
+                <td>${a.message}</td>
+            </tr>`;
+        });
+        html += `</tbody></table></div>`;
+    }
+    html += `</div>`;
+
     document.getElementById('content').innerHTML = html;
 }
 
@@ -487,14 +503,13 @@ function renderRecupTable(btls, kind) {
         </div>
         <div class="table-wrap"><table>
         <colgroup>
-            <col style="width:110px;min-width:110px">
-            <col style="width:80px;min-width:80px">
+            <col style="width:120px;min-width:120px">
             <col style="width:90px;min-width:90px">
-            <col style="width:110px;min-width:110px">
-            <col style="min-width:160px">
-            <col style="width:110px;min-width:110px">
+            <col style="width:100px;min-width:100px">
+            <col style="width:130px;min-width:130px">
+            <col style="min-width:220px">
         </colgroup>
-        <thead><tr><th>N° Bouteille</th><th>Fluide</th><th>Statut</th><th>Fluide actuel</th><th>Place disponible ↓</th><th>Capacité max</th></tr></thead><tbody>`;
+        <thead><tr><th>N° Bouteille</th><th>Fluide</th><th>Statut</th><th>Fluide actuel</th><th>Place disponible ↓</th></tr></thead><tbody>`;
 
     sorted.forEach(b => {
         const statCls = b.statut==='Stock'||b.statut==='Disponible' ? 'pill-stock'
@@ -503,7 +518,7 @@ function renderRecupTable(btls, kind) {
         if (b.placeDisponible!==null && b.statut!=='Sortie' && b.statut!=='En sortie') {
             const cap   = parseFloat(b.capaciteMax)||0;
             const place = parseFloat(b.placeDisponible)||0;
-            const pct   = cap>0 ? Math.min(100,(place/cap)*100).toFixed(0) : 0;
+            const pct   = cap>0 ? Math.min(100,(place/cap)*100).toFixed(0) : 50;
             placeHtml   = `<div class="qty-bar-wrap">
                 <div class="qty-bar"><div class="${fillCls}" style="width:${100-pct}%"></div></div>
                 <span class="qty-val qty-green">${b.placeDisponible} kg</span>
@@ -517,7 +532,6 @@ function renderRecupTable(btls, kind) {
             <td><span class="pill ${statCls}">${b.statut}</span></td>
             <td style="white-space:nowrap">${b.statut!=='Sortie'&&b.statut!=='En sortie'?b.fluideActuel+' kg':'—'}</td>
             <td>${placeHtml}</td>
-            <td style="white-space:nowrap">${b.capaciteMax?b.capaciteMax+' kg':'—'}</td>
         </tr>`;
     });
     return html + `</tbody></table></div>`;
@@ -1023,10 +1037,14 @@ function renderResMgmt() {
     html += `<div class="res-section-title">Nouvelle réservation</div>
         <div class="res-form-row">
             <label class="res-form-label">Bouteille</label>
-            <select class="res-form-select" id="rf-bottle" onchange="onResBottleChange()">
-                <option value="">— Sélectionner —</option>
-                ${(d.availableBottles||[]).map(b=>`<option value="${b.id}" data-fluide="${b.fluide}" data-type="${b.type}">${b.id} — ${b.fluide||'?'} (${b.type})</option>`).join('')}
-            </select>
+            <input type="text" class="res-form-input" id="rf-bottle"
+                   list="rf-bottle-list"
+                   placeholder="Tapez le numéro, le fluide ou le type…"
+                   autocomplete="off"
+                   oninput="onResBottleChange()"/>
+            <datalist id="rf-bottle-list">
+                ${(d.availableBottles||[]).map(b=>`<option value="${b.id} — ${b.fluide||'?'} (${b.type})" data-id="${b.id}" data-fluide="${b.fluide}" data-type="${b.type}">`).join('')}
+            </datalist>
         </div>
         <div class="res-form-row">
             <label class="res-form-label">N° Affaire</label>
@@ -1072,24 +1090,24 @@ function onResBottleChange() {
 }
 
 async function submitReservation() {
-    const bottleEl = document.getElementById('rf-bottle');
-    const bottleId = bottleEl.value;
-    const affaire  = document.getElementById('rf-affaire').value.trim();
-    const date     = document.getElementById('rf-date').value;
-    const gest     = document.getElementById('rf-gest').value;
-    const errEl    = document.getElementById('rf-error');
+    const bottleRaw = (document.getElementById('rf-bottle')?.value || '').trim();
+    const bottleId  = bottleRaw.split(' — ')[0].trim();
+    const affaire   = document.getElementById('rf-affaire').value.trim();
+    const date      = document.getElementById('rf-date').value;
+    const gest      = document.getElementById('rf-gest').value;
+    const errEl     = document.getElementById('rf-error');
 
-    if (!bottleId) { errEl.textContent = 'Sélectionnez une bouteille.'; return; }
+    if (!bottleId) { errEl.textContent = 'Saisissez ou sélectionnez une bouteille.'; return; }
     if (!affaire)  { errEl.textContent = 'Saisissez un N° affaire.'; return; }
     if (!date)     { errEl.textContent = 'Saisissez une date de sortie prévue.'; return; }
     if (!gest)     { errEl.textContent = 'Sélectionnez un gestionnaire.'; return; }
     errEl.textContent = '';
 
-    const sel = bottleEl.options[bottleEl.selectedIndex];
+    const bottleInfo = (resData?.availableBottles||[]).find(b => b.id === bottleId) || {};
     const payload = {
         bottleId,
-        fluide:      sel.dataset.fluide || '',
-        type:        sel.dataset.type   || '',
+        fluide:      bottleInfo.fluide || '',
+        type:        bottleInfo.type   || '',
         affaire,
         datePrevu:   date,
         gestionnaire:gest,
