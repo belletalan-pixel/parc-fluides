@@ -518,11 +518,15 @@ function renderRecupTable(btls, kind) {
         if (b.placeDisponible!==null && b.statut!=='Sortie' && b.statut!=='En sortie') {
             const cap   = parseFloat(b.capaciteMax)||0;
             const place = parseFloat(b.placeDisponible)||0;
-            const pct   = cap>0 ? Math.min(100,(place/cap)*100).toFixed(0) : 50;
-            placeHtml   = `<div class="qty-bar-wrap">
-                <div class="qty-bar"><div class="${fillCls}" style="width:${100-pct}%"></div></div>
-                <span class="qty-val qty-green">${b.placeDisponible} kg</span>
-            </div>`;
+            if (cap > 0) {
+                const pct = Math.min(100,(place/cap)*100).toFixed(0);
+                placeHtml = `<div class="qty-bar-wrap">
+                    <div class="qty-bar"><div class="${fillCls}" style="width:${100-pct}%"></div></div>
+                    <span class="qty-val qty-green">${b.placeDisponible} kg</span>
+                </div>`;
+            } else {
+                placeHtml = `<span class="qty-val qty-green">${b.placeDisponible} kg</span>`;
+            }
         } else if (b.statut==='Sortie'||b.statut==='En sortie') {
             placeHtml = `<span style="font-size:12px;color:var(--muted)">En sortie (${b.technicien||'—'})</span>`;
         }
