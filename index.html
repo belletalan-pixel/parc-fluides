@@ -338,6 +338,7 @@
             <input type="text" class="form-input" id="f-aff" placeholder="ex : 2025-047" autocomplete="off" />
         </div>
     </div>
+    <div id="form-overcap-warn"></div>
     <div id="form-error"></div>
     <button class="btn-primary" onclick="submitForm()">✔ Valider</button>
     <button class="btn-ghost" onclick="showScreen('s-bottle')">Annuler</button>
@@ -414,6 +415,7 @@
 
     <div id="create-error"></div>
     <button class="btn-primary" onclick="submitCreate()">✔ Créer la bouteille</button>
+
     <button class="btn-ghost" onclick="goSearch()">Annuler</button>
 </div>
 
@@ -815,6 +817,7 @@ function buildForm() {
     tag.textContent = ACTION_LABELS[act];
     tag.className   = `form-tag ${act}`;
     document.getElementById('form-error').innerHTML = '';
+    document.getElementById('form-overcap-warn').innerHTML = '';
 
     const tare        = parseNum(b.tare);
     const dernierPoids = parseNum(b.dernierPoids);
@@ -955,8 +958,17 @@ async function submitForm() {
     if (act === 'retour' && !isRec && poids > dernierPoids) {
         setFormErr(`❌ Poids impossible — bouteille neuve ne peut pas revenir plus lourde (départ ${dernierPoids} kg).`); return;
     }
-    if (act === 'retour' && isRec && capMax && poids > tare + capMax) {
-        setFormErr(`❌ Bouteille saturée — poids max ${(tare+capMax).toFixed(2)} kg (cap. ${capMax} kg de fluide).`); return;
+    // Avertissement (non bloquant) si dépassement capacité max pour Récup/Transfert
+    const overCapacity = act === 'retour' && isRec && capMax && poids > tare + capMax;
+    if (overCapacity) {
+        const excess = (poids - tare - capMax).toFixed(3);
+        document.getElementById('form-overcap-warn').innerHTML =
+            `<div style="background:#FFF0E6;border:1.5px solid #E05F00;border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:13px;color:#E05F00;font-weight:600;">
+                ⚠️ Dépassement de capacité : +${excess} kg au-dessus du max (${(tare+capMax).toFixed(3)} kg)<br>
+                <span style="font-weight:400">Vérifiez le poids saisi avant de valider.</span>
+            </div>`;
+    } else {
+        document.getElementById('form-overcap-warn').innerHTML = '';
     }
 
     showScreen('s-submitting');
