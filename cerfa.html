@@ -105,6 +105,14 @@
         .btn-save:hover{opacity:.9;}
         .btn-cancel{padding:10px 16px;background:transparent;color:var(--muted);border:none;font-size:13px;cursor:pointer;font-family:inherit;text-decoration:underline;}
         .form-err{font-size:12px;color:var(--red);}
+        .status-warn{background:#FFF0E6;color:#E05F00;font-weight:700;padding:3px 10px;border-radius:10px;font-size:11px;white-space:nowrap;}
+        .cerfa-existing-card{border:1px solid var(--brown-bdr);border-radius:8px;margin-bottom:8px;overflow:hidden;}
+        .cerfa-existing-hdr{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;background:var(--brown-bg);gap:10px;font-size:13px;}
+        .cerfa-existing-hdr:hover{background:#FDE68A44;}
+        .cerfa-sum{padding:12px 16px;border-radius:8px;font-size:13px;font-weight:600;text-align:center;margin-bottom:12px;}
+        .cerfa-sum.ok{background:var(--green-bg);color:var(--green);}
+        .cerfa-sum.warn{background:var(--red-bg);color:var(--red);}
+        .cerfa-sum.empty{background:#F3F4F6;color:var(--muted);}
 
         /* Loading */
         .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:40vh;gap:14px;color:var(--muted);}
@@ -268,165 +276,206 @@ function applyFilter() {
 }
 
 // ── Render ──────────────────────────────────
+// ── Helpers ──────────────────────────────────
+function cerfaConsoValue(b, c) {
+    if (b.type === 'Neuf') return (c.qtRecharge||0) - (c.qtRecup||0);
+    return (c.qtRecup||0) - (c.qtRecharge||0);
+}
+
 function renderAll() {
     const bottles = cerfaData.bottles || [];
-    const totalMvt = bottles.reduce((s,b) => s+b.movements.length, 0);
-    const totalKo  = bottles.reduce((s,b) => s+b.movements.filter(m=>!m.cerfaSaisi).length, 0);
-
+    const totalMvt = bottles.reduce((s,b)=>s+b.movements.length,0);
+    const totalKo  = bottles.reduce((s,b)=>s+b.movements.filter(m=>!m.cerfaSaisi).length,0);
     document.getElementById('mgmt-stats').innerHTML =
-        `${bottles.length} bouteille(s) · ${totalMvt} mouvement(s) · <strong>${totalKo} Cerfa manquant(s)</strong>`;
+        `${bottles.length} bouteille(s) · ${totalMvt} mouvement(s) · <strong>${totalKo} sans Cerfa</strong>`;
 
     if (!bottles.length) {
-        document.getElementById('bottles-list').innerHTML =
-            '<div class="empty-msg">Aucun mouvement avec variation de fluide.</div>';
+        document.getElementById('bottles-list').innerHTML='<div class="empty-msg">Aucun mouvement avec variation de fluide.</div>';
         return;
     }
 
-    let html = '';
-    bottles.forEach((b, bi) => {
-        const nbKo    = b.movements.filter(m=>!m.cerfaSaisi).length;
-        const nbOk    = b.movements.filter(m=>m.cerfaSaisi).length;
-        const mvtText = b.movements.map(m=>m.affaire+' '+m.technicien).join(' ');
+    let html='';
+    bottles.forEach((b,bi)=>{
+        const nbKo=b.movements.filter(m=>!m.cerfaSaisi).length;
+        const nbOk=b.movements.filter(m=>m.cerfaSaisi).length;
+        const mvtText=b.movements.map(m=>m.affaire+' '+m.technicien).join(' ');
 
-        html += `<div class="bottle-card" id="bottle-${bi}"
+        html+=`<div class="bottle-card" id="bottle-${bi}"
             data-id="${b.id}" data-fluide="${b.fluide||''}"
-            data-nbko="${nbKo}" data-nbok="${nbOk}"
-            data-mvttext="${mvtText}">
+            data-nbko="${nbKo}" data-nbok="${nbOk}" data-mvttext="${mvtText}">
             <div class="bottle-hdr" onclick="toggleBottle(${bi})">
                 <div>
                     <div class="bottle-name">${b.id}</div>
                     <div class="bottle-sub">${b.fluide||'?'} · ${b.type} · ${b.movements.length} mouvement(s)</div>
                 </div>
                 <div class="bottle-badges">
-                    ${nbKo>0 ? `<span class="badge badge-warn">⚠️ ${nbKo} manquant(s)</span>` : ''}
-                    ${nbOk>0 ? `<span class="badge badge-ok">✓ ${nbOk} saisi(s)</span>` : ''}
+                    ${nbKo>0?`<span class="badge badge-warn">⚠️ ${nbKo} sans Cerfa</span>`:''}
+                    ${nbOk>0?`<span class="badge badge-ok">✓ ${nbOk} renseigné(s)</span>`:''}
                 </div>
                 <span class="bottle-arr">▾</span>
             </div>
             <div class="bottle-body" id="body-${bi}">`;
 
-        b.movements.forEach((m, mi) => {
-            const isPos   = m.sens.startsWith('+');
-            const sensCls = isPos ? 'sens-pos' : 'sens-neg';
-            const statusCls  = m.cerfaSaisi ? 'status-ok' : 'status-ko';
-            const statusLabel= m.cerfaSaisi ? '✓ Cerfa saisi' : 'Cerfa manquant';
-            const cerfaInfo  = m.cerfaSaisi && m.cerfa
-                ? `N° ${m.cerfa.noCerfa} · ${m.cerfa.motif}`
-                : '';
-            const remindBtn = !m.cerfaSaisi
-                ? `<button class="btn-remind" id="remind-${bi}-${mi}"
-                     onclick="event.stopPropagation();sendReminder(${bi},${mi})"
-                     title="Envoyer un mail de relance au technicien">📧 Relancer</button>`
-                : '';
+        b.movements.forEach((m,mi)=>{
+            const sensCls=m.sens.startsWith('+')?'sens-pos':'sens-neg';
+            const sumCerfa=(m.cerfas||[]).reduce((s,c)=>s+cerfaConsoValue(b,c),0);
+            const delta=Math.abs(parseFloat((sumCerfa-m.conso).toFixed(3)));
+            const allOk=m.cerfas.length>0 && delta<=0.1;
+            const hasWarn=m.cerfas.length>0 && delta>0.1;
+            const statusCls=!m.cerfaSaisi?'status-ko':allOk?'status-ok':'status-warn';
+            const statusLabel=!m.cerfaSaisi?'Sans Cerfa':allOk?`✓ ${m.cerfas.length} Cerfa(s)`:` ⚠️ Écart`;
+            const remindBtn=!m.cerfaSaisi
+                ?`<button class="btn-remind" id="remind-${bi}-${mi}" onclick="event.stopPropagation();sendReminder(${bi},${mi})">📧 Relancer</button>`:'';
 
-            html += `<div class="mvt-row" onclick="toggleForm(${bi},${mi})">
+            html+=`<div class="mvt-row" onclick="toggleSection(${bi},${mi})">
                 <div>
                     <div class="mvt-date">${m.date}</div>
                     <div class="mvt-meta">📋 ${m.affaire} &nbsp;·&nbsp; 👤 ${m.technicien}</div>
-                    ${cerfaInfo ? `<div class="mvt-cerfa-info">${cerfaInfo}</div>` : ''}
+                    ${m.cerfas.length>0?`<div class="mvt-cerfa-info">Σ Cerfa : ${sumCerfa.toFixed(3)} kg / théorique : ${m.sens}</div>`:''}
                 </div>
                 <span class="mvt-sens ${sensCls}">${m.sens}</span>
                 <span class="mvt-status ${statusCls}">${statusLabel}</span>
                 ${remindBtn}
             </div>
-            <div id="form-${bi}-${mi}" style="display:none">
-                ${buildForm(b, m, bi, mi)}
+            <div id="section-${bi}-${mi}" style="display:none">
+                ${buildCerfaSection(b,m,bi,mi)}
             </div>`;
         });
-
-        html += `</div></div>`;
+        html+=`</div></div>`;
     });
-
-    document.getElementById('bottles-list').innerHTML = html;
+    document.getElementById('bottles-list').innerHTML=html;
     applyFilter();
 }
 
 function toggleBottle(bi) {
-    const card = document.getElementById('bottle-'+bi);
-    if (!card) return;
-    const wasOpen = card.classList.contains('open');
-    // Fermer tous
-    document.querySelectorAll('.bottle-card').forEach(c => c.classList.remove('open'));
-    if (!wasOpen) card.classList.add('open');
+    const card=document.getElementById('bottle-'+bi);
+    if(!card) return;
+    const wasOpen=card.classList.contains('open');
+    document.querySelectorAll('.bottle-card').forEach(c=>c.classList.remove('open'));
+    if(!wasOpen) card.classList.add('open');
 }
 
-function toggleForm(bi, mi) {
-    // Fermer autres formulaires de la même bouteille
-    document.querySelectorAll(`[id^="form-${bi}-"]`).forEach(el => {
-        if (el.id !== `form-${bi}-${mi}`) el.style.display = 'none';
+function toggleSection(bi,mi) {
+    document.querySelectorAll(`[id^="section-${bi}-"]`).forEach(el=>{
+        if(el.id!==`section-${bi}-${mi}`) el.style.display='none';
     });
-    const form = document.getElementById(`form-${bi}-${mi}`);
-    if (!form) return;
-    const isOpen = form.style.display !== 'none';
-    form.style.display = isOpen ? 'none' : 'block';
-    // Ouvrir l'accordéon
-    if (!isOpen) {
-        const card = document.getElementById('bottle-'+bi);
-        if (card) card.classList.add('open');
-    }
+    const sec=document.getElementById(`section-${bi}-${mi}`);
+    if(!sec) return;
+    sec.style.display=sec.style.display==='none'?'block':'none';
+    document.getElementById('bottle-'+bi)?.classList.add('open');
 }
 
-function buildForm(b, m, bi, mi) {
-    const isRec = b.type === 'Récupération' || b.type === 'Transfert';
-    const c = m.cerfa || {};
-    return `<div class="cerfa-form">
-        ${m.cerfaSaisi ? `<div style="background:var(--orange-bg);border:1px solid #FFD0A8;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--orange);font-weight:600;">
-            ⚠️ Ce Cerfa a déjà été enregistré. La modification écrasera les données existantes.
-        </div>` : ''}
+function toggleCerfaEditForm(bi,mi,ci) {
+    const el=document.getElementById(`cerfaedit-${bi}-${mi}-${ci}`);
+    if(el) el.style.display=el.style.display==='none'?'block':'none';
+}
+
+function toggleNewCerfaForm(bi,mi) {
+    const el=document.getElementById(`cerfanew-${bi}-${mi}`);
+    if(el) el.style.display=el.style.display==='none'?'block':'none';
+}
+
+function buildCerfaSection(b,m,bi,mi) {
+    const cerfas=m.cerfas||[];
+    const sumCerfa=cerfas.reduce((s,c)=>s+cerfaConsoValue(b,c),0);
+    const delta=parseFloat((sumCerfa-m.conso).toFixed(3));
+    const absDelta=Math.abs(delta);
+
+    // Indicateur de somme
+    let sumHtml='';
+    if(cerfas.length>0){
+        const sumCls=absDelta<=0.1?'ok':'warn';
+        sumHtml=`<div class="cerfa-sum ${sumCls}">
+            Σ Cerfa : <strong>${sumCerfa.toFixed(3)} kg</strong> &nbsp;/&nbsp;
+            Théorique mouvement : <strong>${m.conso.toFixed(3)} kg</strong>
+            ${absDelta>0.1?` &nbsp;⚠️ Écart : ${delta>=0?'+':''}${delta.toFixed(3)} kg`:' &nbsp;✓ Conforme'}
+        </div>`;
+    } else {
+        sumHtml=`<div class="cerfa-sum empty">Aucun Cerfa saisi pour ce mouvement — théorique : ${m.conso.toFixed(3)} kg</div>`;
+    }
+
+    // Cerfa existants
+    const existingHtml=cerfas.map((c,ci)=>`
+        <div class="cerfa-existing-card">
+            <div class="cerfa-existing-hdr" onclick="toggleCerfaEditForm(${bi},${mi},${ci})">
+                <span><strong>#${ci+1} — ${c.noCerfa||'N° ?'}</strong> &nbsp;·&nbsp; ${c.motif||'—'} &nbsp;·&nbsp; ${c.detenteur||'—'}</span>
+                <span style="color:var(--brown);font-weight:700">${cerfaConsoValue(b,c).toFixed(3)} kg</span>
+                <span style="font-size:11px;color:var(--muted)">✏️ Modifier</span>
+            </div>
+            <div id="cerfaedit-${bi}-${mi}-${ci}" style="display:none">
+                ${buildForm(b,m,bi,mi,ci,c)}
+            </div>
+        </div>`).join('');
+
+    return `<div class="cerfa-form" style="border-top:2px solid var(--brown-bdr)">
+        ${sumHtml}
+        ${existingHtml}
+        <div id="cerfanew-${bi}-${mi}" style="display:none">
+            ${buildForm(b,m,bi,mi,-1,null)}
+        </div>
+        <button class="btn-save" style="margin-top:10px;background:var(--navy)"
+            onclick="toggleNewCerfaForm(${bi},${mi})">➕ Ajouter un Cerfa</button>
+    </div>`;
+}
+
+function buildForm(b,m,bi,mi,ci,c) {
+    c=c||{};
+    const isNew=ci===-1;
+    const formId=isNew?`new-${bi}-${mi}`:`edit-${bi}-${mi}-${ci}`;
+    const isRec=b.type==='Récupération'||b.type==='Transfert';
+    return `<div class="cerfa-form" style="background:#fff;border-top:1px dashed var(--brown-bdr)">
         <div class="cerfa-form-title">
-            📑 Données Cerfa — ${m.date} · ${m.affaire}
-            <span style="font-weight:400;color:var(--muted)"> · Conso théorique : ${m.sens}</span>
+            ${isNew?'➕ Nouveau Cerfa':'✏️ Modifier Cerfa #'+(ci+1)} — ${m.date} · ${m.affaire}
+            <span style="font-weight:400;color:var(--muted)"> · Théorique mouvement : ${m.sens}</span>
         </div>
         <div class="form-grid">
             <div>
-                <label class="fl">N° fiche Cerfa <span style="font-weight:400;font-style:italic">(partageable entre mouvements)</span></label>
-                <input class="fi" id="fi-no-${bi}-${mi}" value="${c.noCerfa||''}" placeholder="ex : 2025-147" autocomplete="off"/>
+                <label class="fl">N° fiche Cerfa</label>
+                <input class="fi" id="fi-no-${formId}" value="${c.noCerfa||''}" placeholder="ex : 2025-147" autocomplete="off"/>
             </div>
             <div>
                 <label class="fl">Date du Cerfa</label>
-                <input class="fi" id="fi-date-${bi}-${mi}" type="date" value="${c.dateCerfa||''}"/>
+                <input class="fi" id="fi-date-${formId}" type="date" value="${c.dateCerfa||''}"/>
             </div>
             <div class="form-full">
                 <label class="fl">Détenteur de l'installation (client)</label>
-                <input class="fi" id="fi-det-${bi}-${mi}" value="${c.detenteur||''}" placeholder="ex : TOTAL Normandie, Client XYZ…" autocomplete="off"/>
+                <input class="fi" id="fi-det-${formId}" value="${c.detenteur||''}" placeholder="ex : TOTAL Normandie…" autocomplete="off"/>
             </div>
             <div class="form-full">
                 <label class="fl">Nature de l'intervention</label>
-                <select class="fi" id="fi-motif-${bi}-${mi}">
+                <select class="fi" id="fi-motif-${formId}">
                     <option value="">— Sélectionner —</option>
                     ${['Mise en service','Maintenance préventive','Maintenance curative / Réparation',
-                       'Récupération','Recharge','Contrôle d\'étanchéité',
-                       'Dépose d\'équipement','Autre']
-                      .map(o => `<option value="${o}" ${c.motif===o?'selected':''}>${o}</option>`)
-                      .join('')}
+                       'Récupération','Recharge','Contrôle d\'étanchéité','Dépose d\'équipement','Autre']
+                      .map(o=>`<option value="${o}" ${c.motif===o?'selected':''}>${o}</option>`).join('')}
                 </select>
             </div>
             <div>
                 <label class="fl">Qté récupérée Cerfa (kg)</label>
-                <input class="fi ${!isRec?'dimmed':''}" id="fi-recup-${bi}-${mi}" type="number"
+                <input class="fi ${!isRec?'dimmed':''}" id="fi-recup-${formId}" type="number"
                     step="0.001" min="0" value="${c.qtRecup||''}" placeholder="0.000"
                     ${!isRec?'tabindex="-1"':''}/>
-                ${!isRec?'<div style="font-size:11px;color:var(--muted);margin-top:4px">Non applicable pour une bouteille Neuf</div>':''}
+                ${!isRec?'<div style="font-size:11px;color:var(--muted);margin-top:4px">Non applicable (bouteille Neuf)</div>':''}
             </div>
             <div>
                 <label class="fl">Qté chargée Cerfa (kg)
-                    ${b.type==='Transfert'?' <span style="color:var(--brown);font-size:10px">(fluide réinjecté dans l\'installation)</span>':''}
+                    ${b.type==='Transfert'?'<span style="font-size:10px;color:var(--brown)"> (réinjecté)</span>':''}
                 </label>
-                <input class="fi ${b.type==='Récupération'?'dimmed':''}" id="fi-recharge-${bi}-${mi}" type="number"
+                <input class="fi ${b.type==='Récupération'?'dimmed':''}" id="fi-recharge-${formId}" type="number"
                     step="0.001" min="0" value="${c.qtRecharge||''}" placeholder="0.000"
                     ${b.type==='Récupération'?'tabindex="-1"':''}/>
-                ${b.type==='Récupération'?'<div style="font-size:11px;color:var(--muted);margin-top:4px">Non applicable pour une Récupération</div>':''}
+                ${b.type==='Récupération'?'<div style="font-size:11px;color:var(--muted);margin-top:4px">Non applicable (Récupération)</div>':''}
             </div>
             <div class="form-full">
                 <label class="fl">Technicien manipulant</label>
-                <input class="fi" id="fi-ope-${bi}-${mi}" value="${c.operateur||m.technicien}" autocomplete="off"/>
+                <input class="fi" id="fi-ope-${formId}" value="${c.operateur||m.technicien}" autocomplete="off"/>
             </div>
         </div>
-        <div id="fi-ecart-${bi}-${mi}"></div>
+        <div id="fi-ecart-${formId}"></div>
         <div class="form-actions">
-            <button class="btn-save" onclick="submitCerfa(${bi},${mi})">✔ Enregistrer</button>
-            <button class="btn-cancel" onclick="toggleForm(${bi},${mi})">Annuler</button>
-            <span class="form-err" id="fi-err-${bi}-${mi}"></span>
+            <button class="btn-save" onclick="submitCerfa(${bi},${mi},${ci},'${c.fullRef||''}')">✔ Enregistrer</button>
+            <button class="btn-cancel" onclick="${isNew?`toggleNewCerfaForm(${bi},${mi})`:`toggleCerfaEditForm(${bi},${mi},${ci})`}">Annuler</button>
+            <span class="form-err" id="fi-err-${formId}"></span>
         </div>
     </div>`;
 }
@@ -468,20 +517,23 @@ async function sendReminder(bi, mi) {
     }
 }
 
-async function submitCerfa(bi, mi) {
+async function submitCerfa(bi, mi, ci, fullRef) {
     const b = (cerfaData.bottles||[])[bi];
     const m = b ? b.movements[mi] : null;
     if (!b || !m) return;
 
-    const noCerfa    = document.getElementById(`fi-no-${bi}-${mi}`)?.value.trim();
-    const dateCerfa  = document.getElementById(`fi-date-${bi}-${mi}`)?.value;
-    const detenteur  = document.getElementById(`fi-det-${bi}-${mi}`)?.value.trim();
-    const motif      = document.getElementById(`fi-motif-${bi}-${mi}`)?.value.trim();
-    const qtRecup    = parseFloat(document.getElementById(`fi-recup-${bi}-${mi}`)?.value) || 0;
-    const qtRecharge = parseFloat(document.getElementById(`fi-recharge-${bi}-${mi}`)?.value) || 0;
-    const operateur  = document.getElementById(`fi-ope-${bi}-${mi}`)?.value.trim();
-    const errEl      = document.getElementById(`fi-err-${bi}-${mi}`);
-    const ecartEl    = document.getElementById(`fi-ecart-${bi}-${mi}`);
+    const isNew  = ci === -1;
+    const formId = isNew ? `new-${bi}-${mi}` : `edit-${bi}-${mi}-${ci}`;
+
+    const noCerfa    = document.getElementById(`fi-no-${formId}`)?.value.trim();
+    const dateCerfa  = document.getElementById(`fi-date-${formId}`)?.value;
+    const detenteur  = document.getElementById(`fi-det-${formId}`)?.value.trim();
+    const motif      = document.getElementById(`fi-motif-${formId}`)?.value.trim();
+    const qtRecup    = parseFloat(document.getElementById(`fi-recup-${formId}`)?.value) || 0;
+    const qtRecharge = parseFloat(document.getElementById(`fi-recharge-${formId}`)?.value) || 0;
+    const operateur  = document.getElementById(`fi-ope-${formId}`)?.value.trim();
+    const errEl      = document.getElementById(`fi-err-${formId}`);
+    const ecartEl    = document.getElementById(`fi-ecart-${formId}`);
 
     if (!noCerfa)   { errEl.textContent = 'Saisissez le N° fiche Cerfa.'; return; }
     if (!dateCerfa) { errEl.textContent = 'Saisissez la date du Cerfa.'; return; }
@@ -490,37 +542,43 @@ async function submitCerfa(bi, mi) {
     if (!operateur) { errEl.textContent = "Saisissez le technicien manipulant."; return; }
     errEl.textContent = '';
 
-    // Calcul consommation selon le type
-    let ecart, ecartCls, ecartMsg;
+    // Consommation de ce Cerfa
+    const ecart = parseFloat(cerfaConsoValue(b, {qtRecup, qtRecharge}).toFixed(3));
+
+    // Somme projetée (ce Cerfa + les autres existants)
+    const otherCerfas = (m.cerfas||[]).filter((_,i) => i !== ci);
+    const sumProjected = otherCerfas.reduce((s,c)=>s+cerfaConsoValue(b,c),0) + ecart;
+    const delta = parseFloat((sumProjected - m.conso).toFixed(3));
+    const absDelta = Math.abs(delta);
+
+    // Affichage écart individuel + somme projetée
+    let ecartCls, ecartMsg;
     if (b.type === 'Neuf') {
-        // Neuf : chargé − récupéré = consommation nette
-        ecart    = parseFloat((qtRecharge - qtRecup).toFixed(3));
         ecartCls = ecart < -0.5 ? 'ecart-warn' : 'ecart-ok';
-        ecartMsg = `Consommation Cerfa (chargé − récupéré) : <strong>${ecart>=0?'+':''}${ecart.toFixed(3)} kg</strong>
-            ${ecart < -0.5 ? ' ⚠️ Récupération supérieure à la charge — à vérifier' : ' ✓ Cohérent'}`;
+        ecartMsg = `Ce Cerfa : <strong>${ecart>=0?'+':''}${ecart.toFixed(3)} kg</strong>`;
     } else if (b.type === 'Récupération') {
-        // Récupération : tout reste dans la bouteille
-        ecart    = parseFloat((qtRecup - qtRecharge).toFixed(3));
         ecartCls = ecart < 0 ? 'ecart-warn' : 'ecart-ok';
-        ecartMsg = `Fluide net récupéré : <strong>${ecart.toFixed(3)} kg</strong>
-            ${ecart < 0 ? ' ⚠️ Valeur négative — à vérifier' : ' ✓ Normal pour une Récupération'}`;
+        ecartMsg = `Fluide net récupéré ce Cerfa : <strong>${ecart.toFixed(3)} kg</strong>`;
     } else {
-        // Transfert : récupéré − réinjecté = résiduel dans la bouteille
-        ecart    = parseFloat((qtRecup - qtRecharge).toFixed(3));
         ecartCls = ecart < -0.5 ? 'ecart-warn' : 'ecart-ok';
-        ecartMsg = `Résiduel dans la bouteille (récupéré − réinjecté) : <strong>${ecart>=0?'+':''}${ecart.toFixed(3)} kg</strong>
-            ${ecart < -0.5 ? ' ⚠️ Plus réinjecté que récupéré — impossible, à vérifier' : ' ✓ Cohérent'}`;
+        ecartMsg = `Résiduel ce Cerfa : <strong>${ecart>=0?'+':''}${ecart.toFixed(3)} kg</strong>`;
     }
+    // Ajouter la somme projetée vs théorique
+    const sumCls = absDelta <= 0.1 ? 'color:var(--green)' : 'color:var(--red)';
+    ecartMsg += ` &nbsp;|&nbsp; <span style="${sumCls}">Σ projetée : ${sumProjected.toFixed(3)} kg / théorique : ${m.conso.toFixed(3)} kg
+        ${absDelta > 0.1 ? ' ⚠️ Écart : '+(delta>=0?'+':'')+delta.toFixed(3)+' kg' : ' ✓'}</span>`;
     ecartEl.innerHTML = `<div class="ecart-box ${ecartCls}" style="margin-top:12px">${ecartMsg}</div>`;
 
     const payload = {
-        ref: m.ref, bottleId: b.id, fluide: b.fluide, type: b.type,
+        ref: m.ref,
+        fullRef: fullRef || null,
+        bottleId: b.id, fluide: b.fluide, type: b.type,
         date: m.date, affaire: m.affaire, technicien: m.technicien,
         consoTheo: m.conso, noCerfa, dateCerfa, detenteur, motif,
         qtRecup, qtRecharge, operateur,
     };
 
-    const btn = document.querySelector(`#form-${bi}-${mi} .btn-save`);
+    const btn = document.querySelector(`#cerfanew-${bi}-${mi} .btn-save, #cerfaedit-${bi}-${mi}-${ci} .btn-save`);
     if (btn) { btn.disabled = true; btn.textContent = 'Enregistrement…'; }
 
     try {
@@ -530,7 +588,7 @@ async function submitCerfa(bi, mi) {
         const r = await fetch(url.toString());
         const res = await r.json();
         if (res.error) throw new Error(res.error);
-        await loadData(); // Rafraîchir tout
+        await loadData();
     } catch(err) {
         errEl.textContent = '❌ ' + err.message;
         if (btn) { btn.disabled = false; btn.textContent = '✔ Enregistrer'; }
