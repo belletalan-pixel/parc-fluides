@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration — Parc Fluides PAGANETTI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --navy:#0D2137;--green:#1A6E38;--green-bg:#E8F5EE;
+            --red:#C0392B;--red-bg:#FDEDEC;
+            --grey:#4B5563;--grey-bg:#F3F4F6;
+            --orange:#E05F00;--orange-bg:#FFF0E6;
+            --bg:#EDF0F3;--card:#fff;--border:#D2D8DF;--text:#0D2137;--muted:#6B7A8A;
+        }
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+        .header{background:var(--grey);color:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:20;}
+        .header h1{font-size:16px;font-weight:800;}
+        .header p{font-size:11px;opacity:.55;margin-top:2px;}
+        .btn-back{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 14px;border-radius:6px;font-size:12px;font-family:inherit;text-decoration:none;}
+
+        .content{max-width:900px;margin:0 auto;padding:24px 20px;}
+
+        /* PIN */
+        .pin-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;gap:8px;}
+        .pin-title{font-size:16px;font-weight:700;margin-bottom:4px;}
+        .pin-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
+        .pin-dots{display:flex;gap:18px;justify-content:center;margin:16px 0 8px;}
+        .pin-dot{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--border);background:transparent;transition:all .12s;}
+        .pin-dot.filled{background:var(--grey);border-color:var(--grey);}
+        .pin-err{text-align:center;font-size:12px;color:var(--red);min-height:18px;margin-bottom:12px;font-weight:500;}
+        @keyframes pshake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+        .pshake{animation:pshake .45s ease;}
+        .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:240px;}
+        .np-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:18px 8px;font-size:22px;font-weight:700;font-family:inherit;color:var(--navy);cursor:pointer;text-align:center;}
+        .np-btn:active{transform:scale(.93);}
+        .np-btn.del{font-size:18px;color:var(--red);border-color:transparent;background:transparent;}
+        .np-btn.empty{opacity:0;pointer-events:none;}
+
+        /* Sections admin */
+        .admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+        @media(max-width:640px){.admin-grid{grid-template-columns:1fr;}}
+        .admin-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+        .admin-card-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+        .admin-card-icon{font-size:20px;}
+        .admin-card-title{font-size:14px;font-weight:700;color:var(--navy);}
+        .admin-card-body{padding:14px 18px;}
+
+        /* Liste d'items */
+        .item-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;min-height:32px;}
+        .item-pill{display:flex;align-items:center;gap:6px;background:var(--grey-bg);border:1px solid var(--border);border-radius:20px;padding:5px 10px;font-size:12px;font-weight:600;}
+        .item-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:0 2px;}
+        .item-del:hover{color:var(--red);}
+        .item-empty{font-size:12px;color:var(--muted);font-style:italic;}
+
+        /* Add input */
+        .add-row{display:flex;gap:8px;}
+        .add-input{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:#fff;}
+        .add-input:focus{outline:none;border-color:var(--grey);}
+        .btn-add{padding:9px 16px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+        .btn-add:hover{opacity:.9;}
+
+        /* Seuils */
+        .threshold-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
+        .threshold-label{font-size:13px;color:var(--text);}
+        .threshold-input{width:80px;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;text-align:center;}
+        .threshold-input:focus{outline:none;border-color:var(--grey);}
+        .threshold-unit{font-size:12px;color:var(--muted);}
+        .btn-save-thresh{padding:8px 16px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;margin-top:4px;}
+
+        /* Sauvegardes */
+        .backup-status{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:12px 14px;border-radius:10px;}
+        .backup-status.on{background:var(--green-bg);}
+        .backup-status.off{background:var(--grey-bg);}
+        .backup-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+        .backup-dot.on{background:var(--green);}
+        .backup-dot.off{background:var(--muted);}
+        .backup-txt{font-size:13px;font-weight:600;}
+        .btn-toggle{width:100%;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;}
+        .btn-force{width:100%;padding:10px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+        .btn-force:hover{opacity:.9;}
+
+        .msg-ok{font-size:12px;color:var(--green);margin-top:6px;font-weight:600;}
+        .msg-err{font-size:12px;color:var(--red);margin-top:6px;font-weight:600;}
+
+        .loading{text-align:center;padding:40px;color:var(--muted);}
+    </style>
+</head>
+<body>
+<div class="header">
+    <div>
+        <p>PAGANETTI THERMIQUE</p>
+        <h1>⚙️ Administration</h1>
+    </div>
+    <a href="dashboard.html" class="btn-back">← Tableau de bord</a>
+</div>
+
+<!-- PIN phase -->
+<div class="content" id="pin-phase">
+    <div class="pin-page">
+        <div class="pin-title">Accès réservé</div>
+        <div class="pin-sub">Saisissez le code d'accès</div>
+        <div class="pin-dots" id="pin-dots">
+            <div class="pin-dot" id="pd1"></div>
+            <div class="pin-dot" id="pd2"></div>
+            <div class="pin-dot" id="pd3"></div>
+            <div class="pin-dot" id="pd4"></div>
+        </div>
+        <div class="pin-err" id="pin-err"></div>
+        <div class="numpad">
+            <button class="np-btn" onclick="pressPin('1')">1</button>
+            <button class="np-btn" onclick="pressPin('2')">2</button>
+            <button class="np-btn" onclick="pressPin('3')">3</button>
+            <button class="np-btn" onclick="pressPin('4')">4</button>
+            <button class="np-btn" onclick="pressPin('5')">5</button>
+            <button class="np-btn" onclick="pressPin('6')">6</button>
+            <button class="np-btn" onclick="pressPin('7')">7</button>
+            <button class="np-btn" onclick="pressPin('8')">8</button>
+            <button class="np-btn" onclick="pressPin('9')">9</button>
+            <button class="np-btn empty" disabled></button>
+            <button class="np-btn" onclick="pressPin('0')">0</button>
+            <button class="np-btn del" onclick="deletePin()">⌫</button>
+        </div>
+    </div>
+</div>
+
+<!-- Admin phase -->
+<div class="content" id="admin-phase" style="display:none">
+    <div id="admin-loading" class="loading">Chargement…</div>
+    <div id="admin-content" style="display:none">
+        <div class="admin-grid">
+
+            <!-- Techniciens -->
+            <div class="admin-card">
+                <div class="admin-card-hdr">
+                    <span class="admin-card-icon">👤</span>
+                    <span class="admin-card-title">Techniciens</span>
+                </div>
+                <div class="admin-card-body">
+                    <div class="item-list" id="list-technicien"></div>
+                    <div class="add-row">
+                        <input class="add-input" id="add-technicien" placeholder="Nom Prénom" autocomplete="off"/>
+                        <button class="btn-add" onclick="addItem('technicien','add-technicien','list-technicien')">Ajouter</button>
+                    </div>
+                    <div id="msg-technicien"></div>
+                </div>
+            </div>
+
+            <!-- Gestionnaires -->
+            <div class="admin-card">
+                <div class="admin-card-hdr">
+                    <span class="admin-card-icon">🏢</span>
+                    <span class="admin-card-title">Gestionnaires</span>
+                </div>
+                <div class="admin-card-body">
+                    <div class="item-list" id="list-gestionnaire"></div>
+                    <div class="add-row">
+                        <input class="add-input" id="add-gestionnaire" placeholder="Nom Prénom" autocomplete="off"/>
+                        <button class="btn-add" onclick="addItem('gestionnaire','add-gestionnaire','list-gestionnaire')">Ajouter</button>
+                    </div>
+                    <div id="msg-gestionnaire"></div>
+                </div>
+            </div>
+
+            <!-- Fluides -->
+            <div class="admin-card">
+                <div class="admin-card-hdr">
+                    <span class="admin-card-icon">🧪</span>
+                    <span class="admin-card-title">Fluides</span>
+                </div>
+                <div class="admin-card-body">
+                    <div class="item-list" id="list-fluide"></div>
+                    <div class="add-row">
+                        <input class="add-input" id="add-fluide" placeholder="ex : R410A" autocomplete="off" autocapitalize="characters"/>
+                        <button class="btn-add" onclick="addItem('fluide','add-fluide','list-fluide')">Ajouter</button>
+                    </div>
+                    <div id="msg-fluide"></div>
+                </div>
+            </div>
+
+            <!-- Fournisseurs -->
+            <div class="admin-card">
+                <div class="admin-card-hdr">
+                    <span class="admin-card-icon">🏭</span>
+                    <span class="admin-card-title">Fournisseurs</span>
+                </div>
+                <div class="admin-card-body">
+                    <div class="item-list" id="list-fournisseur"></div>
+                    <div class="add-row">
+                        <input class="add-input" id="add-fournisseur" placeholder="ex : GFF" autocomplete="off"/>
+                        <button class="btn-add" onclick="addItem('fournisseur','add-fournisseur','list-fournisseur')">Ajouter</button>
+                    </div>
+                    <div id="msg-fournisseur"></div>
+                </div>
+            </div>
+
+            <!-- Seuils d'alerte -->
+            <div class="admin-card">
+                <div class="admin-card-hdr">
+                    <span class="admin-card-icon">⚠️</span>
+                    <span class="admin-card-title">Seuils d'alerte</span>
+                </div>
+                <div class="admin-card-body">
+                    <div class="threshold-row">
+                        <span class="threshold-label">Fluide restant bas</span>
+                        <div style="display:flex;align-items:center;gap:6px">
+                            <span class="threshold-unit">sous</span>
+                            <input class="threshold-input" id="thresh-fluide" type="number" min="1" max="100"/>
+                            <span class="threshold-unit">%</span>
+                        </div>
+                    </div>
+                    <div class="threshold-row">
+                        <span class="threshold-label">Bouteille en sortie longue</span>
+                        <div style="display:flex;align-items:center;gap:6px">
+                            <span class="threshold-unit">plus de</span>
+                            <input class="threshold-input" id="thresh-sortie" type="number" min="1"/>
+                            <span class="threshold-unit">jours</span>
+                        </div>
+                    </div>
+                    <button class="btn-save-thresh" onclick="saveThresholds()">✔ Enregistrer les seuils</button>
+                    <div id="msg-thresh"></div>
+                </div>
+            </div>
+
+            <!-- Sauvegardes -->
+            <div class="admin-card">
+                <div class="admin-card-hdr">
+                    <span class="admin-card-icon">💾</span>
+                    <span class="admin-card-title">Sauvegardes automatiques</span>
+                </div>
+                <div class="admin-card-body">
+                    <div class="backup-status" id="backup-status-box">
+                        <div class="backup-dot" id="backup-dot"></div>
+                        <span class="backup-txt" id="backup-txt">Chargement…</span>
+                    </div>
+                    <button class="btn-toggle" id="btn-toggle-backup" onclick="toggleBackup()">…</button>
+                    <button class="btn-force" onclick="forceBackup()">📤 Lancer une sauvegarde maintenant</button>
+                    <div id="msg-backup"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYoKD0FWNrQ87sbAMn3yLcE-Qej37VYDVwECZFAg65rtA5UdiWzjJMpYn1p-AccUYVnQ/exec';
+const PIN_CODE   = '1858';
+
+let pin = '';
+let adminData = null;
+
+// ── PIN ────────────────────────────────────
+function pressPin(d) {
+    if (pin.length >= 4) return;
+    pin += d; updateDots();
+    document.getElementById('pin-err').textContent = '';
+    if (pin.length === 4) setTimeout(checkPin, 160);
+}
+function deletePin() { pin = pin.slice(0,-1); updateDots(); }
+function updateDots() {
+    for (let i=1;i<=4;i++)
+        document.getElementById('pd'+i).classList.toggle('filled', i<=pin.length);
+}
+function checkPin() {
+    if (pin === PIN_CODE) {
+        document.getElementById('pin-phase').style.display = 'none';
+        document.getElementById('admin-phase').style.display = 'block';
+        loadAdmin();
+    } else {
+        const dots = document.getElementById('pin-dots');
+        dots.classList.add('pshake');
+        setTimeout(() => { pin=''; updateDots(); dots.classList.remove('pshake');
+            document.getElementById('pin-err').textContent='Code incorrect'; }, 420);
+    }
+}
+
+// ── Load ───────────────────────────────────
+async function loadAdmin() {
+    document.getElementById('admin-loading').style.display = 'block';
+    document.getElementById('admin-content').style.display = 'none';
+    try {
+        const r = await fetch(`${SCRIPT_URL}?action=getAdminConfig`);
+        adminData = await r.json();
+        if (adminData.error) throw new Error(adminData.error);
+        renderAdmin();
+    } catch(err) {
+        document.getElementById('admin-loading').textContent = '❌ ' + err.message;
+    }
+}
+
+function renderAdmin() {
+    document.getElementById('admin-loading').style.display = 'none';
+    document.getElementById('admin-content').style.display = 'block';
+
+    renderList('technicien',  adminData.techniciens);
+    renderList('gestionnaire',adminData.gestionnaires);
+    renderList('fluide',      adminData.fluides);
+    renderList('fournisseur', adminData.fournisseurs);
+
+    document.getElementById('thresh-fluide').value  = adminData.seuilFluidePct;
+    document.getElementById('thresh-sortie').value  = adminData.seuilSortieJours;
+
+    renderBackupStatus(adminData.backupActive);
+}
+
+function renderList(type, items) {
+    const el = document.getElementById('list-'+type);
+    if (!items || !items.length) {
+        el.innerHTML = '<span class="item-empty">Aucun élément</span>';
+        return;
+    }
+    el.innerHTML = items.map(v => `
+        <span class="item-pill">
+            ${v}
+            <button class="item-del" onclick="removeItem('${type}','${v.replace(/'/g,"\\'")}','list-${type}')" title="Supprimer">✕</button>
+        </span>`).join('');
+}
+
+function renderBackupStatus(active) {
+    const box = document.getElementById('backup-status-box');
+    const dot = document.getElementById('backup-dot');
+    const txt = document.getElementById('backup-txt');
+    const btn = document.getElementById('btn-toggle-backup');
+    box.className = 'backup-status ' + (active ? 'on' : 'off');
+    dot.className = 'backup-dot ' + (active ? 'on' : 'off');
+    txt.textContent = active ? 'Sauvegarde automatique active — chaque lundi à 7h00' : 'Sauvegarde automatique désactivée';
+    btn.textContent = active ? '⏹ Désactiver la sauvegarde automatique' : '▶ Activer la sauvegarde automatique (lundi 7h)';
+    btn.style.background = active ? '#E05F00' : '#1A6E38';
+    btn.style.color = '#fff';
+}
+
+// ── Gestion items ──────────────────────────
+async function addItem(type, inputId, listId) {
+    const input = document.getElementById(inputId);
+    const value = input.value.trim();
+    const msgEl = document.getElementById('msg-'+type);
+    if (!value) { showMsg(msgEl,'Saisissez une valeur.','err'); return; }
+
+    try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action','addConfigItem');
+        url.searchParams.set('data', JSON.stringify({type, value}));
+        const r   = await fetch(url.toString());
+        const res = await r.json();
+        if (res.error) throw new Error(res.error);
+        input.value = '';
+        showMsg(msgEl, '✓ Ajouté', 'ok');
+        await loadAdmin();
+    } catch(err) { showMsg(msgEl, '❌ '+err.message, 'err'); }
+}
+
+async function removeItem(type, value, listId) {
+    if (!confirm(`Supprimer "${value}" de la liste ?`)) return;
+    const msgEl = document.getElementById('msg-'+type);
+    try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action','removeConfigItem');
+        url.searchParams.set('data', JSON.stringify({type, value}));
+        const r   = await fetch(url.toString());
+        const res = await r.json();
+        if (res.error) throw new Error(res.error);
+        showMsg(msgEl, '✓ Supprimé', 'ok');
+        await loadAdmin();
+    } catch(err) { showMsg(msgEl, '❌ '+err.message, 'err'); }
+}
+
+// ── Seuils ─────────────────────────────────
+async function saveThresholds() {
+    const pct   = parseInt(document.getElementById('thresh-fluide').value);
+    const jours = parseInt(document.getElementById('thresh-sortie').value);
+    const msgEl = document.getElementById('msg-thresh');
+    if (!pct || !jours) { showMsg(msgEl,'Valeurs invalides.','err'); return; }
+    try {
+        const call = async (key, value) => {
+            const url = new URL(SCRIPT_URL);
+            url.searchParams.set('action','updateThreshold');
+            url.searchParams.set('data', JSON.stringify({key, value}));
+            const r = await fetch(url.toString());
+            const res = await r.json();
+            if (res.error) throw new Error(res.error);
+        };
+        await call('seuil_fluide_pct',   pct);
+        await call('seuil_sortie_jours', jours);
+        showMsg(msgEl, '✓ Seuils enregistrés', 'ok');
+    } catch(err) { showMsg(msgEl, '❌ '+err.message, 'err'); }
+}
+
+// ── Sauvegardes ────────────────────────────
+async function toggleBackup() {
+    const msgEl = document.getElementById('msg-backup');
+    document.getElementById('btn-toggle-backup').disabled = true;
+    try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action','toggleBackupTrigger');
+        const r   = await fetch(url.toString());
+        const res = await r.json();
+        if (res.error) throw new Error(res.error);
+        renderBackupStatus(res.active);
+        showMsg(msgEl, res.active ? '✓ Sauvegarde automatique activée' : '✓ Sauvegarde automatique désactivée', 'ok');
+    } catch(err) { showMsg(msgEl, '❌ '+err.message, 'err'); }
+    document.getElementById('btn-toggle-backup').disabled = false;
+}
+
+async function forceBackup() {
+    const msgEl = document.getElementById('msg-backup');
+    const btn   = document.querySelector('.btn-force');
+    btn.disabled = true; btn.textContent = 'Envoi en cours…';
+    try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action','triggerBackup');
+        const r   = await fetch(url.toString());
+        const res = await r.json();
+        if (res.error) throw new Error(res.error);
+        showMsg(msgEl, '✓ Sauvegarde envoyée par mail', 'ok');
+    } catch(err) { showMsg(msgEl, '❌ '+err.message, 'err'); }
+    btn.disabled = false; btn.textContent = '📤 Lancer une sauvegarde maintenant';
+}
+
+// ── Helper ─────────────────────────────────
+function showMsg(el, text, type) {
+    el.className = type === 'ok' ? 'msg-ok' : 'msg-err';
+    el.textContent = text;
+    setTimeout(() => { if (el) el.textContent = ''; }, 4000);
+}
+</script>
+</body>
+</html>
