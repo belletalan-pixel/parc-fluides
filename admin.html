@@ -139,11 +139,12 @@
                     <span class="admin-card-title">Techniciens</span>
                 </div>
                 <div class="admin-card-body">
-                    <div class="item-list" id="list-technicien"></div>
-                    <div class="add-row">
-                        <input class="add-input" id="add-technicien" placeholder="Nom Prénom" autocomplete="off"/>
-                        <button class="btn-add" onclick="addItem('technicien','add-technicien','list-technicien')">Ajouter</button>
+                    <div id="list-technicien" style="margin-bottom:14px;display:flex;flex-direction:column;gap:8px;"></div>
+                    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px">
+                        <input class="add-input" id="add-technicien-name" placeholder="Nom Prénom" autocomplete="off"/>
+                        <input class="add-input" id="add-technicien-email" placeholder="adresse@email.com" type="email" autocomplete="off"/>
                     </div>
+                    <button class="btn-add" style="width:100%" onclick="addTechnicien()">Ajouter le technicien</button>
                     <div id="msg-technicien"></div>
                 </div>
             </div>
@@ -295,7 +296,7 @@ function renderAdmin() {
     document.getElementById('admin-loading').style.display = 'none';
     document.getElementById('admin-content').style.display = 'block';
 
-    renderList('technicien',  adminData.techniciens);
+    renderTechnicienList(adminData.techniciens);
     renderList('gestionnaire',adminData.gestionnaires);
     renderList('fluide',      adminData.fluides);
     renderList('fournisseur', adminData.fournisseurs);
@@ -330,6 +331,69 @@ function renderBackupStatus(active) {
     btn.textContent = active ? '⏹ Désactiver la sauvegarde automatique' : '▶ Activer la sauvegarde automatique (lundi 7h)';
     btn.style.background = active ? '#E05F00' : '#1A6E38';
     btn.style.color = '#fff';
+}
+
+// ── Techniciens (nom + email) ──────────────
+function renderTechnicienList(items) {
+    const el = document.getElementById('list-technicien');
+    if (!items || !items.length) {
+        el.innerHTML = '<span class="item-empty">Aucun technicien</span>';
+        return;
+    }
+    el.innerHTML = items.map(t => {
+        const name  = t.name  || t; // compatibilité ancien format simple string
+        const email = t.email || '';
+        const safeN = name.replace(/'/g,"\\'");
+        return `<div style="background:var(--grey-bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                <span style="font-size:13px;font-weight:600">${name}</span>
+                <button class="item-del" onclick="removeItem('technicien','${safeN}','list-technicien')" title="Supprimer">✕</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+                <input style="flex:1;padding:6px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-family:inherit"
+                    type="email" placeholder="adresse@email.com"
+                    id="email-${name.replace(/\s+/g,'_')}"
+                    value="${email}" autocomplete="off"/>
+                <button onclick="saveTechEmail('${safeN}','email-${name.replace(/\s+/g,'_')}')"
+                    style="padding:6px 12px;background:var(--navy);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">
+                    ✔ Enregistrer
+                </button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+async function addTechnicien() {
+    const name  = document.getElementById('add-technicien-name').value.trim();
+    const email = document.getElementById('add-technicien-email').value.trim();
+    const msgEl = document.getElementById('msg-technicien');
+    if (!name) { showMsg(msgEl,'Saisissez le nom du technicien.','err'); return; }
+    try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action','addConfigItem');
+        url.searchParams.set('data', JSON.stringify({type:'technicien', value:name, email}));
+        const r   = await fetch(url.toString());
+        const res = await r.json();
+        if (res.error) throw new Error(res.error);
+        document.getElementById('add-technicien-name').value  = '';
+        document.getElementById('add-technicien-email').value = '';
+        showMsg(msgEl,'✓ Technicien ajouté','ok');
+        await loadAdmin();
+    } catch(err) { showMsg(msgEl,'❌ '+err.message,'err'); }
+}
+
+async function saveTechEmail(name, inputId) {
+    const email = document.getElementById(inputId)?.value.trim();
+    const msgEl = document.getElementById('msg-technicien');
+    try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action','updateTechnicienEmail');
+        url.searchParams.set('data', JSON.stringify({name, email}));
+        const r   = await fetch(url.toString());
+        const res = await r.json();
+        if (res.error) throw new Error(res.error);
+        showMsg(msgEl,'✓ Email enregistré pour '+name,'ok');
+    } catch(err) { showMsg(msgEl,'❌ '+err.message,'err'); }
 }
 
 // ── Gestion items ──────────────────────────
