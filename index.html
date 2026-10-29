@@ -384,11 +384,11 @@
             <input type="number" class="form-input" id="c-tare" placeholder="ex : 8.500" step="0.001" min="0" inputmode="decimal"/>
         </div>
 
-        <!-- Poids chargé — Neuf uniquement -->
+        <!-- Poids actuel — affiché pour tous les types mais libellé différent -->
         <div class="form-section" id="c-poids-grp" style="display:none">
-            <label class="form-label">Poids actuel chargé (kg)</label>
+            <label class="form-label" id="c-poids-label">Poids actuel (kg)</label>
             <input type="number" class="form-input" id="c-poids" placeholder="ex : 18.500" step="0.001" min="0" inputmode="decimal"/>
-            <div class="form-hint">Poids total = Tare + Fluide chargé</div>
+            <div class="form-hint" id="c-poids-hint"></div>
         </div>
 
         <!-- Capacité max — Récupération/Transfert uniquement -->
@@ -1087,11 +1087,22 @@ function buildCreateForm() {
 function onCreateTypeChange() {
     const type  = document.getElementById('c-type').value;
     const isRec = type === 'Récupération' || type === 'Transfert';
-    document.getElementById('c-fluide-grp').style.display  = (!isRec && type) ? 'block' : 'none';
-    document.getElementById('c-poids-grp').style.display   = (!isRec && type) ? 'block' : 'none';
-    // Capacité max : uniquement pour Récup/Transfert (Neuf = calculé auto)
-    document.getElementById('c-capmax-grp').style.display  = (isRec && type)  ? 'block' : 'none';
+    document.getElementById('c-fluide-grp').style.display = (!isRec && type) ? 'block' : 'none';
+    // Poids actuel : affiché pour tous les types dès qu'un type est choisi
+    document.getElementById('c-poids-grp').style.display  = type ? 'block' : 'none';
+    // Capacité max : uniquement pour Récup/Transfert
+    document.getElementById('c-capmax-grp').style.display = (isRec && type) ? 'block' : 'none';
     document.getElementById('c-capmax').value = '';
+    // Adapter le libellé et l'indice selon le type
+    const label = document.getElementById('c-poids-label');
+    const hint  = document.getElementById('c-poids-hint');
+    if (!isRec) {
+        label.textContent = 'Poids actuel chargé (kg)';
+        hint.textContent  = 'Poids total = Tare + Fluide chargé';
+    } else {
+        label.textContent = 'Poids actuel réel (kg)';
+        hint.textContent  = 'Poids réel mesuré — peut différer légèrement de la tare';
+    }
 }
 
 async function submitCreate() {
@@ -1114,7 +1125,9 @@ async function submitCreate() {
     if (!type)                    { setCreateErr('Sélectionnez le type de bouteille.'); return; }
     if (!isRec && !fluide)        { setCreateErr('Sélectionnez le fluide.'); return; }
     if (!tare || tare <= 0)       { setCreateErr('Saisissez la tare (poids à vide).'); return; }
-    if (!isRec && (!poids || poids <= tare)) { setCreateErr(`Le poids chargé (${poids} kg) doit être supérieur à la tare (${tare} kg).`); return; }
+    if (!poids || poids <= 0)  { setCreateErr('Saisissez le poids actuel réel.'); return; }
+    if (!isRec && poids <= tare) { setCreateErr(`Le poids chargé (${poids} kg) doit être supérieur à la tare (${tare} kg).`); return; }
+    if (isRec  && poids < tare)  { setCreateErr(`Le poids actuel (${poids} kg) ne peut pas être inférieur à la tare (${tare} kg).`); return; }
     // Capacité max : calculée auto pour Neuf, saisie obligatoire pour Récup/Transfert
     const effectiveCapmax = isRec ? capmax : Math.max(0, poids - tare);
     if (isRec && (!capmax || capmax <= 0)) { setCreateErr('Saisissez la capacité max.'); return; }
@@ -1125,7 +1138,7 @@ async function submitCreate() {
 
     const payload = {
         id, type, fluide, tare,
-        poidsActuel: isRec ? tare : poids,
+        poidsActuel: poids,
         capaciteMax: effectiveCapmax,
         fournisseur: four,
         gestionnaire: gest,
