@@ -235,7 +235,11 @@
     <div class="card">
         <div class="form-section" style="margin:0">
             <label class="form-label">N° de bouteille</label>
-            <input type="text" class="form-input" id="manual-id" placeholder="ex : R410A-001" autocapitalize="characters" autocomplete="off" />
+            <input type="text" class="form-input" id="manual-id"
+                   list="bottle-list"
+                   placeholder="ex : R410A-001"
+                   autocapitalize="characters" autocomplete="off" />
+            <datalist id="bottle-list"></datalist>
         </div>
         <div id="search-error"></div>
         <button class="btn-primary" style="margin-top:14px" onclick="searchBottle()">Rechercher</button>
@@ -535,6 +539,7 @@ async function loadConfig() {
 
 function populateAllSelects() {
     populateDatalist('list-tech', LCONFIG.techniciens);
+    populateDatalist('bottle-list', LCONFIG.bottleIds || []);
     populateSel('f-gest',   LCONFIG.gestionnaires);
     populateSel('f-four',   LCONFIG.fournisseurs);
     populateSel('f-fluide', LCONFIG.fluides);
