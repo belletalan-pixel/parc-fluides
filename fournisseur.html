@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Départs fournisseur — Parc Fluides PAGANETTI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --navy:#0D2137;--violet:#6D28D9;--violet-bg:#F5F3FF;--violet-bdr:#DDD6FE;
+            --green:#1A6E38;--green-bg:#E8F5EE;--red:#C0392B;--red-bg:#FDEDEC;
+            --orange:#E05F00;--blue:#1A4DB5;--blue-bg:#EEF4FF;
+            --bg:#EDF0F3;--card:#fff;--border:#D2D8DF;--text:#0D2137;--muted:#6B7A8A;
+        }
+        *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+        body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+        .header{background:var(--violet);color:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:20;}
+        .header h1{font-size:16px;font-weight:800;}
+        .header p{font-size:11px;opacity:.6;margin-top:2px;letter-spacing:.06em;}
+        .btn-back{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 14px;border-radius:6px;font-size:12px;font-family:inherit;text-decoration:none;white-space:nowrap;cursor:pointer;}
+        .btn-back:hover{background:rgba(255,255,255,.25);}
+        .content{max-width:980px;margin:0 auto;padding:24px 20px;}
+
+        /* PIN */
+        .pin-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;gap:8px;}
+        .pin-title{font-size:16px;font-weight:700;margin-bottom:4px;}
+        .pin-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
+        .pin-dots{display:flex;gap:18px;justify-content:center;margin:16px 0 8px;}
+        .pin-dot{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--border);background:transparent;transition:all .12s;}
+        .pin-dot.filled{background:var(--violet);border-color:var(--violet);}
+        .pin-err{text-align:center;font-size:12px;color:var(--red);min-height:18px;margin-bottom:12px;font-weight:500;}
+        @keyframes pshake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+        .pshake{animation:pshake .45s ease;}
+        .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:240px;}
+        .np-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:18px 8px;font-size:22px;font-weight:700;font-family:inherit;color:var(--navy);cursor:pointer;text-align:center;}
+        .np-btn:active{transform:scale(.93);}
+        .np-btn.del{font-size:18px;color:var(--red);border-color:transparent;background:transparent;}
+        .np-btn.empty{opacity:0;pointer-events:none;}
+
+        /* Sections */
+        .sec{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:20px;overflow:hidden;}
+        .sec-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+        .sec-title{font-size:14px;font-weight:700;}
+        .sec-badge{background:var(--violet-bg);color:var(--violet);border-radius:10px;padding:2px 10px;font-size:12px;font-weight:800;}
+        .sec-body{padding:16px 18px;}
+        .intro{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:14px;}
+        .empty-msg{text-align:center;padding:28px;color:var(--muted);font-size:13px;font-style:italic;}
+
+        /* Carte bouteille en attente */
+        .wcard{border:1.5px solid var(--violet-bdr);border-radius:12px;margin-bottom:14px;overflow:hidden;background:#fff;}
+        .wcard-hdr{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;background:var(--violet-bg);}
+        .wcard-id{font-size:16px;font-weight:800;color:var(--navy);}
+        .wcard-sub{font-size:12px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+        .wcard-w{font-size:11px;color:var(--muted);text-align:right;line-height:1.5;}
+        .wcard-w strong{font-size:14px;color:var(--navy);}
+        .wcard-form{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;padding:16px;}
+        .fl{display:block;font-size:11px;font-weight:700;color:var(--violet);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px;}
+        .fi{width:100%;padding:10px 12px;border:1.5px solid var(--violet-bdr);border-radius:8px;font-size:14px;font-family:inherit;background:#fff;color:var(--text);}
+        .fi:focus{outline:none;border-color:var(--violet);}
+        .hint{font-size:11px;color:var(--muted);margin-top:4px;}
+        .nobsd{padding:10px 12px;border-radius:8px;background:var(--blue-bg);color:var(--blue);font-size:13px;font-weight:600;}
+        .wcard-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:0 16px 16px;}
+        .btn-go{padding:11px 22px;background:var(--violet);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+        .btn-go:hover{opacity:.9;}
+        .btn-go:disabled{opacity:.5;cursor:default;}
+        .btn-undo{padding:10px 14px;background:transparent;color:var(--muted);border:none;font-size:13px;cursor:pointer;font-family:inherit;text-decoration:underline;}
+        .err{font-size:12px;color:var(--red);font-weight:600;}
+
+        /* Pills type */
+        .pill{display:inline-block;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:700;}
+        .p-neuf{background:var(--green-bg);color:var(--green);}
+        .p-rec{background:#FEF2F2;color:#9B1C1C;}
+        .p-tr{background:var(--blue-bg);color:var(--blue);}
+
+        /* Ajout */
+        .add-row{display:flex;gap:10px;flex-wrap:wrap;}
+        .add-input{flex:1;min-width:220px;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;}
+        .add-input:focus{outline:none;border-color:var(--violet);}
+        .btn-add{padding:11px 20px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+        .msg-ok{font-size:12px;color:var(--green);margin-top:8px;font-weight:600;}
+        .msg-err{font-size:12px;color:var(--red);margin-top:8px;font-weight:600;}
+        .loading{text-align:center;padding:40px;color:var(--muted);}
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div>
+        <p>PAGANETTI THERMIQUE</p>
+        <h1>🚚 Départs fournisseur</h1>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a href="cerfa.html" class="btn-back">📑 Cerfa</a>
+        <a href="dashboard.html" class="btn-back">← Tableau de bord</a>
+    </div>
+</div>
+
+<!-- PIN -->
+<div class="content" id="pin-phase">
+    <div class="pin-page">
+        <div class="pin-title">Accès réservé</div>
+        <div class="pin-sub">Saisissez le code d'accès à 4 chiffres</div>
+        <div class="pin-dots" id="pin-dots">
+            <div class="pin-dot" id="pd1"></div><div class="pin-dot" id="pd2"></div>
+            <div class="pin-dot" id="pd3"></div><div class="pin-dot" id="pd4"></div>
+        </div>
+        <div class="pin-err" id="pin-err"></div>
+        <div class="numpad">
+            <button class="np-btn" onclick="pressPin('1')">1</button>
+            <button class="np-btn" onclick="pressPin('2')">2</button>
+            <button class="np-btn" onclick="pressPin('3')">3</button>
+            <button class="np-btn" onclick="pressPin('4')">4</button>
+            <button class="np-btn" onclick="pressPin('5')">5</button>
+            <button class="np-btn" onclick="pressPin('6')">6</button>
+            <button class="np-btn" onclick="pressPin('7')">7</button>
+            <button class="np-btn" onclick="pressPin('8')">8</button>
+            <button class="np-btn" onclick="pressPin('9')">9</button>
+            <button class="np-btn empty" disabled></button>
+            <button class="np-btn" onclick="pressPin('0')">0</button>
+            <button class="np-btn del" onclick="deletePin()">⌫</button>
+        </div>
+    </div>
+</div>
+
+<!-- Page -->
+<div class="content" id="main-phase" style="display:none">
+    <div id="main-loading" class="loading">Chargement…</div>
+    <div id="main-content" style="display:none">
+
+        <!-- À expédier -->
+        <div class="sec">
+            <div class="sec-hdr">
+                <span>🚚</span><span class="sec-title">Bouteilles en attente de départ</span>
+                <span class="sec-badge" id="wait-count">0</span>
+            </div>
+            <div class="sec-body">
+                <div class="intro">
+                    Ces bouteilles sont prêtes mais encore au parc. Pesez-les avant le départ, renseignez le n° de BSD
+                    Trackdéchets (Récupération et Transfert), choisissez le fournisseur puis validez : la bouteille est archivée
+                    comme « Retournée fournisseur ». Les bouteilles Neuf n'ont pas de BSD.
+                </div>
+                <div id="wait-list"></div>
+            </div>
+        </div>
+
+        <!-- Ajout -->
+        <div class="sec">
+            <div class="sec-hdr"><span>➕</span><span class="sec-title">Mettre une bouteille en attente de départ</span></div>
+            <div class="sec-body">
+                <div class="intro">
+                    Pour une bouteille non issue de la page Cerfa (par exemple une bouteille Neuf rendue sans avoir servi).
+                    Seules les bouteilles présentes au parc (statut Stock ou Neuve) sont proposées.
+                </div>
+                <div class="add-row">
+                    <input class="add-input" id="add-input" list="add-list" autocomplete="off"
+                           placeholder="Tapez le numéro, le fluide ou le type…"/>
+                    <datalist id="add-list"></datalist>
+                    <button class="btn-add" onclick="addWaiting()">Mettre en attente</button>
+                </div>
+                <div id="add-msg"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYoKD0FWNrQ87sbAMn3yLcE-Qej37VYDVwECZFAg65rtA5UdiWzjJMpYn1p-AccUYVnQ/exec';
+const PIN_CODE   = '1858';
+
+let pin = '', data = null;
+let lastFour = '', lastGest = '';   // mémorisés le temps de la session pour éviter de re-sélectionner
+
+// ── PIN ─────────────────────────────────────
+function pressPin(d) {
+    if (pin.length >= 4) return;
+    pin += d; updateDots();
+    document.getElementById('pin-err').textContent = '';
+    if (pin.length === 4) setTimeout(checkPin, 160);
+}
+function deletePin() { pin = pin.slice(0,-1); updateDots(); }
+function updateDots() {
+    for (let i=1;i<=4;i++) document.getElementById('pd'+i).classList.toggle('filled', i<=pin.length);
+}
+function checkPin() {
+    if (pin === PIN_CODE) {
+        document.getElementById('pin-phase').style.display = 'none';
+        document.getElementById('main-phase').style.display = 'block';
+        loadData();
+    } else {
+        const dots = document.getElementById('pin-dots');
+        dots.classList.add('pshake');
+        setTimeout(() => { pin=''; updateDots(); dots.classList.remove('pshake');
+            document.getElementById('pin-err').textContent = 'Code incorrect'; }, 420);
+    }
+}
+
+// ── Données ─────────────────────────────────
+async function callApi(action, payload) {
+    const url = new URL(SCRIPT_URL);
+    url.searchParams.set('action', action);
+    if (payload) url.searchParams.set('data', JSON.stringify(payload));
+    const r   = await fetch(url.toString());
+    const res = await r.json();
+    if (res.error) throw new Error(res.error);
+    return res;
+}
+
+async function loadData() {
+    try {
+        data = await callApi('getWaitingData');
+        render();
+    } catch (err) {
+        document.getElementById('main-loading').textContent = '❌ ' + err.message;
+    }
+}
+
+function opts(list, selected) {
+    return '<option value="">— Sélectionner —</option>'
+        + (list||[]).map(v => `<option value="${v}" ${v===selected?'selected':''}>${v}</option>`).join('');
+}
+
+function typePill(t) {
+    if (t === 'Neuf')         return '<span class="pill p-neuf">Neuf</span>';
+    if (t === 'Récupération') return '<span class="pill p-rec">Récup.</span>';
+    return '<span class="pill p-tr">Transf.</span>';
+}
+
+function render() {
+    document.getElementById('main-loading').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+
+    const w = data.waiting || [];
+    document.getElementById('wait-count').textContent = w.length;
+    document.getElementById('wait-list').innerHTML = w.length
+        ? w.map(cardHtml).join('')
+        : '<div class="empty-msg">Aucune bouteille en attente de départ.</div>';
+
+    document.getElementById('add-list').innerHTML = (data.eligible||[])
+        .map(b => `<option value="${b.id} — ${b.fluide||'?'} (${b.type})">`).join('');
+}
+
+function cardHtml(b, i) {
+    const isNeuf = b.type === 'Neuf';
+    return `<div class="wcard" id="wc-${i}">
+        <div class="wcard-hdr">
+            <div>
+                <div class="wcard-id">${b.id}</div>
+                <div class="wcard-sub">${b.fluide||'Fluide non défini'} ${typePill(b.type)} · en attente depuis le ${b.dateAttente}</div>
+            </div>
+            <div class="wcard-w">Dernier poids connu<br><strong>${b.poids ? b.poids.toFixed(3)+' kg' : '—'}</strong></div>
+        </div>
+        <div class="wcard-form">
+            <div>
+                <label class="fl">Poids de départ (kg) — repesée</label>
+                <input class="fi" id="w-poids-${i}" type="number" step="0.001" min="0" inputmode="decimal" placeholder="0.000"/>
+                <div class="hint">Tare : ${b.tare} kg</div>
+            </div>
+            <div>
+                <label class="fl">N° BSD Trackdéchets</label>
+                ${isNeuf
+                    ? '<div class="nobsd">Bouteille neuve : pas de BSD</div>'
+                    : `<input class="fi" id="w-bsd-${i}" autocomplete="off" placeholder="N° du bordereau"/>`}
+            </div>
+            <div>
+                <label class="fl">Fournisseur</label>
+                <select class="fi" id="w-four-${i}" onchange="lastFour=this.value">${opts(data.fournisseurs, lastFour)}</select>
+            </div>
+            <div>
+                <label class="fl">Gestionnaire</label>
+                <select class="fi" id="w-gest-${i}" onchange="lastGest=this.value">${opts(data.gestionnaires, lastGest)}</select>
+            </div>
+        </div>
+        <div class="wcard-actions">
+            <button class="btn-go" id="go-${i}" onclick="depart(${i})">🚚 Valider le départ</button>
+            <button class="btn-undo" onclick="undo(${i})">↩ Remettre en stock</button>
+            <span class="err" id="w-err-${i}"></span>
+        </div>
+    </div>`;
+}
+
+// ── Valider le départ ───────────────────────
+async function depart(i) {
+    const b     = data.waiting[i];
+    const errEl = document.getElementById('w-err-'+i);
+    const poids = parseFloat(document.getElementById('w-poids-'+i).value);
+    const bsd   = (document.getElementById('w-bsd-'+i)?.value || '').trim();
+    const four  = document.getElementById('w-four-'+i).value;
+    const gest  = document.getElementById('w-gest-'+i).value;
+    const isNeuf = b.type === 'Neuf';
+
+    if (!poids || poids <= 0)  { errEl.textContent = 'Saisissez le poids de départ.'; return; }
+    if (poids < b.tare)        { errEl.textContent = `Poids inférieur à la tare (${b.tare} kg).`; return; }
+    if (!isNeuf && !bsd)       { errEl.textContent = 'Saisissez le n° de BSD Trackdéchets.'; return; }
+    if (!four)                 { errEl.textContent = 'Sélectionnez le fournisseur.'; return; }
+    if (!gest)                 { errEl.textContent = 'Sélectionnez le gestionnaire.'; return; }
+    errEl.textContent = '';
+
+    const recap = `Valider le départ de ${b.id} ?\n\n`
+        + `Fournisseur : ${four}\nPoids : ${poids.toFixed(3)} kg\n`
+        + (isNeuf ? '' : `BSD : ${bsd}\n`)
+        + `\nLa bouteille sera archivée (Retournée fournisseur).`;
+    if (!confirm(recap)) return;
+
+    const btn = document.getElementById('go-'+i);
+    btn.disabled = true; btn.textContent = 'Enregistrement…';
+    try {
+        await callApi('departSupplier', { bottleId: b.id, poids, bsd: isNeuf ? '' : bsd, fournisseur: four, gestionnaire: gest });
+        lastFour = four; lastGest = gest;
+        await loadData();
+    } catch (err) {
+        errEl.textContent = '❌ ' + err.message;
+        btn.disabled = false; btn.textContent = '🚚 Valider le départ';
+    }
+}
+
+// ── Remettre en stock ───────────────────────
+async function undo(i) {
+    const b = data.waiting[i];
+    if (!confirm(`Remettre la bouteille ${b.id} en stock ?`)) return;
+    try {
+        await callApi('setWaiting', { bottleId: b.id, waiting: false });
+        await loadData();
+    } catch (err) {
+        document.getElementById('w-err-'+i).textContent = '❌ ' + err.message;
+    }
+}
+
+// ── Ajouter une bouteille en attente ────────
+async function addWaiting() {
+    const input = document.getElementById('add-input');
+    const msgEl = document.getElementById('add-msg');
+    const id    = input.value.trim().split(' — ')[0].trim();
+    const show  = (t, ok) => { msgEl.className = ok ? 'msg-ok' : 'msg-err'; msgEl.textContent = t; };
+
+    if (!id) { show('Saisissez ou sélectionnez une bouteille.', false); return; }
+    const found = (data.eligible||[]).find(b => b.id.toLowerCase() === id.toLowerCase());
+    if (!found) { show('Bouteille introuvable parmi celles disponibles au parc (Stock ou Neuve).', false); return; }
+    if (!confirm(`Mettre la bouteille ${found.id} en attente de départ fournisseur ?`)) return;
+
+    try {
+        await callApi('setWaiting', { bottleId: found.id, waiting: true });
+        input.value = '';
+        show(`✓ ${found.id} mise en attente de départ`, true);
+        await loadData();
+    } catch (err) { show('❌ ' + err.message, false); }
+}
+</script>
+</body>
+</html>
