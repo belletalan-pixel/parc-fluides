@@ -105,6 +105,11 @@
         .btn-save:hover{opacity:.9;}
         .btn-cancel{padding:10px 16px;background:transparent;color:var(--muted);border:none;font-size:13px;cursor:pointer;font-family:inherit;text-decoration:underline;}
         .form-err{font-size:12px;color:var(--red);}
+        .wait-chk{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#6D28D9;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:8px;padding:5px 10px;cursor:pointer;white-space:nowrap;}
+        .wait-chk input{accent-color:#6D28D9;width:15px;height:15px;cursor:pointer;}
+        .wait-chk.off{opacity:.5;cursor:not-allowed;}
+        .wait-chk.off input{cursor:not-allowed;}
+        .badge-gone{background:#F3F4F6;color:#6B7A8A;}
         .status-warn{background:#FFF0E6;color:#E05F00;font-weight:700;padding:3px 10px;border-radius:10px;font-size:11px;white-space:nowrap;}
         .cerfa-existing-card{border:1px solid var(--brown-bdr);border-radius:8px;margin-bottom:8px;overflow:hidden;}
         .cerfa-existing-hdr{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;background:var(--brown-bg);gap:10px;font-size:13px;}
@@ -139,7 +144,10 @@
         <p>PAGANETTI THERMIQUE</p>
         <h1>📑 Gestion des données Cerfa</h1>
     </div>
-    <a href="dashboard.html" class="btn-back">← Tableau de bord</a>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a href="fournisseur.html" class="btn-back">🚚 Départs fournisseur</a>
+        <a href="dashboard.html" class="btn-back">← Tableau de bord</a>
+    </div>
 </div>
 
 <!-- PIN phase -->
@@ -311,6 +319,7 @@ function renderAll() {
                 <div class="bottle-badges">
                     ${nbKo>0?`<span class="badge badge-warn">⚠️ ${nbKo} sans Cerfa</span>`:''}
                     ${nbOk>0?`<span class="badge badge-ok">✓ ${nbOk} renseigné(s)</span>`:''}
+                    ${waitControl(b,bi)}
                 </div>
                 <span class="bottle-arr">▾</span>
             </div>
@@ -345,6 +354,72 @@ function renderAll() {
     });
     document.getElementById('bottles-list').innerHTML=html;
     applyFilter();
+}
+
+// ── Départ fournisseur ───────────────────────
+const ST_ATT = 'En attente fournisseur';
+
+function waitControl(b, bi) {
+    const st = b.statut || '';
+    if (st === 'Retourné fournisseur')
+        return `<span class="badge badge-gone">📦 Parti chez le fournisseur</span>`;
+    if (st === ST_ATT)
+        return `<label class="wait-chk" onclick="event.stopPropagation()" title="Décocher pour la remettre en stock">
+            <input type="checkbox" checked onchange="toggleWaiting(${bi},this)"> 🚚 En attente départ</label>`;
+    if (st === 'Stock' || st === 'Neuve' || st === 'Disponible')
+        return `<label class="wait-chk" onclick="event.stopPropagation()">
+            <input type="checkbox" onchange="toggleWaiting(${bi},this)"> 🚚 Prête pour départ fournisseur</label>`;
+    return `<label class="wait-chk off" onclick="event.stopPropagation()" title="Bouteille non disponible au parc (statut : ${st||'inconnu'})">
+        <input type="checkbox" disabled> 🚚 Prête pour départ</label>`;
+}
+
+// Points à vérifier avant de déclarer la bouteille prête (information, non bloquant)
+function bottleIssues(b) {
+    const issues = [];
+    const sans = b.movements.filter(m => !m.cerfaSaisi).length;
+    if (sans > 0) issues.push(`${sans} mouvement(s) sans Cerfa`);
+    const ecart = b.movements.filter(m => {
+        if (!m.cerfas || !m.cerfas.length) return false;
+        const sum = m.cerfas.reduce((t,c) => t + cerfaConsoValue(b,c), 0);
+        return Math.abs(sum - m.conso) > 0.1;
+    }).length;
+    if (ecart > 0) issues.push(`${ecart} mouvement(s) avec un écart entre la somme des Cerfa et le théorique`);
+    return issues;
+}
+
+async function toggleWaiting(bi, el) {
+    const b = (cerfaData.bottles||[])[bi];
+    if (!b) return;
+    const want = el.checked;
+    let msg;
+    if (want) {
+        const issues = bottleIssues(b);
+        msg = `Mettre la bouteille ${b.id} en attente de départ fournisseur ?\n\n`
+            + `Elle ne sera plus comptée dans le stock (neuf / récupération / transfert), mais reste au parc.`
+            + (issues.length ? `\n\n⚠️ À vérifier avant :\n - ${issues.join('\n - ')}` : '');
+    } else {
+        msg = `Remettre la bouteille ${b.id} en stock ?`;
+    }
+    if (!confirm(msg)) { el.checked = !want; return; }
+
+    el.disabled = true;
+    try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action', 'setWaiting');
+        url.searchParams.set('data', JSON.stringify({ bottleId: b.id, waiting: want }));
+        const r   = await fetch(url.toString());
+        const res = await r.json();
+        if (res.error) throw new Error(res.error);
+        await loadData();
+        // Garder la bouteille ouverte après le rechargement
+        document.querySelectorAll('.bottle-card').forEach(c => {
+            if (c.dataset.id === b.id) c.classList.add('open');
+        });
+    } catch(err) {
+        el.checked = !want;
+        el.disabled = false;
+        alert('❌ ' + err.message);
+    }
 }
 
 function toggleBottle(bi) {
