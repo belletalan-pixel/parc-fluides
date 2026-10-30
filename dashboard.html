@@ -41,6 +41,7 @@
         .blue .sc-lbl{color:var(--blue);}.blue .sc-val{color:var(--blue);}
         .red .sc-lbl{color:var(--red);}.red .sc-val{color:var(--red);}
         .navy .sc-lbl{color:var(--muted);}.navy .sc-val{color:var(--navy);}
+        .violet .sc-lbl{color:#6D28D9;}.violet .sc-val{color:#6D28D9;}
 
         /* Action bar */
         .action-bar{margin-bottom:20px;}
@@ -269,6 +270,7 @@ function render(d) {
     const nbStock   = (bs['Stock']||0)+(bs['Disponible']||0)+(bs['Neuve']||0);
     const nbSortie  = (bs['Sortie']||0)+(bs['En sortie']||0);
     const nbNeuve   = bs['Neuve']||0;   // affiché séparément pour info
+    const nbAttente = bs['En attente fournisseur']||0;
     const nbAlertes = (d.alertes||[]).length;
 
     let html = '';
@@ -278,6 +280,7 @@ function render(d) {
         <div class="sc green"><div class="sc-lbl">En stock</div><div class="sc-val">${nbStock}</div></div>
         <div class="sc orange"><div class="sc-lbl">En sortie</div><div class="sc-val">${nbSortie}</div></div>
         <div class="sc blue"><div class="sc-lbl">Neuves</div><div class="sc-val">${nbNeuve}</div></div>
+        <div class="sc violet"><div class="sc-lbl">En attente fournisseur</div><div class="sc-val">${nbAttente}</div></div>
         <div class="sc ${nbAlertes>0?'red':'navy'}"><div class="sc-lbl">⚠️ Alertes</div><div class="sc-val">${nbAlertes}</div></div>
         <div class="sc navy"><div class="sc-lbl">Total parc</div><div class="sc-val">${d.stock?.total||0}</div></div>
     </div>`;
@@ -288,6 +291,7 @@ function render(d) {
         <a href="https://belletalan-pixel.github.io/parc-fluides/" target="_blank" class="btn-action secondary">🧊 Ouvrir l'app</a>
         <button class="btn-action" style="background:#B45309;border:none;cursor:pointer;font-family:inherit" onclick="openReservations()">📋 Réservations</button>
         <a href="cerfa.html" target="_blank" class="btn-action" style="background:#7B4C00">📑 Cerfa</a>
+        <a href="fournisseur.html" target="_blank" class="btn-action" style="background:#6D28D9">🚚 Départs fournisseur</a>
         <a href="admin.html" target="_blank" class="btn-action" style="background:#4B5563">⚙️ Administration</a>
     </div>`;
 
