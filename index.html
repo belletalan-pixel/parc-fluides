@@ -64,6 +64,7 @@
         .pill-sortie   { background: var(--orange-bg); color: var(--orange); }
         .pill-neuve    { background: var(--blue-bg);   color: var(--blue); }
         .pill-reservee { background: #FFFBEB; color: #B45309; }
+        .pill-attente  { background: #F5F3FF; color: #6D28D9; }
         .pill-archived { background: var(--grey-bg);   color: var(--grey); }
         .info-grid { margin-top: 16px; }
         .info-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
@@ -494,6 +495,7 @@ const STATUS_PILL = {
     'Neuve':                 'pill-neuve',
     'Stock':                 'pill-stock',
     'Réservée':              'pill-reservee',
+    'En attente fournisseur': 'pill-attente',
     'Sortie':                'pill-sortie',
     'Retourné fournisseur':  'pill-archived',
 };
@@ -625,6 +627,7 @@ async function loadBottle(id) {
             'neuve':'Neuve', 'Neuve':'Neuve',
             'attendu':'Neuve', 'Attendu':'Neuve',
             'réservée':'Réservée', 'Réservée':'Réservée',
+            'en attente fournisseur':'En attente fournisseur',
             'retourné fournisseur':'Retourné fournisseur',
         };
         const statLower = String(data.statut || '').trim().toLowerCase();
@@ -756,11 +759,16 @@ function renderBottle(b) {
             </div>`;
             break;
         }
+        case 'En attente fournisseur':
+            btns.innerHTML = `<div style="background:#F5F3FF;border:1px solid #DDD6FE;border-radius:10px;padding:14px 16px;font-size:13px;color:#6D28D9;text-align:center;margin-top:4px">
+                🚚 <strong>En attente de départ fournisseur</strong><br>
+                <span style="font-size:12px;color:#6B7A8A">Bouteille prête, encore au parc.<br>Le départ se valide depuis le tableau de bord (Départs fournisseur).</span>
+            </div>`;
+            break;
         case 'Neuve':   // bouteille neuve en parc → peut être sortie
-        case 'Stock':   // bouteille disponible en parc
-            btns.innerHTML = `<div class="action-row two">
+        case 'Stock':   // bouteille disponible en parc (le départ fournisseur se gère depuis le tableau de bord)
+            btns.innerHTML = `<div class="action-row one">
                 <button class="action-btn btn-sortie" onclick="startAction('sortie')"><span class="icon">↗</span><span>SORTIE</span></button>
-                <button class="action-btn btn-archive" onclick="startAction('retour_fournisseur')"><span class="icon">📦</span><span>RETOUR FOURNISSEUR</span></button>
             </div>`;
             break;
         case 'Sortie':
@@ -771,7 +779,7 @@ function renderBottle(b) {
         default:
             btns.innerHTML = `<div style="background:#FFF8E1;border:1px solid #FFE082;border-radius:10px;padding:14px 16px;font-size:13px;color:#7B5800;text-align:center;margin-top:4px">
                 ⚠️ Statut non reconnu : <strong>${b.statut || '(vide)'}</strong><br>
-                <span style="font-size:11px;opacity:0.8">Corrige la colonne E dans l'onglet Stock du Sheet<br>(valeurs acceptées : Neuve · Stock · Sortie · Retourné fournisseur)</span>
+                <span style="font-size:11px;opacity:0.8">Corrige la colonne E dans l'onglet Stock du Sheet<br>(valeurs acceptées : Neuve · Stock · Sortie · Réservée · En attente fournisseur · Retourné fournisseur)</span>
             </div>`;
     }
 }
