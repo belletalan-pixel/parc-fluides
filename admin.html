@@ -78,6 +78,11 @@
         .backup-dot.on{background:var(--green);}
         .backup-dot.off{background:var(--muted);}
         .backup-txt{font-size:13px;font-weight:600;}
+        .backup-lbl{display:block;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px;}
+        .backup-last{font-size:12px;font-weight:600;margin-top:12px;padding:10px 12px;border-radius:8px;line-height:1.5;}
+        .backup-last.ok{background:var(--green-bg);color:var(--green);}
+        .backup-last.ko{background:var(--red-bg);color:var(--red);}
+        .backup-last.none{background:var(--grey-bg);color:var(--muted);}
         .btn-toggle{width:100%;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;}
         .btn-force{width:100%;padding:10px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
         .btn-force:hover{opacity:.9;}
@@ -232,12 +237,19 @@
                     <span class="admin-card-title">Sauvegardes automatiques</span>
                 </div>
                 <div class="admin-card-body">
+                    <label class="backup-lbl" for="backup-email">Adresse de réception des sauvegardes</label>
+                    <div class="add-row" style="margin-bottom:8px">
+                        <input class="add-input" id="backup-email" type="email" placeholder="boite.generique@entreprise.fr" autocomplete="off"/>
+                        <button class="btn-add" onclick="saveBackupEmail()">Enregistrer</button>
+                    </div>
+                    <div id="backup-warn" style="margin-bottom:10px"></div>
                     <div class="backup-status" id="backup-status-box">
                         <div class="backup-dot" id="backup-dot"></div>
                         <span class="backup-txt" id="backup-txt">Chargement…</span>
                     </div>
                     <button class="btn-toggle" id="btn-toggle-backup" onclick="toggleBackup()">…</button>
                     <button class="btn-force" onclick="forceBackup()">📤 Lancer une sauvegarde maintenant</button>
+                    <div class="backup-last none" id="backup-last"></div>
                     <div id="msg-backup"></div>
                 </div>
             </div>
@@ -305,6 +317,7 @@ function renderAdmin() {
     document.getElementById('thresh-sortie').value  = adminData.seuilSortieJours;
 
     renderBackupStatus(adminData.backupActive);
+    renderBackupInfo(adminData);
 }
 
 function renderList(type, items) {
@@ -453,6 +466,59 @@ async function saveThresholds() {
 }
 
 // ── Sauvegardes ────────────────────────────
+function renderBackupInfo(d) {
+    const inp = document.getElementById('backup-email');
+    if (document.activeElement !== inp) inp.value = d.backupEmail || '';
+
+    const warn = document.getElementById('backup-warn');
+    warn.textContent = '';
+    if (!d.backupEmail) {
+        warn.className = 'msg-err';
+        warn.textContent = "⚠️ Aucune adresse définie : les sauvegardes échoueront tant qu'elle n'est pas renseignée.";
+    } else {
+        warn.className = '';
+    }
+
+    const el = document.getElementById('backup-last');
+    const l  = d.backupLast;
+    if (!l) {
+        el.className = 'backup-last none';
+        el.textContent = "Aucune sauvegarde enregistrée pour l'instant.";
+    } else if (l.ok) {
+        el.className = 'backup-last ok';
+        el.textContent = '✓ Dernière sauvegarde : ' + l.at + ' — ' + l.msg;
+    } else {
+        el.className = 'backup-last ko';
+        el.textContent = '✗ Dernière tentative : ' + l.at + ' — échec : ' + l.msg;
+    }
+}
+
+async function refreshBackupInfo() {
+    try {
+        const r = await fetch(`${SCRIPT_URL}?action=getAdminConfig`);
+        const d = await r.json();
+        if (d.error) return;
+        renderBackupStatus(d.backupActive);
+        renderBackupInfo(d);
+    } catch(e) { /* l'affichage garde son état précédent */ }
+}
+
+async function saveBackupEmail() {
+    const msgEl = document.getElementById('msg-backup');
+    const email = document.getElementById('backup-email').value.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { showMsg(msgEl, 'Adresse mail invalide.', 'err'); return; }
+    try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action','updateThreshold');
+        url.searchParams.set('data', JSON.stringify({ key:'email_sauvegarde', value:email }));
+        const r   = await fetch(url.toString());
+        const res = await r.json();
+        if (res.error) throw new Error(res.error);
+        showMsg(msgEl, '✓ Adresse enregistrée', 'ok');
+        await refreshBackupInfo();
+    } catch(err) { showMsg(msgEl, '❌ '+err.message, 'err'); }
+}
+
 async function toggleBackup() {
     const msgEl = document.getElementById('msg-backup');
     document.getElementById('btn-toggle-backup').disabled = true;
@@ -466,6 +532,7 @@ async function toggleBackup() {
         showMsg(msgEl, res.active ? '✓ Sauvegarde automatique activée' : '✓ Sauvegarde automatique désactivée', 'ok');
     } catch(err) { showMsg(msgEl, '❌ '+err.message, 'err'); }
     document.getElementById('btn-toggle-backup').disabled = false;
+    await refreshBackupInfo();
 }
 
 async function forceBackup() {
@@ -481,6 +548,7 @@ async function forceBackup() {
         showMsg(msgEl, '✓ Sauvegarde envoyée par mail', 'ok');
     } catch(err) { showMsg(msgEl, '❌ '+err.message, 'err'); }
     btn.disabled = false; btn.textContent = '📤 Lancer une sauvegarde maintenant';
+    await refreshBackupInfo();   // affiche le résultat (succès ou cause de l'échec)
 }
 
 // ── Helper ─────────────────────────────────
