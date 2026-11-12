@@ -57,15 +57,6 @@
         .res-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
         .res-body{padding:20px;}
         /* PIN dans overlay */
-        .res-pin-dots{display:flex;gap:14px;justify-content:center;margin:20px 0 8px;}
-        .res-pin-dot{width:14px;height:14px;border-radius:50%;border:2.5px solid #D2D8DF;background:transparent;transition:all .12s;}
-        .res-pin-dot.filled{background:#B45309;border-color:#B45309;}
-        .res-numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
-        .res-np{background:#EDF0F3;border:1.5px solid #D2D8DF;border-radius:10px;padding:14px 8px;font-size:20px;font-weight:700;cursor:pointer;text-align:center;font-family:inherit;color:#0D2137;}
-        .res-np:active{transform:scale(.94);}
-        .res-np.del{font-size:16px;color:#C0392B;border-color:transparent;background:transparent;}
-        .res-np.empty{opacity:0;pointer-events:none;}
-        .res-pin-err{text-align:center;font-size:12px;color:#C0392B;min-height:16px;margin-bottom:12px;}
         /* Reservation cards */
         .res-card{border:1.5px solid #FDE68A;background:#FFFBEB;border-radius:10px;padding:14px;margin-bottom:10px;}
         .res-card-id{font-size:15px;font-weight:800;color:#0D2137;}
@@ -231,6 +222,7 @@
         <h1>🧊 Parc à Fluides — Tableau de bord</h1>
     </div>
     <div class="header-right">
+        <span id="pf-chip"></span>
         <span id="last-update">—</span>
         <button class="btn-h" onclick="loadData()">⟳ Actualiser</button>
     </div>
@@ -242,6 +234,7 @@
 
 <div class="footer">Actualisation automatique toutes les 5 min · Lecture seule</div>
 
+<script src="auth.js"></script>
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYoKD0FWNrQ87sbAMn3yLcE-Qej37VYDVwECZFAg65rtA5UdiWzjJMpYn1p-AccUYVnQ/exec';
 
@@ -657,290 +650,17 @@ loadData();
 setInterval(loadData, 5*60*1000);
 
 // ══════════════════════════════════════════
-//  CERFA — overlay PIN + gestion
+//  RÉSERVATIONS — connexion gestionnaire + gestion
 // ══════════════════════════════════════════
-let cerfaPin  = '';
-let cerfaData = null;
-
-function openCerfa() {
-    cerfaPin = '';
-    if (!document.getElementById('cerfa-overlay')) buildCerfaOverlay();
-    document.getElementById('cerfa-overlay').style.display = 'flex';
-    document.getElementById('cerfa-pin-phase').style.display = 'block';
-    document.getElementById('cerfa-mgmt-phase').style.display = 'none';
-    updateCerfaPinDots();
-    document.getElementById('cerfa-pin-err').textContent = '';
-}
-
-function buildCerfaOverlay() {
-    const el = document.createElement('div');
-    el.id = 'cerfa-overlay';
-    el.className = 'res-overlay';
-    el.style.display = 'none';
-    el.innerHTML = `
-        <div class="res-panel">
-            <div class="res-panel-header cerfa-panel-header">
-                <h2>📑 Données Cerfa</h2>
-                <button class="res-close" onclick="closeCerfaOverlay()">✕</button>
-            </div>
-            <div class="res-body">
-                <div id="cerfa-pin-phase">
-                    <div style="text-align:center;font-size:13px;color:var(--muted);margin-bottom:4px">Saisissez le code d'accès</div>
-                    <div class="res-pin-dots" id="cerfa-pin-dots">
-                        <div class="res-pin-dot" id="cpd1"></div>
-                        <div class="res-pin-dot" id="cpd2"></div>
-                        <div class="res-pin-dot" id="cpd3"></div>
-                        <div class="res-pin-dot" id="cpd4"></div>
-                    </div>
-                    <div class="res-pin-err" id="cerfa-pin-err"></div>
-                    <div class="res-numpad">
-                        <button class="res-np" onclick="pressCerfaPin('1')">1</button>
-                        <button class="res-np" onclick="pressCerfaPin('2')">2</button>
-                        <button class="res-np" onclick="pressCerfaPin('3')">3</button>
-                        <button class="res-np" onclick="pressCerfaPin('4')">4</button>
-                        <button class="res-np" onclick="pressCerfaPin('5')">5</button>
-                        <button class="res-np" onclick="pressCerfaPin('6')">6</button>
-                        <button class="res-np" onclick="pressCerfaPin('7')">7</button>
-                        <button class="res-np" onclick="pressCerfaPin('8')">8</button>
-                        <button class="res-np" onclick="pressCerfaPin('9')">9</button>
-                        <button class="res-np empty" disabled></button>
-                        <button class="res-np" onclick="pressCerfaPin('0')">0</button>
-                        <button class="res-np del" onclick="deleteCerfaPin()">⌫</button>
-                    </div>
-                </div>
-                <div id="cerfa-mgmt-phase" style="display:none">
-                    <div id="cerfa-mgmt-content"><div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div></div>
-                </div>
-            </div>
-        </div>`;
-    document.body.appendChild(el);
-}
-
-function closeCerfaOverlay() {
-    const el = document.getElementById('cerfa-overlay');
-    if (el) el.style.display = 'none';
-}
-
-// ── PIN Cerfa ─────────────────────────────
-function pressCerfaPin(d) {
-    if (cerfaPin.length >= 4) return;
-    cerfaPin += d;
-    updateCerfaPinDots();
-    document.getElementById('cerfa-pin-err').textContent = '';
-    if (cerfaPin.length === 4) setTimeout(checkCerfaPin, 160);
-}
-function deleteCerfaPin() { cerfaPin = cerfaPin.slice(0,-1); updateCerfaPinDots(); }
-function updateCerfaPinDots() {
-    for (let i=1;i<=4;i++) {
-        const el = document.getElementById('cpd'+i);
-        if (el) el.classList.toggle('filled', i<=cerfaPin.length);
-    }
-}
-function checkCerfaPin() {
-    if (cerfaPin === RES_PIN) {
-        document.getElementById('cerfa-pin-phase').style.display = 'none';
-        document.getElementById('cerfa-mgmt-phase').style.display = 'block';
-        loadCerfaData();
-    } else {
-        const dots = document.getElementById('cerfa-pin-dots');
-        dots.style.animation = 'pshake .4s ease';
-        setTimeout(() => {
-            cerfaPin = ''; updateCerfaPinDots();
-            dots.style.animation = '';
-            document.getElementById('cerfa-pin-err').textContent = 'Code incorrect';
-        }, 420);
-    }
-}
-
-// ── Charger données Cerfa ─────────────────
-async function loadCerfaData() {
-    document.getElementById('cerfa-mgmt-content').innerHTML =
-        '<div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div>';
-    try {
-        const r = await fetch(`${SCRIPT_URL}?action=getCerfaData`);
-        cerfaData = await r.json();
-        if (cerfaData.error) throw new Error(cerfaData.error);
-        renderCerfaMgmt();
-    } catch(err) {
-        document.getElementById('cerfa-mgmt-content').innerHTML =
-            `<div style="color:var(--red);padding:16px">❌ ${err.message}</div>`;
-    }
-}
-
-function renderCerfaMgmt() {
-    const bottles = cerfaData.bottles || [];
-    if (!bottles.length) {
-        document.getElementById('cerfa-mgmt-content').innerHTML =
-            '<div style="color:var(--muted);font-size:13px;font-style:italic;padding:16px">Aucun mouvement avec variation de fluide.</div>';
-        return;
-    }
-
-    const manquants = bottles.reduce((s,b) => s + b.movements.filter(m=>!m.cerfaSaisi).length, 0);
-    let html = `<div style="font-size:12px;color:var(--muted);margin-bottom:14px">
-        ${bottles.length} bouteille(s) · <span style="color:#B45309;font-weight:700">${manquants} Cerfa manquant(s)</span>
-    </div>`;
-
-    bottles.forEach((b, bi) => {
-        const nbManq = b.movements.filter(m=>!m.cerfaSaisi).length;
-        html += `<div class="cerfa-bottle" id="cb-${bi}">
-            <div class="cerfa-bottle-hdr" onclick="toggleCerfaBottle(${bi})">
-                <div>
-                    <div class="cerfa-bottle-title">${b.id} — ${b.fluide||'?'} <span style="font-size:11px;color:var(--muted)">(${b.type})</span></div>
-                    <div class="cerfa-bottle-sub">${b.movements.length} mouvement(s)
-                        ${nbManq > 0 ? `· <span style="color:#B45309">${nbManq} Cerfa manquant(s)</span>` : '· <span style="color:var(--green)">Cerfa complets ✓</span>'}
-                    </div>
-                </div>
-                <span class="cerfa-bottle-arr">▾</span>
-            </div>
-            <div class="cerfa-bottle-body" id="cb-body-${bi}">`;
-
-        b.movements.forEach((m, mi) => {
-            const isPos  = m.sens.startsWith('+');
-            const sensCls = isPos ? 'sens-pos' : 'sens-neg';
-            const badge  = m.cerfaSaisi
-                ? '<span class="cerfa-badge-ok">✓ Cerfa saisi</span>'
-                : '<span class="cerfa-badge-ko">Cerfa manquant</span>';
-            html += `<div class="cerfa-mvt" onclick="toggleCerfaForm(${bi},${mi})">
-                <div class="cerfa-mvt-left">
-                    <div class="cerfa-mvt-date">${m.date}</div>
-                    <div class="cerfa-mvt-meta">
-                        📋 ${m.affaire} &nbsp;·&nbsp; 👤 ${m.technicien}
-                        ${m.cerfaSaisi && m.cerfa ? ` &nbsp;·&nbsp; N° ${m.cerfa.noCerfa}` : ''}
-                    </div>
-                </div>
-                <span class="cerfa-mvt-sens ${sensCls}">${m.sens}</span>
-                ${badge}
-            </div>
-            <div id="cf-form-${bi}-${mi}" style="display:none">
-                ${buildCerfaForm(b, m, bi, mi)}
-            </div>`;
-        });
-
-        html += `</div></div>`;
-    });
-
-    document.getElementById('cerfa-mgmt-content').innerHTML = html;
-}
-
-function toggleCerfaBottle(bi) {
-    const el = document.getElementById('cb-'+bi);
-    if (el) el.classList.toggle('open');
-}
-
-function toggleCerfaForm(bi, mi) {
-    // Fermer tous les autres formulaires de la même bouteille
-    document.querySelectorAll(`[id^="cf-form-${bi}-"]`).forEach(el => {
-        if (el.id !== `cf-form-${bi}-${mi}`) el.style.display = 'none';
-    });
-    const form = document.getElementById(`cf-form-${bi}-${mi}`);
-    if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    // Ouvrir l'accordéon si pas déjà ouvert
-    const bottle = document.getElementById('cb-'+bi);
-    if (bottle && !bottle.classList.contains('open')) bottle.classList.add('open');
-}
-
-function buildCerfaForm(b, m, bi, mi) {
-    const isRec = b.type === 'Récupération' || b.type === 'Transfert';
-    const c = m.cerfa || {};
-    return `<div class="cerfa-form-wrap">
-        <div class="cerfa-form-grid">
-            <div class="cerfa-form-full">
-                <label class="cerfa-fl">N° Cerfa</label>
-                <input class="cerfa-fi" id="cfi-nocerfa-${bi}-${mi}" value="${c.noCerfa||''}" placeholder="ex : 2025-147" autocomplete="off"/>
-            </div>
-            <div class="cerfa-form-full">
-                <label class="cerfa-fl">Motif d'intervention</label>
-                <input class="cerfa-fi" id="cfi-motif-${bi}-${mi}" value="${c.motif||''}" placeholder="ex : Recharge, Récupération, Fuite…" autocomplete="off"/>
-            </div>
-            <div>
-                <label class="cerfa-fl">Qté récupérée Cerfa (kg)</label>
-                <input class="cerfa-fi" id="cfi-recup-${bi}-${mi}" type="number" step="0.001" min="0"
-                    value="${c.qtRecup||''}" placeholder="0.000"
-                    style="${!isRec?'opacity:.4':''}" ${!isRec?'tabindex="-1"':''}/>
-            </div>
-            <div>
-                <label class="cerfa-fl">Qté rechargée Cerfa (kg)</label>
-                <input class="cerfa-fi" id="cfi-recharge-${bi}-${mi}" type="number" step="0.001" min="0"
-                    value="${c.qtRecharge||''}" placeholder="0.000"
-                    style="${isRec?'opacity:.4':''}" ${isRec?'tabindex="-1"':''}/>
-            </div>
-            <div class="cerfa-form-full">
-                <label class="cerfa-fl">Opérateur (technicien)</label>
-                <input class="cerfa-fi" id="cfi-ope-${bi}-${mi}" value="${c.operateur||m.technicien}" autocomplete="off"/>
-            </div>
-        </div>
-        <div id="cfi-ecart-${bi}-${mi}"></div>
-        <div id="cfi-err-${bi}-${mi}" style="color:var(--red);font-size:12px;margin-top:6px"></div>
-        <button class="btn-save-cerfa" onclick="submitCerfa(${bi},${mi})">✔ Enregistrer le Cerfa</button>
-    </div>`;
-}
-
-async function submitCerfa(bi, mi) {
-    const b   = (cerfaData.bottles||[])[bi];
-    const m   = b ? b.movements[mi] : null;
-    if (!b || !m) return;
-
-    const noCerfa   = document.getElementById(`cfi-nocerfa-${bi}-${mi}`)?.value.trim();
-    const motif     = document.getElementById(`cfi-motif-${bi}-${mi}`)?.value.trim();
-    const qtRecup   = parseFloat(document.getElementById(`cfi-recup-${bi}-${mi}`)?.value) || 0;
-    const qtRecharge= parseFloat(document.getElementById(`cfi-recharge-${bi}-${mi}`)?.value) || 0;
-    const operateur = document.getElementById(`cfi-ope-${bi}-${mi}`)?.value.trim();
-    const errEl     = document.getElementById(`cfi-err-${bi}-${mi}`);
-
-    if (!noCerfa)   { errEl.textContent = 'Saisissez le N° Cerfa.'; return; }
-    if (!motif)     { errEl.textContent = 'Saisissez le motif.'; return; }
-    if (!operateur) { errEl.textContent = 'Saisissez l\'opérateur.'; return; }
-    errEl.textContent = '';
-
-    const isRec = b.type === 'Récupération' || b.type === 'Transfert';
-    const ecart = isRec
-        ? parseFloat((qtRecup - m.conso).toFixed(3))
-        : parseFloat((m.conso - qtRecharge).toFixed(3));
-
-    // Afficher écart avant envoi
-    const ecartEl = document.getElementById(`cfi-ecart-${bi}-${mi}`);
-    const ecartCls = Math.abs(ecart) > 0.5 ? 'warn' : 'ok';
-    ecartEl.innerHTML = `<div class="cerfa-ecart ${ecartCls}">
-        Écart théorique / Cerfa : <strong>${ecart > 0 ? '+' : ''}${ecart.toFixed(3)} kg</strong>
-        ${Math.abs(ecart) > 0.5 ? ' ⚠️ Écart > 0.5 kg' : ' ✓ OK'}
-    </div>`;
-
-    const payload = {
-        ref: m.ref, bottleId: b.id, fluide: b.fluide, type: b.type,
-        date: m.date, affaire: m.affaire, technicien: m.technicien,
-        consoTheo: m.conso, noCerfa, motif, qtRecup, qtRecharge, operateur,
-    };
-
-    try {
-        const url = new URL(SCRIPT_URL);
-        url.searchParams.set('action', 'saveCerfa');
-        url.searchParams.set('data', JSON.stringify(payload));
-        const r = await fetch(url.toString());
-        const res = await r.json();
-        if (res.error) throw new Error(res.error);
-        // Rafraîchir
-        await loadCerfaData();
-    } catch(err) {
-        errEl.textContent = '❌ ' + err.message;
-    }
-}
-
-// ══════════════════════════════════════════
-//  RÉSERVATIONS — overlay PIN + gestion
-// ══════════════════════════════════════════
-const RES_PIN  = '1858';
-let resPin     = '';
 let resData    = null; // { reservations, availableBottles, gestionnaires }
 
-function openReservations() {
-    resPin = '';
-    // Create overlay if not exists
+async function openReservations() {
+    const ok = await PFAuth.ensure(SCRIPT_URL, 'Connexion gestionnaire requise pour gérer les réservations.');
+    if (!ok) return;
     if (!document.getElementById('res-overlay')) buildResOverlay();
     document.getElementById('res-overlay').style.display = 'flex';
-    document.getElementById('res-pin-phase').style.display = 'block';
-    document.getElementById('res-mgmt-phase').style.display = 'none';
-    updateResPinDots();
-    document.getElementById('res-pin-err').textContent = '';
+    document.getElementById('res-mgmt-phase').style.display = 'block';
+    loadResData();
 }
 
 function buildResOverlay() {
@@ -955,33 +675,8 @@ function buildResOverlay() {
                 <button class="res-close" onclick="closeResOverlay()">✕</button>
             </div>
             <div class="res-body">
-                <!-- PIN phase -->
-                <div id="res-pin-phase">
-                    <div style="text-align:center;font-size:13px;color:var(--muted);margin-bottom:4px">Saisissez le code d'accès</div>
-                    <div class="res-pin-dots" id="res-pin-dots">
-                        <div class="res-pin-dot" id="rpd1"></div>
-                        <div class="res-pin-dot" id="rpd2"></div>
-                        <div class="res-pin-dot" id="rpd3"></div>
-                        <div class="res-pin-dot" id="rpd4"></div>
-                    </div>
-                    <div class="res-pin-err" id="res-pin-err"></div>
-                    <div class="res-numpad">
-                        <button class="res-np" onclick="pressResPin('1')">1</button>
-                        <button class="res-np" onclick="pressResPin('2')">2</button>
-                        <button class="res-np" onclick="pressResPin('3')">3</button>
-                        <button class="res-np" onclick="pressResPin('4')">4</button>
-                        <button class="res-np" onclick="pressResPin('5')">5</button>
-                        <button class="res-np" onclick="pressResPin('6')">6</button>
-                        <button class="res-np" onclick="pressResPin('7')">7</button>
-                        <button class="res-np" onclick="pressResPin('8')">8</button>
-                        <button class="res-np" onclick="pressResPin('9')">9</button>
-                        <button class="res-np empty" disabled></button>
-                        <button class="res-np" onclick="pressResPin('0')">0</button>
-                        <button class="res-np del" onclick="deleteResPin()">⌫</button>
-                    </div>
-                </div>
                 <!-- Management phase -->
-                <div id="res-mgmt-phase" style="display:none">
+                <div id="res-mgmt-phase">
                     <div id="res-mgmt-content">Chargement…</div>
                 </div>
             </div>
@@ -995,36 +690,6 @@ function closeResOverlay() {
 }
 
 // ── PIN réservations ──────────────────────
-function pressResPin(d) {
-    if (resPin.length >= 4) return;
-    resPin += d;
-    updateResPinDots();
-    document.getElementById('res-pin-err').textContent = '';
-    if (resPin.length === 4) setTimeout(checkResPin, 160);
-}
-function deleteResPin() { resPin = resPin.slice(0,-1); updateResPinDots(); }
-function updateResPinDots() {
-    for (let i=1;i<=4;i++) {
-        const el = document.getElementById('rpd'+i);
-        if (el) el.classList.toggle('filled', i<=resPin.length);
-    }
-}
-function checkResPin() {
-    if (resPin === RES_PIN) {
-        document.getElementById('res-pin-phase').style.display = 'none';
-        document.getElementById('res-mgmt-phase').style.display = 'block';
-        loadResData();
-    } else {
-        const dots = document.getElementById('res-pin-dots');
-        dots.style.animation = 'pshake .4s ease';
-        setTimeout(() => {
-            resPin = ''; updateResPinDots();
-            dots.style.animation = '';
-            document.getElementById('res-pin-err').textContent = 'Code incorrect';
-        }, 420);
-    }
-}
-
 // ── Charger données réservations ──────────
 async function loadResData() {
     document.getElementById('res-mgmt-content').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div>';
@@ -1155,6 +820,10 @@ async function confirmCancelRes(resId, bottleId) {
         await loadResData();
     }
 }
+
+// ── Connexion gestionnaire : le tableau de bord reste en lecture libre ──
+PFAuth.renderChip(document.getElementById('pf-chip'), SCRIPT_URL);
+PFAuth.verify(SCRIPT_URL);   // coupe la connexion mémorisée si le mot de passe a changé
 </script>
 </body>
 </html>
