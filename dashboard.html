@@ -3,214 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parc Fluides — PAGANETTI THERMIQUE</title>
+    <title>Cerfa — Parc Fluides PAGANETTI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root{
-            --navy:#0D2137;--navy2:#1A3A5C;
-            --orange:#E05F00;--orange-bg:#FFF0E6;
-            --green:#1A6E38;--green-bg:#E8F5EE;
-            --blue:#1A4DB5;--blue-bg:#EEF4FF;
-            --red:#9B1C1C;--red-bg:#FEF2F2;
-            --amber:#B45309;--amber-bg:#FFFBEB;
-            --bg:#EDF0F3;--card:#fff;--border:#D2D8DF;
-            --text:#0D2137;--muted:#6B7A8A;
+        :root {
+            --navy:#0D2137; --navy2:#1A3A5C;
+            --brown:#7B4C00; --brown-bg:#FFFBEB; --brown-bdr:#FDE68A;
+            --green:#1A6E38; --green-bg:#E8F5EE;
+            --orange:#E05F00; --orange-bg:#FFF0E6;
+            --red:#C0392B; --red-bg:#FDEDEC;
+            --blue:#1A4DB5; --blue-bg:#EEF4FF;
+            --bg:#EDF0F3; --card:#fff; --border:#D2D8DF;
+            --text:#0D2137; --muted:#6B7A8A;
         }
-        *{box-sizing:border-box;margin:0;padding:0;}
+        *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
         body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
         /* Header */
-        .header{background:var(--navy);color:#fff;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
-        .header-left h1{font-size:17px;font-weight:800;}
+        .header{background:var(--brown);color:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:20;}
+        .header-left h1{font-size:16px;font-weight:800;}
         .header-left p{font-size:11px;opacity:.55;margin-top:2px;letter-spacing:.06em;}
-        .header-right{display:flex;align-items:center;gap:10px;font-size:12px;opacity:.85;}
-        .btn-h{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-family:inherit;text-decoration:none;white-space:nowrap;}
-        .btn-h:hover{background:rgba(255,255,255,.25);}
+        .btn-back{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 14px;border-radius:6px;font-size:12px;font-family:inherit;text-decoration:none;white-space:nowrap;}
+        .btn-back:hover{background:rgba(255,255,255,.25);}
 
         /* Content */
-        .content{max-width:1100px;margin:0 auto;padding:24px 20px;}
+        .content{max-width:1000px;margin:0 auto;padding:24px 20px;}
 
-        /* Stats */
-        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:20px;}
-        .sc{background:var(--card);border-radius:12px;padding:18px 20px;border:1px solid var(--border);}
-        .sc-lbl{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;}
-        .sc-val{font-size:38px;font-weight:800;line-height:1;}
-        .green .sc-lbl{color:var(--green);}.green .sc-val{color:var(--green);}
-        .orange .sc-lbl{color:var(--orange);}.orange .sc-val{color:var(--orange);}
-        .blue .sc-lbl{color:var(--blue);}.blue .sc-val{color:var(--blue);}
-        .red .sc-lbl{color:var(--red);}.red .sc-val{color:var(--red);}
-        .navy .sc-lbl{color:var(--muted);}.navy .sc-val{color:var(--navy);}
-        .violet .sc-lbl{color:#6D28D9;}.violet .sc-val{color:#6D28D9;}
+        /* PIN phase */
 
-        /* Action bar */
-        .action-bar{margin-bottom:20px;}
-        .btn-action{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:var(--navy);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;}
-        .btn-action:hover{background:var(--navy2);}
-        .btn-action.secondary{background:var(--green);}
-        .btn-action.secondary:hover{opacity:.9;}
-        /* Réservations overlay */
-        .res-overlay{position:fixed;inset:0;background:rgba(13,33,55,.55);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;}
-        .res-panel{background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.25);}
-        .res-panel-header{background:#B45309;color:#fff;padding:16px 20px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;}
-        .res-panel-header h2{font-size:15px;font-weight:800;}
-        .res-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
-        .res-body{padding:20px;}
-        /* PIN dans overlay */
-        /* Reservation cards */
-        .res-card{border:1.5px solid #FDE68A;background:#FFFBEB;border-radius:10px;padding:14px;margin-bottom:10px;}
-        .res-card-id{font-size:15px;font-weight:800;color:#0D2137;}
-        .res-card-meta{font-size:12px;color:#6B7A8A;margin-top:4px;}
-        .btn-cancel-res{margin-top:10px;padding:6px 14px;background:#FEF2F2;border:1px solid #FECACA;color:#9B1C1C;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;}
-        /* Reservation form */
-        .res-form-row{margin-bottom:14px;}
-        .res-form-label{display:block;font-size:11px;font-weight:700;color:#6B7A8A;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;}
-        .res-form-input,.res-form-select{width:100%;padding:11px 14px;border:1.5px solid #D2D8DF;border-radius:8px;font-size:14px;font-family:inherit;background:#fff;-webkit-appearance:none;}
-        .res-form-input:focus,.res-form-select:focus{outline:none;border-color:#B45309;}
-        .btn-create-res{width:100%;padding:14px;background:#B45309;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:6px;}
-        .btn-create-res:hover{opacity:.9;}
-        .res-section-title{font-size:13px;font-weight:700;color:#0D2137;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid #D2D8DF;}
+        /* Management phase */
+        .mgmt-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
+        .mgmt-stats{font-size:13px;color:var(--muted);}
+        .mgmt-stats strong{color:var(--brown);}
 
-        /* Cerfa overlay */
-        .cerfa-panel-header{background:#7B4C00;}
-        .cerfa-bottle{border:1px solid #D2D8DF;border-radius:10px;margin-bottom:10px;overflow:hidden;}
-        .cerfa-bottle-hdr{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#FAFBFC;cursor:pointer;user-select:none;}
-        .cerfa-bottle-hdr:hover{background:#f0f0f0;}
-        .cerfa-bottle-title{font-size:14px;font-weight:700;color:var(--navy);}
-        .cerfa-bottle-sub{font-size:12px;color:var(--muted);}
-        .cerfa-bottle-arr{font-size:13px;color:var(--muted);transition:transform .2s;}
-        .cerfa-bottle.open .cerfa-bottle-arr{transform:rotate(180deg);}
-        .cerfa-bottle-body{display:none;border-top:1px solid var(--border);}
-        .cerfa-bottle.open .cerfa-bottle-body{display:block;}
-        .cerfa-mvt{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;gap:10px;}
-        .cerfa-mvt:last-child{border-bottom:none;}
-        .cerfa-mvt:hover{background:#FFFBEB;}
-        .cerfa-mvt-left{flex:1;}
-        .cerfa-mvt-date{font-size:13px;font-weight:600;color:var(--navy);}
-        .cerfa-mvt-meta{font-size:11px;color:var(--muted);margin-top:2px;}
-        .cerfa-mvt-sens{font-size:14px;font-weight:800;white-space:nowrap;}
+        /* Filters */
+        .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+        .filter-input{flex:1;min-width:200px;padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--card);}
+        .filter-input:focus{outline:none;border-color:var(--brown);}
+        .filter-btns{display:flex;gap:6px;}
+        .fb{padding:7px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--muted);}
+        .fb.active{border-color:var(--brown);background:var(--brown);color:#fff;}
+
+        /* Bottle accordion */
+        .bottle-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden;}
+        .bottle-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;user-select:none;gap:12px;}
+        .bottle-hdr:hover{background:#FAFBFC;}
+        .bottle-name{font-size:15px;font-weight:800;color:var(--navy);}
+        .bottle-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+        .bottle-badges{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+        .badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;white-space:nowrap;}
+        .badge-ok{background:var(--green-bg);color:var(--green);}
+        .badge-warn{background:var(--brown-bg);color:var(--brown);}
+        .bottle-arr{font-size:14px;color:var(--muted);transition:transform .2s;flex-shrink:0;}
+        .bottle-card.open .bottle-arr{transform:rotate(180deg);}
+        .bottle-body{display:none;border-top:1px solid var(--border);}
+        .bottle-card.open .bottle-body{display:block;}
+
+        /* Movement rows */
+        .mvt-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border);cursor:pointer;}
+        .mvt-row:last-child{border-bottom:none;}
+        .mvt-row:hover{background:var(--brown-bg);}
+        .mvt-date{font-size:13px;font-weight:600;color:var(--navy);}
+        .mvt-meta{font-size:11px;color:var(--muted);margin-top:3px;}
+        .mvt-cerfa-info{font-size:11px;color:var(--muted);margin-top:2px;}
+        .mvt-sens{font-size:14px;font-weight:800;white-space:nowrap;}
         .sens-neg{color:var(--green);}
         .sens-pos{color:var(--orange);}
-        .cerfa-badge-ok{background:var(--green-bg);color:var(--green);padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap;}
-        .cerfa-badge-ko{background:#FFFBEB;color:#B45309;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap;}
-        .cerfa-form-wrap{padding:14px;background:#FFFBEB;border-top:1px solid #FDE68A;}
-        .cerfa-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-        .cerfa-form-full{grid-column:1/-1;}
-        .cerfa-fl{display:block;font-size:11px;font-weight:700;color:#7B4C00;letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px;}
-        .cerfa-fi{width:100%;padding:9px 12px;border:1.5px solid #FDE68A;border-radius:8px;font-size:14px;font-family:inherit;background:#fff;}
-        .cerfa-fi:focus{outline:none;border-color:#7B4C00;}
-        .cerfa-ecart{padding:10px 12px;border-radius:8px;font-size:13px;font-weight:700;text-align:center;margin-top:8px;}
-        .cerfa-ecart.ok{background:var(--green-bg);color:var(--green);}
-        .cerfa-ecart.warn{background:var(--red-bg);color:var(--red);}
-        .btn-save-cerfa{padding:9px 20px;background:#7B4C00;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;}
+        .mvt-status{font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;white-space:nowrap;}
+        .status-ok{background:var(--green-bg);color:var(--green);}
+        .status-ko{background:var(--brown-bg);color:var(--brown);}
 
-        /* Filtre Récupération */
-        .recup-filter-bar{padding:12px 16px;border-bottom:1px solid var(--border);background:#FAFBFC;}
-        .recup-filter{padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text);min-width:220px;-webkit-appearance:none;appearance:none;}
+        /* Cerfa form */
+        .cerfa-form{background:var(--brown-bg);border-top:1px solid var(--brown-bdr);padding:20px 18px;}
+        .cerfa-form-title{font-size:13px;font-weight:700;color:var(--brown);margin-bottom:14px;}
+        .form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+        .form-full{grid-column:1/-1;}
+        .fl{display:block;font-size:11px;font-weight:700;color:var(--brown);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px;}
+        .fi{width:100%;padding:10px 14px;border:1.5px solid var(--brown-bdr);border-radius:8px;font-size:14px;font-family:inherit;background:#fff;color:var(--text);}
+        .fi:focus{outline:none;border-color:var(--brown);}
+        .fi.dimmed{opacity:.45;}
+        .ecart-box{padding:12px 16px;border-radius:8px;font-size:13px;font-weight:700;text-align:center;margin-top:4px;}
+        .ecart-ok{background:var(--green-bg);color:var(--green);}
+        .ecart-warn{background:var(--red-bg);color:var(--red);}
+        .form-actions{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap;}
+        .btn-save{padding:10px 24px;background:var(--brown);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+        .btn-save:hover{opacity:.9;}
+        .btn-cancel{padding:10px 16px;background:transparent;color:var(--muted);border:none;font-size:13px;cursor:pointer;font-family:inherit;text-decoration:underline;}
+        .form-err{font-size:12px;color:var(--red);}
+        .wait-chk{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#6D28D9;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:8px;padding:5px 10px;cursor:pointer;white-space:nowrap;}
+        .wait-chk input{accent-color:#6D28D9;width:15px;height:15px;cursor:pointer;}
+        .wait-chk.off{opacity:.5;cursor:not-allowed;}
+        .wait-chk.off input{cursor:not-allowed;}
+        .badge-gone{background:#F3F4F6;color:#6B7A8A;}
+        .status-warn{background:#FFF0E6;color:#E05F00;font-weight:700;padding:3px 10px;border-radius:10px;font-size:11px;white-space:nowrap;}
+        .cerfa-existing-card{border:1px solid var(--brown-bdr);border-radius:8px;margin-bottom:8px;overflow:hidden;}
+        .cerfa-existing-hdr{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;background:var(--brown-bg);gap:10px;font-size:13px;}
+        .cerfa-existing-hdr:hover{background:#FDE68A44;}
+        .cerfa-sum{padding:12px 16px;border-radius:8px;font-size:13px;font-weight:600;text-align:center;margin-bottom:12px;}
+        .cerfa-sum.ok{background:var(--green-bg);color:var(--green);}
+        .cerfa-sum.warn{background:var(--red-bg);color:var(--red);}
+        .cerfa-sum.empty{background:#F3F4F6;color:var(--muted);}
 
-        /* Section */
-        .section{background:var(--card);border-radius:14px;border:1px solid var(--border);margin-bottom:20px;}
-        .section-header{display:flex;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--border);background:#FAFBFC;}
-        .section-title{font-size:14px;font-weight:700;}
-        .s-badge{font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;}
-        .sb-red{background:var(--red-bg);color:var(--red);}
-        .sb-orange{background:var(--orange-bg);color:var(--orange);}
-        .sb-green{background:var(--green-bg);color:var(--green);}
-        .sb-blue{background:var(--blue-bg);color:var(--blue);}
-        .sb-navy{background:var(--bg);color:var(--navy);}
-
-        /* Tabs */
-        .tabs{display:flex;border-bottom:1px solid var(--border);padding:0 20px;background:#FAFBFC;overflow-x:auto;}
-        .tab-btn{padding:10px 16px;font-size:13px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2.5px solid transparent;font-family:inherit;margin-bottom:-1px;white-space:nowrap;}
-        .tab-btn.active{color:var(--navy);border-bottom-color:var(--navy);}
-
-        /* Fluid cards (Neuves) */
-        .fluid-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:14px;padding:20px;}
-        .fluid-card{border:1.5px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:box-shadow .15s;}
-        .fluid-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.09);}
-        .fluid-card.open{border-color:var(--navy);}
-        .fluid-hdr{display:flex;justify-content:space-between;align-items:start;margin-bottom:8px;}
-        .fluid-name{font-size:18px;font-weight:800;color:var(--navy);}
-        .fluid-arr{font-size:13px;color:var(--muted);transition:transform .2s;}
-        .fluid-card.open .fluid-arr{transform:rotate(180deg);}
-        .fluid-qty{font-size:30px;font-weight:800;color:var(--green);line-height:1;}
-        .fluid-unit{font-size:13px;font-weight:600;color:var(--green);}
-        .fluid-meta{font-size:12px;color:var(--muted);margin-top:5px;}
-        .m-sortie{color:var(--orange);font-weight:600;}
-        .m-zero{color:var(--red);font-weight:600;}
-        .fluid-detail{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:none;}
-        .fluid-card.open .fluid-detail{display:block;}
-        .drow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;gap:6px;min-height:24px;}
-        .drow:last-child{border-bottom:none;}
-        .d-id{font-weight:700;color:var(--navy);white-space:nowrap;}
-        .d-qty{font-weight:700;color:var(--green);white-space:nowrap;}
-        .d-qty.muted{color:var(--muted);}
-        .empty-fl{font-size:12px;color:var(--muted);font-style:italic;text-align:center;padding:10px 0;}
-
-        /* Pills */
-        .pill{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap;}
-        .pill-stock,.pill-disponible{background:var(--green-bg);color:var(--green);}
-        .pill-sortie,.pill-en-sortie{background:var(--orange-bg);color:var(--orange);}
-        .pill-neuve{background:var(--blue-bg);color:var(--blue);}
-
-        /* Récup/Transfert table + section headers */
-        .sub-section{margin:0;}
-        .sub-hdr{display:flex;align-items:center;gap:10px;padding:12px 20px 8px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
-        .sub-hdr.rec{color:var(--red);}
-        .sub-hdr.transf{color:var(--blue);}
-        .sub-divider{height:1px;background:var(--border);margin:0 20px 0;}
-
-        /* Tables */
-        .table-wrap{overflow-x:auto;}
-        table{width:100%;border-collapse:collapse;font-size:13px;}
-        th{text-align:left;padding:10px 16px;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap;}
-        td{padding:10px 16px;border-bottom:1px solid var(--border);vertical-align:middle;}
-        tr:last-child td{border-bottom:none;}
-        .qty-bar-wrap{display:flex;align-items:center;gap:10px;width:100%;}
-        .qty-bar{background:#DDE3EA;border-radius:4px;height:7px;flex:1;overflow:hidden;}
-        .qty-fill-rec{height:100%;background:var(--orange);border-radius:4px;}
-        .qty-fill-transf{height:100%;background:var(--blue);border-radius:4px;}
-        .qty-val{font-weight:700;font-size:13px;white-space:nowrap;}
-        .qty-green{color:var(--green);}
-        .qty-muted{color:var(--muted);}
-        .tot-row td{background:var(--bg);font-weight:700;}
-
-        /* Historique */
-        .hist-controls{padding:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--border);}
-        .hist-input{flex:1;min-width:200px;max-width:420px;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;background:var(--card);}
-        .hist-input:focus{outline:none;border-color:var(--navy);}
-        .btn-load{padding:10px 20px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
-        .btn-load:hover{background:var(--navy2);}
-        .hist-content{padding:0;}
-        .hist-empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:13px;font-style:italic;}
-        .hist-bottle-info{display:flex;gap:14px;flex-wrap:wrap;padding:14px 20px;background:#FAFBFC;border-bottom:1px solid var(--border);}
-        .hist-info-item{font-size:13px;} .hist-info-item strong{color:var(--navy);margin-right:4px;}
-        .action-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;}
-        .ab-reception{background:var(--blue-bg);color:var(--blue);}
-        .ab-sortie{background:var(--orange-bg);color:var(--orange);}
-        .ab-retour{background:var(--green-bg);color:var(--green);}
-        .ab-retour_fournisseur{background:var(--red-bg);color:var(--red);}
-
-        /* En sortie */
-        .dur-warn{color:var(--red);font-weight:700;}
-        tr.row-warn td{background:var(--red-bg);}
-
-        /* Alert items */
-        .alert-item{display:flex;align-items:flex-start;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);font-size:13px;}
-        .alert-item:last-child{border-bottom:none;}
-        .alert-item.warn{background:var(--amber-bg);}
-        .alert-id{font-weight:700;min-width:110px;}
-        .empty-msg{padding:20px;color:var(--muted);font-size:13px;font-style:italic;text-align:center;}
-        .footer{text-align:center;padding:20px;font-size:11px;color:var(--muted);}
-        .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;color:var(--muted);}
-        .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;}
+        /* Loading */
+        .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:40vh;gap:14px;color:var(--muted);}
+        .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--brown);border-radius:50%;animation:spin .7s linear infinite;}
         @keyframes spin{to{transform:rotate(360deg);}}
+
+        .empty-msg{text-align:center;padding:40px;color:var(--muted);font-size:13px;font-style:italic;}
+        .btn-remind{padding:4px 12px;background:#EEF4FF;border:1px solid #BDD0F5;color:#1A4DB5;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+        .btn-remind:hover{background:#BDD0F5;}
+        .btn-remind.sent{background:var(--green-bg);border-color:var(--green);color:var(--green);cursor:default;}
 
         @media(max-width:600px){
             .header{padding:14px 16px;}
             .content{padding:16px 12px;}
-            .sc-val{font-size:28px;}
-            .fluid-grid{padding:14px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+            .mvt-row{grid-template-columns:1fr auto;}
+            .mvt-status{display:none;}
         }
     </style>
 </head>
@@ -219,611 +128,483 @@
 <div class="header">
     <div class="header-left">
         <p>PAGANETTI THERMIQUE</p>
-        <h1>🧊 Parc à Fluides — Tableau de bord</h1>
+        <h1>📑 Gestion des données Cerfa</h1>
     </div>
-    <div class="header-right">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
         <span id="pf-chip"></span>
-        <span id="last-update">—</span>
-        <button class="btn-h" onclick="loadData()">⟳ Actualiser</button>
+        <a href="fournisseur.html" class="btn-back">🚚 Départs fournisseur</a>
+        <a href="dashboard.html" class="btn-back">← Tableau de bord</a>
     </div>
 </div>
 
-<div class="content" id="content">
-    <div class="loading"><div class="spinner"></div><div>Chargement…</div></div>
-</div>
+<!-- Management phase -->
+<div class="content" id="mgmt-phase" style="display:none">
+    <div class="mgmt-header">
+        <div class="mgmt-stats" id="mgmt-stats"></div>
+        <button class="btn-back" style="background:var(--brown);border-color:var(--brown)" onclick="loadData()">⟳ Actualiser</button>
+    </div>
 
-<div class="footer">Actualisation automatique toutes les 5 min · Lecture seule</div>
+    <div class="filters">
+        <input type="text" class="filter-input" id="search-input"
+               placeholder="Rechercher une bouteille, affaire, technicien…"
+               oninput="applyFilter()"/>
+        <div class="filter-btns">
+            <button class="fb active" id="fb-all"   onclick="setFilter('all')">Tous</button>
+            <button class="fb"        id="fb-ko"    onclick="setFilter('ko')">Manquants</button>
+            <button class="fb"        id="fb-ok"    onclick="setFilter('ok')">Saisis</button>
+        </div>
+    </div>
+
+    <div id="bottles-list">
+        <div class="loading"><div class="spinner"></div><div>Chargement…</div></div>
+    </div>
+</div>
 
 <script src="auth.js"></script>
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYoKD0FWNrQ87sbAMn3yLcE-Qej37VYDVwECZFAg65rtA5UdiWzjJMpYn1p-AccUYVnQ/exec';
 
-let CURRENT_TAB = 'neuf';
-let DASH_DATA   = null;
+let cerfaData = null;
+let currentFilter = 'all';
+let openBottle    = null; // index of open accordion
+let openMvt       = null; // {bi, mi}
 
-// ─ Load dashboard ─────────────────────────────────────
+// ── Data ────────────────────────────────────
 async function loadData() {
-    document.getElementById('last-update').textContent = 'Chargement…';
+    document.getElementById('bottles-list').innerHTML =
+        '<div class="loading"><div class="spinner"></div><div>Chargement…</div></div>';
     try {
-        const r = await fetch(`${SCRIPT_URL}?action=getDashboard`);
-        DASH_DATA = await r.json();
-        if (DASH_DATA.error) throw new Error(DASH_DATA.error);
-        render(DASH_DATA);
-        document.getElementById('last-update').textContent = 'Mis à jour : ' + DASH_DATA.updatedAt;
+        const r = await fetch(`${SCRIPT_URL}?action=getCerfaData`);
+        cerfaData = await r.json();
+        if (cerfaData.error) throw new Error(cerfaData.error);
+        renderAll();
     } catch(err) {
-        document.getElementById('content').innerHTML =
-            `<div class="loading">❌ ${err.message}</div>`;
-        document.getElementById('last-update').textContent = 'Erreur';
+        document.getElementById('bottles-list').innerHTML =
+            `<div class="empty-msg">❌ ${err.message}</div>`;
     }
 }
 
-// ─ Main render ────────────────────────────────────────
-function render(d) {
-    const bs = d.stock?.byStatut || {};
-    const nbStock   = (bs['Stock']||0)+(bs['Disponible']||0)+(bs['Neuve']||0);
-    const nbSortie  = (bs['Sortie']||0)+(bs['En sortie']||0);
-    const nbNeuve   = bs['Neuve']||0;   // affiché séparément pour info
-    const nbAttente = bs['En attente fournisseur']||0;
-    const nbAlertes = (d.alertes||[]).length;
-
-    let html = '';
-
-    // Stats
-    html += `<div class="stats">
-        <div class="sc green"><div class="sc-lbl">En stock</div><div class="sc-val">${nbStock}</div></div>
-        <div class="sc orange"><div class="sc-lbl">En sortie</div><div class="sc-val">${nbSortie}</div></div>
-        <div class="sc blue"><div class="sc-lbl">Neuves</div><div class="sc-val">${nbNeuve}</div></div>
-        <div class="sc violet"><div class="sc-lbl">En attente fournisseur</div><div class="sc-val">${nbAttente}</div></div>
-        <div class="sc ${nbAlertes>0?'red':'navy'}"><div class="sc-lbl">⚠️ Alertes</div><div class="sc-val">${nbAlertes}</div></div>
-        <div class="sc navy"><div class="sc-lbl">Total parc</div><div class="sc-val">${d.stock?.total||0}</div></div>
-    </div>`;
-
-    // Action bar
-    html += `<div class="action-bar">
-        <a href="qr-generator.html" target="_blank" class="btn-action">🏷️ Générateur QR codes</a>
-        <a href="https://belletalan-pixel.github.io/parc-fluides/" target="_blank" class="btn-action secondary">🧊 Ouvrir l'app</a>
-        <button class="btn-action" style="background:#B45309;border:none;cursor:pointer;font-family:inherit" onclick="openReservations()">📋 Réservations</button>
-        <a href="cerfa.html" target="_blank" class="btn-action" style="background:#7B4C00">📑 Cerfa</a>
-        <a href="fournisseur.html" target="_blank" class="btn-action" style="background:#6D28D9">🚚 Départs fournisseur</a>
-        <a href="admin.html" target="_blank" class="btn-action" style="background:#4B5563">⚙️ Administration</a>
-    </div>`;
-
-    // ── État du stock ───────────────────────────────────
-    const neufFluides = Object.keys(d.stockNeuf||{}).sort();
-    const recupBtls   = (d.stockRecup||[]).filter(b => b.type==='Récupération');
-    const transfBtls  = (d.stockRecup||[]).filter(b => b.type==='Transfert');
-
-    html += `<div class="section">
-        <div class="section-header">
-            <span>📦</span>
-            <span class="section-title">État du Stock</span>
-        </div>
-        <div class="tabs">
-            <button class="tab-btn ${CURRENT_TAB==='neuf'?'active':''}" onclick="switchTab('neuf')">
-                🟢 Fluides neufs (${neufFluides.length})
-            </button>
-            <button class="tab-btn ${CURRENT_TAB==='rec'?'active':''}" onclick="switchTab('rec')">
-                🔴 Récupération (${recupBtls.length})
-            </button>
-            <button class="tab-btn ${CURRENT_TAB==='transf'?'active':''}" onclick="switchTab('transf')">
-                🔵 Transfert (${transfBtls.length})
-            </button>
-            <button class="tab-btn ${CURRENT_TAB==='hist'?'active':''}" onclick="switchTab('hist')">
-                📋 Historique
-            </button>
-        </div>
-
-        <div id="p-neuf"   style="display:${CURRENT_TAB==='neuf'?'block':'none'}">${renderNeuves(d.stockNeuf||{})}</div>
-        <div id="p-rec"    style="display:${CURRENT_TAB==='rec'?'block':'none'}">${renderRecupTable(recupBtls,'rec')}</div>
-        <div id="p-transf" style="display:${CURRENT_TAB==='transf'?'block':'none'}">${renderRecupTable(transfBtls,'transf')}</div>
-        <div id="p-hist"   style="display:${CURRENT_TAB==='hist'?'block':'none'}">${renderHistPanel(d.allBottles||[])}</div>
-    </div>`;
-
-    // ── En sortie ───────────────────────────────────────
-    const enSortie = d.enSortie||[];
-    html += `<div class="section">
-        <div class="section-header">
-            <span>↗</span><span class="section-title">Bouteilles en sortie</span>
-            <span class="s-badge sb-orange">${enSortie.length}</span>
-            <span style="font-size:11px;color:var(--muted);margin-left:auto">Alerte > ${d.thresholds?.seuilSortieJours||30} j</span>
-        </div>`;
-    if (!enSortie.length) {
-        html += `<div class="empty-msg">Aucune bouteille en sortie.</div>`;
-    } else {
-        html += `<div class="table-wrap"><table>
-            <thead><tr><th>Bouteille</th><th>Fluide</th><th>Type</th><th>Technicien</th><th>Affaire</th><th>Date sortie</th><th>Durée</th><th>Fluide (kg)</th></tr></thead><tbody>`;
-        enSortie.forEach(b => {
-            const cls = b.alerte?' class="row-warn"':'';
-            const typeCode = b.type==='Neuf'
-                ? '<span class="pill pill-stock">Neuf</span>'
-                : b.type==='Récupération'
-                ? '<span class="pill" style="background:#FEF2F2;color:#9B1C1C">Récup.</span>'
-                : b.type==='Transfert'
-                ? '<span class="pill pill-neuve">Transf.</span>'
-                : b.type||'—';
-            html += `<tr${cls}>
-                <td style="white-space:nowrap"><strong>${b.id}</strong></td>
-                <td style="white-space:nowrap">${b.fluide||'—'}</td>
-                <td>${typeCode}</td>
-                <td>${b.technicien||'—'}</td><td>${b.affaire||'—'}</td>
-                <td style="white-space:nowrap">${b.dateSortie}</td>
-                <td class="${b.alerte?'dur-warn':''}">${b.dureeJours!=null?b.dureeJours+'j':'—'}${b.alerte?' ⚠️':''}</td>
-                <td style="white-space:nowrap">${b.fluideCharge} kg</td>
-            </tr>`;
-        });
-        html += `</tbody></table></div>`;
-    }
-    html += `</div>`;
-
-    // ── F-Gaz ───────────────────────────────────────────
-    const fgazFluides = Object.keys(d.fgaz||{}).sort();
-    html += `<div class="section">
-        <div class="section-header">
-            <span>📊</span><span class="section-title">Synthèse F-Gaz ${d.annee}</span>
-            <span class="s-badge sb-blue">${fgazFluides.length} fluide(s)</span>
-        </div>`;
-    if (!fgazFluides.length) {
-        html += `<div class="empty-msg">Aucun mouvement en ${d.annee}.</div>`;
-    } else {
-        let tCharge=0, tRecup=0, tTransf=0;
-        html += `<div class="table-wrap"><table>
-            <thead><tr>
-                <th>Fluide</th>
-                <th style="color:var(--green)">🟢 Chargé chez client (kg)</th>
-                <th style="color:var(--orange)">🟠 Récupéré (kg)</th>
-                <th style="color:var(--blue)">🔵 Transféré (kg)</th>
-            </tr></thead><tbody>`;
-        fgazFluides.forEach(f => {
-            const fg = d.fgaz[f];
-            const charge    = (fg.charge    || 0);
-            const recupere  = (fg.recupere  || 0);
-            const transfere = (fg.transfere || 0);
-            tCharge += charge; tRecup += recupere; tTransf += transfere;
-            html += `<tr>
-                <td><strong>${f}</strong></td>
-                <td>${charge    > 0 ? charge.toFixed(3)    + ' kg' : '—'}</td>
-                <td>${recupere  > 0 ? recupere.toFixed(3)  + ' kg' : '—'}</td>
-                <td>${transfere > 0 ? transfere.toFixed(3) + ' kg' : '—'}</td>
-            </tr>`;
-        });
-        html += `</tbody><tfoot><tr class="tot-row">
-            <td>TOTAL</td>
-            <td>${tCharge.toFixed(3)} kg</td>
-            <td>${tRecup.toFixed(3)} kg</td>
-            <td>${tTransf.toFixed(3)} kg</td>
-        </tr></tfoot></table></div>
-        <div style="padding:10px 20px;font-size:11px;color:var(--muted);font-style:italic">
-            Chargé : fluide neuf injecté chez le client &nbsp;·&nbsp;
-            Récupéré : fluide tiré d'un équipement &nbsp;·&nbsp;
-            Transféré : résiduel en bouteille Transfert &nbsp;·&nbsp;
-            Source officielle : portail Fluido Apave.
-        </div>`;
-    }
-    html += `</div>`;
-
-    // ── Alertes (en fin de page) ─────────────────────────
-    const alertes = d.alertes||[];
-    html += `<div class="section">
-        <div class="section-header">
-            <span>⚠️</span><span class="section-title">Alertes</span>
-            ${alertes.length ? `<span class="s-badge sb-red">${alertes.length}</span>` : ''}
-        </div>`;
-    if (!alertes.length) {
-        html += `<div class="empty-msg">✅ Aucune alerte.</div>`;
-    } else {
-        html += `<div class="table-wrap"><table>
-            <thead><tr>
-                <th>N° Bouteille</th>
-                <th>Fluide</th>
-                <th>Type</th>
-                <th>Description de l'alerte</th>
-            </tr></thead><tbody>`;
-        alertes.forEach(a => {
-            const typeCls = a.type==='Neuf' ? 'pill-stock'
-                : a.type==='Récupération' ? '' : 'pill-neuve';
-            const typeBadge = a.type==='Neuf'
-                ? `<span class="pill pill-stock">Neuf</span>`
-                : a.type==='Récupération'
-                ? `<span class="pill" style="background:#FEF2F2;color:#9B1C1C">Récup.</span>`
-                : `<span class="pill pill-neuve">Transf.</span>`;
-            html += `<tr class="row-warn">
-                <td style="white-space:nowrap"><strong>${a.id}</strong></td>
-                <td style="white-space:nowrap">${a.fluide||'—'}</td>
-                <td>${typeBadge}</td>
-                <td>${a.message}</td>
-            </tr>`;
-        });
-        html += `</tbody></table></div>`;
-    }
-    html += `</div>`;
-
-    document.getElementById('content').innerHTML = html;
-}
-
-// ─ Neuves cards ───────────────────────────────────────
-function renderNeuves(stockNeuf) {
-    const fluides = Object.keys(stockNeuf).sort();
-    if (!fluides.length) return `<div class="empty-msg">Aucune bouteille neuve.</div>`;
-    let html = `<div class="fluid-grid">`;
-    fluides.forEach(f => {
-        const data    = stockNeuf[f];
-        const nbSort  = (data.bottles||[]).filter(b=>b.statut==='Sortie'||b.statut==='En sortie').length;
-        const nbStock = data.nb;
-        const total   = typeof data.totalKg==='number' ? data.totalKg.toFixed(2) : '—';
-        const metaSortie = nbSort ? `<span class="m-sortie"> · ${nbSort} en sortie</span>` : '';
-        const detailRows = (data.bottles||[]).map(b => {
-            const pillCls = b.statut==='Stock'||b.statut==='Disponible' ? 'pill-stock'
-                          : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie' : 'pill-neuve';
-            const qtyCls  = b.statut==='Sortie'||b.statut==='En sortie' ? 'muted' : '';
-            return `<div class="drow">
-                <span class="d-id">${b.id}</span>
-                <span class="d-qty ${qtyCls}">${b.quantite} kg</span>
-                <span class="pill ${pillCls}">${b.statut}</span>
-            </div>`;
-        }).join('');
-        html += `<div class="fluid-card" id="fc-${f}" onclick="toggleFluid('${f}')">
-            <div class="fluid-hdr"><span class="fluid-name">${f}</span><span class="fluid-arr">▾</span></div>
-            <div class="fluid-qty">${nbStock>0?total:'0'} <span class="fluid-unit">kg</span></div>
-            <div class="fluid-meta">${nbStock} dispo${metaSortie}</div>
-            <div class="fluid-detail">${detailRows||`<div class="empty-fl">Aucune bouteille</div>`}</div>
-        </div>`;
+// ── Filter ──────────────────────────────────
+function setFilter(f) {
+    currentFilter = f;
+    ['all','ko','ok'].forEach(k => {
+        document.getElementById('fb-'+k).classList.toggle('active', k===f);
     });
-    return html + `</div>`;
+    applyFilter();
 }
 
-function toggleFluid(f) { document.getElementById('fc-'+f)?.classList.toggle('open'); }
+function applyFilter() {
+    const q = document.getElementById('search-input').value.trim().toLowerCase();
+    document.querySelectorAll('.bottle-card').forEach(card => {
+        const id    = (card.dataset.id    || '').toLowerCase();
+        const fluide= (card.dataset.fluide|| '').toLowerCase();
+        const nbKo  = parseInt(card.dataset.nbko  || '0');
+        const nbOk  = parseInt(card.dataset.nbok  || '0');
 
-// ─ Récup / Transfert table ────────────────────────────
-function renderRecupTable(btls, kind) {
-    if (!btls.length) return `<div class="empty-msg">Aucune bouteille de ce type.</div>`;
+        const matchSearch = !q || id.includes(q) || fluide.includes(q)
+            || card.dataset.mvttext?.toLowerCase().includes(q);
+        const matchFilter = currentFilter==='all'
+            || (currentFilter==='ko' && nbKo>0)
+            || (currentFilter==='ok' && nbOk>0 && nbKo===0);
 
-    // Tri : place disponible décroissante (bouteille la plus vide en premier)
-    const sorted = [...btls].sort((a, b) => {
-        const pa = parseFloat(a.placeDisponible) ?? -1;
-        const pb = parseFloat(b.placeDisponible) ?? -1;
-        if (pa < 0 && pb < 0) return 0;
-        if (pa < 0) return 1;
-        if (pb < 0) return -1;
-        return pb - pa;
-    });
-
-    // Fluides uniques pour le filtre
-    const fluides = [...new Set(sorted.map(b=>b.fluide).filter(Boolean))].sort();
-    const fillCls  = kind==='rec' ? 'qty-fill-rec' : 'qty-fill-transf';
-    const filterId = `filter-${kind}`;
-
-    let html = `
-        <div class="recup-filter-bar">
-            <select class="recup-filter" id="${filterId}" onchange="filterRecup('${kind}',this.value)">
-                <option value="">Tous les fluides — triés par place disponible ↓</option>
-                ${fluides.map(f=>`<option value="${f}">${f}</option>`).join('')}
-            </select>
-        </div>
-        <div class="table-wrap"><table style="width:100%">
-        <colgroup>
-            <col style="width:14%">
-            <col style="width:12%">
-            <col style="width:11%">
-            <col style="width:14%">
-            <col>
-        </colgroup>
-        <thead><tr><th>N° Bouteille</th><th>Fluide</th><th>Statut</th><th>Fluide actuel</th><th>Place disponible ↓</th></tr></thead><tbody>`;
-
-    sorted.forEach(b => {
-        const statCls = b.statut==='Stock'||b.statut==='Disponible' ? 'pill-stock'
-                      : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie' : 'pill-neuve';
-        let placeHtml = '—';
-        if (b.placeDisponible!==null && b.statut!=='Sortie' && b.statut!=='En sortie') {
-            const cap   = parseFloat(b.capaciteMax)||0;
-            const place = parseFloat(b.placeDisponible)||0;
-            if (cap > 0) {
-                const pct     = Math.min(100,(place/cap)*100);
-                const fillPct = Math.max(0, 100 - pct);
-                placeHtml = `<div class="qty-bar-wrap">
-                    <div class="qty-bar"><div class="${fillCls}" style="width:${fillPct.toFixed(1)}%"></div></div>
-                    <span class="qty-val qty-green">${b.placeDisponible} kg</span>
-                </div>`;
-            } else {
-                placeHtml = `<span class="qty-val qty-green">${b.placeDisponible} kg</span>`;
-            }
-        } else if (b.statut==='Sortie'||b.statut==='En sortie') {
-            placeHtml = `<span style="font-size:12px;color:var(--muted)">En sortie (${b.technicien||'—'})</span>`;
-        }
-        html += `<tr data-kind="${kind}" data-fluide="${b.fluide||''}">
-            <td style="white-space:nowrap"><strong>${b.id}</strong></td>
-            <td style="white-space:nowrap">${b.fluide||'—'}</td>
-            <td><span class="pill ${statCls}">${b.statut}</span></td>
-            <td style="white-space:nowrap">${b.statut!=='Sortie'&&b.statut!=='En sortie'?b.fluideActuel+' kg':'—'}</td>
-            <td>${placeHtml}</td>
-        </tr>`;
-    });
-    return html + `</tbody></table></div>`;
-}
-
-// Filtre client-side par fluide dans l'onglet Récup/Transfert
-function filterRecup(kind, fluide) {
-    document.querySelectorAll(`tr[data-kind="${kind}"]`).forEach(row => {
-        row.style.display = (!fluide || row.dataset.fluide === fluide) ? '' : 'none';
+        card.style.display = (matchSearch && matchFilter) ? '' : 'none';
     });
 }
 
-// ─ Historique panel ───────────────────────────────────
-function renderHistPanel(allBottles) {
-    const sorted = [...allBottles]
-        .sort((a,b) => a.id.localeCompare(b.id, 'fr', {numeric:true}));
-    const opts = sorted
-        .map(b => `<option value="${b.id} — ${b.fluide||'?'} ${b.type}">`)
-        .join('');
-    return `
-        <div class="hist-controls">
-            <input  type="text"
-                    class="hist-input"
-                    id="hist-input"
-                    list="hist-list"
-                    placeholder="Tapez le numéro, le fluide ou le type…"
-                    autocomplete="off"
-                    autocapitalize="off"
-                    oninput="onHistInput()"/>
-            <datalist id="hist-list">${opts}</datalist>
-            <button class="btn-load" onclick="loadHistory()">Afficher</button>
-        </div>
-        <div class="hist-content" id="hist-content">
-            <div class="hist-empty">Tapez un numéro de bouteille ou sélectionnez dans la liste.</div>
-        </div>`;
+// ── Render ──────────────────────────────────
+// ── Helpers ──────────────────────────────────
+function cerfaConsoValue(b, c) {
+    if (b.type === 'Neuf') return (c.qtRecharge||0) - (c.qtRecup||0);
+    return (c.qtRecup||0) - (c.qtRecharge||0);
 }
 
-function onHistInput() {
-    const val = (document.getElementById('hist-input')?.value || '').trim();
-    // Déclenchement automatique si une option complète est sélectionnée (contient ' — ')
-    if (val.includes(' — ')) loadHistory();
-}
+function renderAll() {
+    const bottles = cerfaData.bottles || [];
+    const totalMvt = bottles.reduce((s,b)=>s+b.movements.length,0);
+    const totalKo  = bottles.reduce((s,b)=>s+b.movements.filter(m=>!m.cerfaSaisi).length,0);
+    document.getElementById('mgmt-stats').innerHTML =
+        `${bottles.length} bouteille(s) · ${totalMvt} mouvement(s) · <strong>${totalKo} sans Cerfa</strong>`;
 
-async function loadHistory() {
-    const val = (document.getElementById('hist-input')?.value || '').trim();
-    const id  = val.split(' — ')[0].trim();
-    if (!id) return;
-    const el = document.getElementById('hist-content');
-    el.innerHTML = `<div class="hist-empty"><div class="spinner" style="margin:0 auto 8px"></div>Chargement…</div>`;
-    try {
-        const r = await fetch(`${SCRIPT_URL}?action=getBottleHistory&id=${encodeURIComponent(id)}`);
-        const d = await r.json();
-        if (d.error) throw new Error(d.error);
-        renderHistory(d, el);
-    } catch(err) {
-        el.innerHTML = `<div class="hist-empty">❌ ${err.message}</div>`;
+    if (!bottles.length) {
+        document.getElementById('bottles-list').innerHTML='<div class="empty-msg">Aucun mouvement avec variation de fluide.</div>';
+        return;
     }
-}
 
-function renderHistory(d, el) {
-    const b = d.bottle || {};
-    const statCls = b.statut==='Stock'||b.statut==='Disponible' ? 'pill-stock'
-                  : b.statut==='Sortie'||b.statut==='En sortie' ? 'pill-sortie' : 'pill-neuve';
+    let html='';
+    bottles.forEach((b,bi)=>{
+        const nbKo=b.movements.filter(m=>!m.cerfaSaisi).length;
+        const nbOk=b.movements.filter(m=>m.cerfaSaisi).length;
+        const mvtText=b.movements.map(m=>m.affaire+' '+m.technicien).join(' ');
 
-    let html = `<div class="hist-bottle-info">
-        <span class="hist-info-item"><strong>${b.id}</strong></span>
-        <span class="hist-info-item"><strong>Fluide :</strong>${b.fluide}</span>
-        <span class="hist-info-item"><strong>Type :</strong>${b.type}</span>
-        <span class="hist-info-item"><strong>Tare :</strong>${b.tare} kg</span>
-        ${b.dernierPoids?`<span class="hist-info-item"><strong>Dernier poids :</strong>${b.dernierPoids} kg</span>`:''}
-        <span class="hist-info-item"><span class="pill ${statCls}">${b.statut}</span></span>
-    </div>`;
-
-    const mvts = d.mouvements || [];
-    if (!mvts.length) {
-        html += `<div class="hist-empty">Aucun mouvement enregistré pour cette bouteille.</div>`;
-    } else {
-        const actionLabel = {
-            réception:'Réception', sortie:'Sortie',
-            retour:'Retour', retour_fournisseur:'Retour fournisseur',
-        };
-        html += `<div class="table-wrap"><table>
-            <thead><tr><th>Date</th><th>Action</th><th>Venant de</th><th>Vers</th><th>Gestionnaire</th><th>Poids (kg)</th><th>Conso (kg)</th><th>Affaire</th></tr></thead><tbody>`;
-        mvts.forEach(m => {
-            const aCls = `ab-${m.action}`;
-            const lbl  = actionLabel[m.action] || m.action;
-            html += `<tr>
-                <td style="white-space:nowrap">${m.date}</td>
-                <td><span class="action-badge ${aCls}">${lbl}</span></td>
-                <td>${m.venantDe}</td><td>${m.vers}</td>
-                <td>${m.gestionnaire}</td>
-                <td>${m.poids}</td>
-                <td>${m.conso||'—'}</td>
-                <td>${m.affaire||'—'}</td>
-            </tr>`;
-        });
-        html += `</tbody></table></div>`;
-    }
-    el.innerHTML = html;
-}
-
-// ─ Tab switch ─────────────────────────────────────────
-function switchTab(tab) {
-    CURRENT_TAB = tab;
-    ['neuf','rec','transf','hist'].forEach(t => {
-        document.querySelector(`.tab-btn:nth-child(${['neuf','rec','transf','hist'].indexOf(t)+1})`)?.classList.toggle('active', t===tab);
-        const p = document.getElementById('p-'+t);
-        if (p) p.style.display = t===tab ? 'block' : 'none';
-    });
-}
-
-loadData();
-setInterval(loadData, 5*60*1000);
-
-// ══════════════════════════════════════════
-//  RÉSERVATIONS — connexion gestionnaire + gestion
-// ══════════════════════════════════════════
-let resData    = null; // { reservations, availableBottles, gestionnaires }
-
-async function openReservations() {
-    const ok = await PFAuth.ensure(SCRIPT_URL, 'Connexion gestionnaire requise pour gérer les réservations.');
-    if (!ok) return;
-    if (!document.getElementById('res-overlay')) buildResOverlay();
-    document.getElementById('res-overlay').style.display = 'flex';
-    document.getElementById('res-mgmt-phase').style.display = 'block';
-    loadResData();
-}
-
-function buildResOverlay() {
-    const el = document.createElement('div');
-    el.id = 'res-overlay';
-    el.className = 'res-overlay';
-    el.style.display = 'none';
-    el.innerHTML = `
-        <div class="res-panel">
-            <div class="res-panel-header">
-                <h2>📋 Réservations</h2>
-                <button class="res-close" onclick="closeResOverlay()">✕</button>
-            </div>
-            <div class="res-body">
-                <!-- Management phase -->
-                <div id="res-mgmt-phase">
-                    <div id="res-mgmt-content">Chargement…</div>
+        html+=`<div class="bottle-card" id="bottle-${bi}"
+            data-id="${b.id}" data-fluide="${b.fluide||''}"
+            data-nbko="${nbKo}" data-nbok="${nbOk}" data-mvttext="${mvtText}">
+            <div class="bottle-hdr" onclick="toggleBottle(${bi})">
+                <div>
+                    <div class="bottle-name">${b.id}</div>
+                    <div class="bottle-sub">${b.fluide||'?'} · ${b.type} · ${b.movements.length} mouvement(s)</div>
                 </div>
-            </div>
-        </div>`;
-    document.body.appendChild(el);
-}
-
-function closeResOverlay() {
-    const el = document.getElementById('res-overlay');
-    if (el) el.style.display = 'none';
-}
-
-// ── PIN réservations ──────────────────────
-// ── Charger données réservations ──────────
-async function loadResData() {
-    document.getElementById('res-mgmt-content').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Chargement…</div>';
-    try {
-        const r = await fetch(`${SCRIPT_URL}?action=getReservations`);
-        resData = await r.json();
-        if (resData.error) throw new Error(resData.error);
-        renderResMgmt();
-    } catch(err) {
-        document.getElementById('res-mgmt-content').innerHTML = `<div style="color:var(--red);padding:16px">❌ ${err.message}</div>`;
-    }
-}
-
-function renderResMgmt() {
-    const d = resData;
-    const active = d.reservations || [];
-    let html = '';
-
-    // ── Nouvelle réservation ──────────────
-    html += `<div class="res-section-title">Nouvelle réservation</div>
-        <div class="res-form-row">
-            <label class="res-form-label">Bouteille</label>
-            <input type="text" class="res-form-input" id="rf-bottle"
-                   list="rf-bottle-list"
-                   placeholder="Tapez le numéro, le fluide ou le type…"
-                   autocomplete="off"
-                   oninput="onResBottleChange()"/>
-            <datalist id="rf-bottle-list">
-                ${(d.availableBottles||[]).map(b=>`<option value="${b.id} — ${b.fluide||'?'} (${b.type})" data-id="${b.id}" data-fluide="${b.fluide}" data-type="${b.type}">`).join('')}
-            </datalist>
-        </div>
-        <div class="res-form-row">
-            <label class="res-form-label">N° Affaire</label>
-            <input type="text" class="res-form-input" id="rf-affaire" placeholder="ex : 2025-047" autocomplete="off"/>
-        </div>
-        <div class="res-form-row">
-            <label class="res-form-label">Date de sortie prévue</label>
-            <input type="date" class="res-form-input" id="rf-date"/>
-        </div>
-        <div class="res-form-row">
-            <label class="res-form-label">Gestionnaire</label>
-            <select class="res-form-select" id="rf-gest">
-                <option value="">— Sélectionner —</option>
-                ${(d.gestionnaires||[]).map(g=>`<option value="${g}">${g}</option>`).join('')}
-            </select>
-        </div>
-        <div id="rf-error" style="color:var(--red);font-size:12px;margin-bottom:8px"></div>
-        <button class="btn-create-res" onclick="submitReservation()">✔ Créer la réservation</button>`;
-
-    // ── Réservations actives ──────────────
-    html += `<div class="res-section-title">Réservations actives (${active.length})</div>`;
-    if (!active.length) {
-        html += `<div style="color:var(--muted);font-size:13px;font-style:italic;padding:8px 0">Aucune réservation active.</div>`;
-    } else {
-        active.forEach(res => {
-            html += `<div class="res-card">
-                <div class="res-card-id">${res.bottleId} — ${res.fluide||'?'} (${res.type})</div>
-                <div class="res-card-meta">
-                    📋 Affaire : <strong>${res.affaire}</strong> &nbsp;·&nbsp;
-                    📅 Prévue le : <strong>${res.datePrevu}</strong><br>
-                    👤 ${res.gestionnaire} &nbsp;·&nbsp; Créée le ${res.dateCreation}
+                <div class="bottle-badges">
+                    ${nbKo>0?`<span class="badge badge-warn">⚠️ ${nbKo} sans Cerfa</span>`:''}
+                    ${nbOk>0?`<span class="badge badge-ok">✓ ${nbOk} renseigné(s)</span>`:''}
+                    ${waitControl(b,bi)}
                 </div>
-                <button class="btn-cancel-res" onclick="confirmCancelRes('${res.id}','${res.bottleId}')">Annuler la réservation</button>
+                <span class="bottle-arr">▾</span>
+            </div>
+            <div class="bottle-body" id="body-${bi}">`;
+
+        b.movements.forEach((m,mi)=>{
+            const sensCls=m.sens.startsWith('+')?'sens-pos':'sens-neg';
+            const sumCerfa=(m.cerfas||[]).reduce((s,c)=>s+cerfaConsoValue(b,c),0);
+            const delta=Math.abs(parseFloat((sumCerfa-m.conso).toFixed(3)));
+            const allOk=m.cerfas.length>0 && delta<=0.1;
+            const hasWarn=m.cerfas.length>0 && delta>0.1;
+            const statusCls=!m.cerfaSaisi?'status-ko':allOk?'status-ok':'status-warn';
+            const statusLabel=!m.cerfaSaisi?'Sans Cerfa':allOk?`✓ ${m.cerfas.length} Cerfa(s)`:` ⚠️ Écart`;
+            const remindBtn=!m.cerfaSaisi
+                ?`<button class="btn-remind" id="remind-${bi}-${mi}" onclick="event.stopPropagation();sendReminder(${bi},${mi})">📧 Relancer</button>`:'';
+
+            html+=`<div class="mvt-row" onclick="toggleSection(${bi},${mi})">
+                <div>
+                    <div class="mvt-date">${m.date}</div>
+                    <div class="mvt-meta">📋 ${m.affaire} &nbsp;·&nbsp; 👤 ${m.technicien}</div>
+                    ${m.cerfas.length>0?`<div class="mvt-cerfa-info">Σ Cerfa : ${sumCerfa.toFixed(3)} kg / théorique : ${m.sens}</div>`:''}
+                </div>
+                <span class="mvt-sens ${sensCls}">${m.sens}</span>
+                <span class="mvt-status ${statusCls}">${statusLabel}</span>
+                ${remindBtn}
+            </div>
+            <div id="section-${bi}-${mi}" style="display:none">
+                ${buildCerfaSection(b,m,bi,mi)}
             </div>`;
         });
+        html+=`</div></div>`;
+    });
+    document.getElementById('bottles-list').innerHTML=html;
+    applyFilter();
+}
+
+// ── Départ fournisseur ───────────────────────
+const ST_ATT = 'En attente fournisseur';
+
+function waitControl(b, bi) {
+    const st = b.statut || '';
+    if (st === 'Retourné fournisseur')
+        return `<span class="badge badge-gone">📦 Parti chez le fournisseur</span>`;
+    if (st === ST_ATT)
+        return `<label class="wait-chk" onclick="event.stopPropagation()" title="Décocher pour la remettre en stock">
+            <input type="checkbox" checked onchange="toggleWaiting(${bi},this)"> 🚚 En attente départ</label>`;
+    if (st === 'Stock' || st === 'Neuve' || st === 'Disponible')
+        return `<label class="wait-chk" onclick="event.stopPropagation()">
+            <input type="checkbox" onchange="toggleWaiting(${bi},this)"> 🚚 Prête pour départ fournisseur</label>`;
+    return `<label class="wait-chk off" onclick="event.stopPropagation()" title="Bouteille non disponible au parc (statut : ${st||'inconnu'})">
+        <input type="checkbox" disabled> 🚚 Prête pour départ</label>`;
+}
+
+// Points à vérifier avant de déclarer la bouteille prête (information, non bloquant)
+function bottleIssues(b) {
+    const issues = [];
+    const sans = b.movements.filter(m => !m.cerfaSaisi).length;
+    if (sans > 0) issues.push(`${sans} mouvement(s) sans Cerfa`);
+    const ecart = b.movements.filter(m => {
+        if (!m.cerfas || !m.cerfas.length) return false;
+        const sum = m.cerfas.reduce((t,c) => t + cerfaConsoValue(b,c), 0);
+        return Math.abs(sum - m.conso) > 0.1;
+    }).length;
+    if (ecart > 0) issues.push(`${ecart} mouvement(s) avec un écart entre la somme des Cerfa et le théorique`);
+    return issues;
+}
+
+async function toggleWaiting(bi, el) {
+    const b = (cerfaData.bottles||[])[bi];
+    if (!b) return;
+    const want = el.checked;
+    let msg;
+    if (want) {
+        const issues = bottleIssues(b);
+        msg = `Mettre la bouteille ${b.id} en attente de départ fournisseur ?\n\n`
+            + `Elle ne sera plus comptée dans le stock (neuf / récupération / transfert), mais reste au parc.`
+            + (issues.length ? `\n\n⚠️ À vérifier avant :\n - ${issues.join('\n - ')}` : '')
+            + (b.movements.some(m => !m.cerfaSaisi) ? `\n\n⛔ Le départ chez le fournisseur sera impossible tant que ces Cerfa ne sont pas saisis.` : '');
+    } else {
+        msg = `Remettre la bouteille ${b.id} en stock ?`;
     }
+    if (!confirm(msg)) { el.checked = !want; return; }
 
-    document.getElementById('res-mgmt-content').innerHTML = html;
-}
-
-function onResBottleChange() {
-    // Pré-remplir le fluide (info only)
-}
-
-async function submitReservation() {
-    const bottleRaw = (document.getElementById('rf-bottle')?.value || '').trim();
-    const bottleId  = bottleRaw.split(' — ')[0].trim();
-    const affaire   = document.getElementById('rf-affaire').value.trim();
-    const date      = document.getElementById('rf-date').value;
-    const gest      = document.getElementById('rf-gest').value;
-    const errEl     = document.getElementById('rf-error');
-
-    if (!bottleId) { errEl.textContent = 'Saisissez ou sélectionnez une bouteille.'; return; }
-    if (!affaire)  { errEl.textContent = 'Saisissez un N° affaire.'; return; }
-    if (!date)     { errEl.textContent = 'Saisissez une date de sortie prévue.'; return; }
-    if (!gest)     { errEl.textContent = 'Sélectionnez un gestionnaire.'; return; }
-    errEl.textContent = '';
-
-    const bottleInfo = (resData?.availableBottles||[]).find(b => b.id === bottleId) || {};
-    const payload = {
-        bottleId,
-        fluide:      bottleInfo.fluide || '',
-        type:        bottleInfo.type   || '',
-        affaire,
-        datePrevu:   date,
-        gestionnaire:gest,
-    };
-
-    document.getElementById('res-mgmt-content').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Enregistrement…</div>';
+    el.disabled = true;
     try {
         const url = new URL(SCRIPT_URL);
-        url.searchParams.set('action', 'createReservation');
+        url.searchParams.set('action', 'setWaiting');
+        url.searchParams.set('data', JSON.stringify({ bottleId: b.id, waiting: want }));
+        const r   = await fetch(url.toString());
+        const res = await r.json();
+        if (res.error) throw new Error(res.error);
+        await loadData();
+        // Garder la bouteille ouverte après le rechargement
+        document.querySelectorAll('.bottle-card').forEach(c => {
+            if (c.dataset.id === b.id) c.classList.add('open');
+        });
+    } catch(err) {
+        el.checked = !want;
+        el.disabled = false;
+        alert('❌ ' + err.message);
+    }
+}
+
+function toggleBottle(bi) {
+    const card=document.getElementById('bottle-'+bi);
+    if(!card) return;
+    const wasOpen=card.classList.contains('open');
+    document.querySelectorAll('.bottle-card').forEach(c=>c.classList.remove('open'));
+    if(!wasOpen) card.classList.add('open');
+}
+
+function toggleSection(bi,mi) {
+    document.querySelectorAll(`[id^="section-${bi}-"]`).forEach(el=>{
+        if(el.id!==`section-${bi}-${mi}`) el.style.display='none';
+    });
+    const sec=document.getElementById(`section-${bi}-${mi}`);
+    if(!sec) return;
+    sec.style.display=sec.style.display==='none'?'block':'none';
+    document.getElementById('bottle-'+bi)?.classList.add('open');
+}
+
+function toggleCerfaEditForm(bi,mi,ci) {
+    const el=document.getElementById(`cerfaedit-${bi}-${mi}-${ci}`);
+    if(el) el.style.display=el.style.display==='none'?'block':'none';
+}
+
+function toggleNewCerfaForm(bi,mi) {
+    const el=document.getElementById(`cerfanew-${bi}-${mi}`);
+    if(el) el.style.display=el.style.display==='none'?'block':'none';
+}
+
+function buildCerfaSection(b,m,bi,mi) {
+    const cerfas=m.cerfas||[];
+    const sumCerfa=cerfas.reduce((s,c)=>s+cerfaConsoValue(b,c),0);
+    const delta=parseFloat((sumCerfa-m.conso).toFixed(3));
+    const absDelta=Math.abs(delta);
+
+    // Indicateur de somme
+    let sumHtml='';
+    if(cerfas.length>0){
+        const sumCls=absDelta<=0.1?'ok':'warn';
+        sumHtml=`<div class="cerfa-sum ${sumCls}">
+            Σ Cerfa : <strong>${sumCerfa.toFixed(3)} kg</strong> &nbsp;/&nbsp;
+            Théorique mouvement : <strong>${m.conso.toFixed(3)} kg</strong>
+            ${absDelta>0.1?` &nbsp;⚠️ Écart : ${delta>=0?'+':''}${delta.toFixed(3)} kg`:' &nbsp;✓ Conforme'}
+        </div>`;
+    } else {
+        sumHtml=`<div class="cerfa-sum empty">Aucun Cerfa saisi pour ce mouvement — théorique : ${m.conso.toFixed(3)} kg</div>`;
+    }
+
+    // Cerfa existants
+    const existingHtml=cerfas.map((c,ci)=>`
+        <div class="cerfa-existing-card">
+            <div class="cerfa-existing-hdr" onclick="toggleCerfaEditForm(${bi},${mi},${ci})">
+                <span><strong>#${ci+1} — ${c.noCerfa||'N° ?'}</strong> &nbsp;·&nbsp; ${c.motif||'—'} &nbsp;·&nbsp; ${c.detenteur||'—'}</span>
+                <span style="color:var(--brown);font-weight:700">${cerfaConsoValue(b,c).toFixed(3)} kg</span>
+                <span style="font-size:11px;color:var(--muted)">✏️ Modifier</span>
+            </div>
+            <div id="cerfaedit-${bi}-${mi}-${ci}" style="display:none">
+                ${buildForm(b,m,bi,mi,ci,c)}
+            </div>
+        </div>`).join('');
+
+    return `<div class="cerfa-form" style="border-top:2px solid var(--brown-bdr)">
+        ${sumHtml}
+        ${existingHtml}
+        <div id="cerfanew-${bi}-${mi}" style="display:none">
+            ${buildForm(b,m,bi,mi,-1,null)}
+        </div>
+        <button class="btn-save" style="margin-top:10px;background:var(--navy)"
+            onclick="toggleNewCerfaForm(${bi},${mi})">➕ Ajouter un Cerfa</button>
+    </div>`;
+}
+
+function buildForm(b,m,bi,mi,ci,c) {
+    c=c||{};
+    const isNew=ci===-1;
+    const formId=isNew?`new-${bi}-${mi}`:`edit-${bi}-${mi}-${ci}`;
+    const isRec=b.type==='Récupération'||b.type==='Transfert';
+    return `<div class="cerfa-form" style="background:#fff;border-top:1px dashed var(--brown-bdr)">
+        <div class="cerfa-form-title">
+            ${isNew?'➕ Nouveau Cerfa':'✏️ Modifier Cerfa #'+(ci+1)} — ${m.date} · ${m.affaire}
+            <span style="font-weight:400;color:var(--muted)"> · Théorique mouvement : ${m.sens}</span>
+        </div>
+        <div class="form-grid">
+            <div>
+                <label class="fl">N° fiche Cerfa</label>
+                <input class="fi" id="fi-no-${formId}" value="${c.noCerfa||''}" placeholder="ex : 2025-147" autocomplete="off"/>
+            </div>
+            <div>
+                <label class="fl">Date du Cerfa</label>
+                <input class="fi" id="fi-date-${formId}" type="date" value="${c.dateCerfa||''}"/>
+            </div>
+            <div class="form-full">
+                <label class="fl">Détenteur de l'installation (client)</label>
+                <input class="fi" id="fi-det-${formId}" value="${c.detenteur||''}" placeholder="ex : TOTAL Normandie…" autocomplete="off"/>
+            </div>
+            <div class="form-full">
+                <label class="fl">Nature de l'intervention</label>
+                <select class="fi" id="fi-motif-${formId}">
+                    <option value="">— Sélectionner —</option>
+                    ${['Mise en service','Maintenance préventive','Maintenance curative / Réparation',
+                       'Récupération','Recharge','Contrôle d\'étanchéité','Dépose d\'équipement','Autre']
+                      .map(o=>`<option value="${o}" ${c.motif===o?'selected':''}>${o}</option>`).join('')}
+                </select>
+            </div>
+            <div>
+                <label class="fl">Qté récupérée Cerfa (kg)</label>
+                <input class="fi ${!isRec?'dimmed':''}" id="fi-recup-${formId}" type="number"
+                    step="0.001" min="0" value="${c.qtRecup||''}" placeholder="0.000"
+                    ${!isRec?'tabindex="-1"':''}/>
+                ${!isRec?'<div style="font-size:11px;color:var(--muted);margin-top:4px">Non applicable (bouteille Neuf)</div>':''}
+            </div>
+            <div>
+                <label class="fl">Qté chargée Cerfa (kg)
+                    ${b.type==='Transfert'?'<span style="font-size:10px;color:var(--brown)"> (réinjecté)</span>':''}
+                </label>
+                <input class="fi ${b.type==='Récupération'?'dimmed':''}" id="fi-recharge-${formId}" type="number"
+                    step="0.001" min="0" value="${c.qtRecharge||''}" placeholder="0.000"
+                    ${b.type==='Récupération'?'tabindex="-1"':''}/>
+                ${b.type==='Récupération'?'<div style="font-size:11px;color:var(--muted);margin-top:4px">Non applicable (Récupération)</div>':''}
+            </div>
+            <div class="form-full">
+                <label class="fl">Technicien manipulant</label>
+                <input class="fi" id="fi-ope-${formId}" value="${c.operateur||m.technicien}" autocomplete="off"/>
+            </div>
+        </div>
+        <div id="fi-ecart-${formId}"></div>
+        <div class="form-actions">
+            <button class="btn-save" onclick="submitCerfa(${bi},${mi},${ci},'${c.fullRef||''}')">✔ Enregistrer</button>
+            <button class="btn-cancel" onclick="${isNew?`toggleNewCerfaForm(${bi},${mi})`:`toggleCerfaEditForm(${bi},${mi},${ci})`}">Annuler</button>
+            <span class="form-err" id="fi-err-${formId}"></span>
+        </div>
+    </div>`;
+}
+
+async function sendReminder(bi, mi) {
+    const b   = (cerfaData.bottles||[])[bi];
+    const m   = b ? b.movements[mi] : null;
+    if (!b || !m) return;
+
+    const btn = document.getElementById(`remind-${bi}-${mi}`);
+    if (btn) { btn.disabled = true; btn.textContent = 'Envoi…'; }
+
+    const payload = {
+        bottleId:   b.id,
+        fluide:     b.fluide,
+        type:       b.type,
+        technicien: m.technicien,
+        date:       m.date,
+        affaire:    m.affaire,
+        sens:       m.sens,
+    };
+
+    try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action', 'sendCerfaReminder');
+        url.searchParams.set('data', JSON.stringify(payload));
+        const r   = await fetch(url.toString());
+        const res = await r.json();
+        if (res.error) throw new Error(res.error);
+
+        if (btn) {
+            btn.classList.add('sent');
+            btn.textContent = '✓ Mail envoyé à ' + res.email;
+            btn.disabled = false;
+        }
+    } catch(err) {
+        if (btn) { btn.disabled = false; btn.textContent = '📧 Relancer'; }
+        alert('❌ ' + err.message);
+    }
+}
+
+async function submitCerfa(bi, mi, ci, fullRef) {
+    const b = (cerfaData.bottles||[])[bi];
+    const m = b ? b.movements[mi] : null;
+    if (!b || !m) return;
+
+    const isNew  = ci === -1;
+    const formId = isNew ? `new-${bi}-${mi}` : `edit-${bi}-${mi}-${ci}`;
+
+    const noCerfa    = document.getElementById(`fi-no-${formId}`)?.value.trim();
+    const dateCerfa  = document.getElementById(`fi-date-${formId}`)?.value;
+    const detenteur  = document.getElementById(`fi-det-${formId}`)?.value.trim();
+    const motif      = document.getElementById(`fi-motif-${formId}`)?.value.trim();
+    const qtRecup    = parseFloat(document.getElementById(`fi-recup-${formId}`)?.value) || 0;
+    const qtRecharge = parseFloat(document.getElementById(`fi-recharge-${formId}`)?.value) || 0;
+    const operateur  = document.getElementById(`fi-ope-${formId}`)?.value.trim();
+    const errEl      = document.getElementById(`fi-err-${formId}`);
+    const ecartEl    = document.getElementById(`fi-ecart-${formId}`);
+
+    if (!noCerfa)   { errEl.textContent = 'Saisissez le N° fiche Cerfa.'; return; }
+    if (!dateCerfa) { errEl.textContent = 'Saisissez la date du Cerfa.'; return; }
+    if (!detenteur) { errEl.textContent = "Saisissez le détenteur de l'installation."; return; }
+    if (!motif)     { errEl.textContent = "Saisissez la nature de l'intervention."; return; }
+    if (!operateur) { errEl.textContent = "Saisissez le technicien manipulant."; return; }
+    errEl.textContent = '';
+
+    // Consommation de ce Cerfa
+    const ecart = parseFloat(cerfaConsoValue(b, {qtRecup, qtRecharge}).toFixed(3));
+
+    // Somme projetée (ce Cerfa + les autres existants)
+    const otherCerfas = (m.cerfas||[]).filter((_,i) => i !== ci);
+    const sumProjected = otherCerfas.reduce((s,c)=>s+cerfaConsoValue(b,c),0) + ecart;
+    const delta = parseFloat((sumProjected - m.conso).toFixed(3));
+    const absDelta = Math.abs(delta);
+
+    // Affichage écart individuel + somme projetée
+    let ecartCls, ecartMsg;
+    if (b.type === 'Neuf') {
+        ecartCls = ecart < -0.5 ? 'ecart-warn' : 'ecart-ok';
+        ecartMsg = `Ce Cerfa : <strong>${ecart>=0?'+':''}${ecart.toFixed(3)} kg</strong>`;
+    } else if (b.type === 'Récupération') {
+        ecartCls = ecart < 0 ? 'ecart-warn' : 'ecart-ok';
+        ecartMsg = `Fluide net récupéré ce Cerfa : <strong>${ecart.toFixed(3)} kg</strong>`;
+    } else {
+        ecartCls = ecart < -0.5 ? 'ecart-warn' : 'ecart-ok';
+        ecartMsg = `Résiduel ce Cerfa : <strong>${ecart>=0?'+':''}${ecart.toFixed(3)} kg</strong>`;
+    }
+    // Ajouter la somme projetée vs théorique
+    const sumCls = absDelta <= 0.1 ? 'color:var(--green)' : 'color:var(--red)';
+    ecartMsg += ` &nbsp;|&nbsp; <span style="${sumCls}">Σ projetée : ${sumProjected.toFixed(3)} kg / théorique : ${m.conso.toFixed(3)} kg
+        ${absDelta > 0.1 ? ' ⚠️ Écart : '+(delta>=0?'+':'')+delta.toFixed(3)+' kg' : ' ✓'}</span>`;
+    ecartEl.innerHTML = `<div class="ecart-box ${ecartCls}" style="margin-top:12px">${ecartMsg}</div>`;
+
+    const payload = {
+        ref: m.ref,
+        fullRef: fullRef || null,
+        bottleId: b.id, fluide: b.fluide, type: b.type,
+        date: m.date, affaire: m.affaire, technicien: m.technicien,
+        consoTheo: m.conso, noCerfa, dateCerfa, detenteur, motif,
+        qtRecup, qtRecharge, operateur,
+    };
+
+    const btn = document.querySelector(`#cerfanew-${bi}-${mi} .btn-save, #cerfaedit-${bi}-${mi}-${ci} .btn-save`);
+    if (btn) { btn.disabled = true; btn.textContent = 'Enregistrement…'; }
+
+    try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action', 'saveCerfa');
         url.searchParams.set('data', JSON.stringify(payload));
         const r = await fetch(url.toString());
         const res = await r.json();
         if (res.error) throw new Error(res.error);
-        await loadResData(); // Rafraîchir
-        loadData();          // Rafraîchir le dashboard
+        await loadData();
     } catch(err) {
-        document.getElementById('rf-error').textContent = '❌ ' + err.message;
+        errEl.textContent = '❌ ' + err.message;
+        if (btn) { btn.disabled = false; btn.textContent = '✔ Enregistrer'; }
     }
 }
 
-async function confirmCancelRes(resId, bottleId) {
-    if (!confirm(`Annuler la réservation de la bouteille ${bottleId} ?`)) return;
-    document.getElementById('res-mgmt-content').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Annulation…</div>';
-    try {
-        const url = new URL(SCRIPT_URL);
-        url.searchParams.set('action', 'cancelReservation');
-        url.searchParams.set('id', resId);
-        const r = await fetch(url.toString());
-        const res = await r.json();
-        if (res.error) throw new Error(res.error);
-        await loadResData();
-        loadData();
-    } catch(err) {
-        alert('❌ ' + err.message);
-        await loadResData();
-    }
-}
-
-// ── Connexion gestionnaire : le tableau de bord reste en lecture libre ──
-PFAuth.renderChip(document.getElementById('pf-chip'), SCRIPT_URL);
-PFAuth.verify(SCRIPT_URL);   // coupe la connexion mémorisée si le mot de passe a changé
+// ── Connexion gestionnaire (remplace l'ancien code) ──
+PFAuth.gate(SCRIPT_URL, { backHref: 'dashboard.html' }).then(() => {
+    document.getElementById('mgmt-phase').style.display = 'block';
+    PFAuth.renderChip(document.getElementById('pf-chip'), SCRIPT_URL, { reloadOnLogout: true });
+    loadData();
+});
 </script>
 </body>
 </html>
