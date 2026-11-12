@@ -31,20 +31,6 @@
         .content{max-width:1000px;margin:0 auto;padding:24px 20px;}
 
         /* PIN phase */
-        .pin-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;gap:8px;}
-        .pin-title{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px;}
-        .pin-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
-        .pin-dots{display:flex;gap:18px;justify-content:center;margin:16px 0 8px;}
-        .pin-dot{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--border);background:transparent;transition:all .12s;}
-        .pin-dot.filled{background:var(--brown);border-color:var(--brown);}
-        .pin-err{text-align:center;font-size:12px;color:var(--red);min-height:18px;margin-bottom:12px;font-weight:500;}
-        @keyframes pshake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
-        .pshake{animation:pshake .45s ease;}
-        .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:240px;}
-        .np-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:18px 8px;font-size:22px;font-weight:700;font-family:inherit;color:var(--navy);cursor:pointer;text-align:center;}
-        .np-btn:active{transform:scale(.93);background:#dde2e8;}
-        .np-btn.del{font-size:18px;color:var(--red);border-color:transparent;background:transparent;}
-        .np-btn.empty{opacity:0;pointer-events:none;}
 
         /* Management phase */
         .mgmt-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
@@ -144,38 +130,10 @@
         <p>PAGANETTI THERMIQUE</p>
         <h1>📑 Gestion des données Cerfa</h1>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <span id="pf-chip"></span>
         <a href="fournisseur.html" class="btn-back">🚚 Départs fournisseur</a>
         <a href="dashboard.html" class="btn-back">← Tableau de bord</a>
-    </div>
-</div>
-
-<!-- PIN phase -->
-<div class="content" id="pin-phase">
-    <div class="pin-page">
-        <div class="pin-title">Accès réservé</div>
-        <div class="pin-sub">Saisissez le code d'accès à 4 chiffres</div>
-        <div class="pin-dots" id="pin-dots">
-            <div class="pin-dot" id="pd1"></div>
-            <div class="pin-dot" id="pd2"></div>
-            <div class="pin-dot" id="pd3"></div>
-            <div class="pin-dot" id="pd4"></div>
-        </div>
-        <div class="pin-err" id="pin-err"></div>
-        <div class="numpad">
-            <button class="np-btn" onclick="pressPin('1')">1</button>
-            <button class="np-btn" onclick="pressPin('2')">2</button>
-            <button class="np-btn" onclick="pressPin('3')">3</button>
-            <button class="np-btn" onclick="pressPin('4')">4</button>
-            <button class="np-btn" onclick="pressPin('5')">5</button>
-            <button class="np-btn" onclick="pressPin('6')">6</button>
-            <button class="np-btn" onclick="pressPin('7')">7</button>
-            <button class="np-btn" onclick="pressPin('8')">8</button>
-            <button class="np-btn" onclick="pressPin('9')">9</button>
-            <button class="np-btn empty" disabled></button>
-            <button class="np-btn" onclick="pressPin('0')">0</button>
-            <button class="np-btn del" onclick="deletePin()">⌫</button>
-        </div>
     </div>
 </div>
 
@@ -202,44 +160,14 @@
     </div>
 </div>
 
+<script src="auth.js"></script>
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYoKD0FWNrQ87sbAMn3yLcE-Qej37VYDVwECZFAg65rtA5UdiWzjJMpYn1p-AccUYVnQ/exec';
-const PIN_CODE   = '1858';
 
-let pin      = '';
 let cerfaData = null;
 let currentFilter = 'all';
 let openBottle    = null; // index of open accordion
 let openMvt       = null; // {bi, mi}
-
-// ── PIN ────────────────────────────────────
-function pressPin(d) {
-    if (pin.length >= 4) return;
-    pin += d;
-    updateDots();
-    document.getElementById('pin-err').textContent = '';
-    if (pin.length === 4) setTimeout(checkPin, 160);
-}
-function deletePin() { pin = pin.slice(0,-1); updateDots(); }
-function updateDots() {
-    for (let i=1;i<=4;i++)
-        document.getElementById('pd'+i).classList.toggle('filled', i<=pin.length);
-}
-function checkPin() {
-    if (pin === PIN_CODE) {
-        document.getElementById('pin-phase').style.display = 'none';
-        document.getElementById('mgmt-phase').style.display = 'block';
-        loadData();
-    } else {
-        const dots = document.getElementById('pin-dots');
-        dots.classList.add('pshake');
-        setTimeout(() => {
-            pin = ''; updateDots();
-            dots.classList.remove('pshake');
-            document.getElementById('pin-err').textContent = 'Code incorrect';
-        }, 420);
-    }
-}
 
 // ── Data ────────────────────────────────────
 async function loadData() {
@@ -670,6 +598,13 @@ async function submitCerfa(bi, mi, ci, fullRef) {
         if (btn) { btn.disabled = false; btn.textContent = '✔ Enregistrer'; }
     }
 }
+
+// ── Connexion gestionnaire (remplace l'ancien code) ──
+PFAuth.gate(SCRIPT_URL, { backHref: 'dashboard.html' }).then(() => {
+    document.getElementById('mgmt-phase').style.display = 'block';
+    PFAuth.renderChip(document.getElementById('pf-chip'), SCRIPT_URL, { reloadOnLogout: true });
+    loadData();
+});
 </script>
 </body>
 </html>
