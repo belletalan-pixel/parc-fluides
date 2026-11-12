@@ -396,7 +396,8 @@ async function toggleWaiting(bi, el) {
         const issues = bottleIssues(b);
         msg = `Mettre la bouteille ${b.id} en attente de départ fournisseur ?\n\n`
             + `Elle ne sera plus comptée dans le stock (neuf / récupération / transfert), mais reste au parc.`
-            + (issues.length ? `\n\n⚠️ À vérifier avant :\n - ${issues.join('\n - ')}` : '');
+            + (issues.length ? `\n\n⚠️ À vérifier avant :\n - ${issues.join('\n - ')}` : '')
+            + (b.movements.some(m => !m.cerfaSaisi) ? `\n\n⛔ Le départ chez le fournisseur sera impossible tant que ces Cerfa ne sont pas saisis.` : '');
     } else {
         msg = `Remettre la bouteille ${b.id} en stock ?`;
     }
