@@ -24,20 +24,6 @@
         .content{max-width:900px;margin:0 auto;padding:24px 20px;}
 
         /* PIN */
-        .pin-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;gap:8px;}
-        .pin-title{font-size:16px;font-weight:700;margin-bottom:4px;}
-        .pin-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
-        .pin-dots{display:flex;gap:18px;justify-content:center;margin:16px 0 8px;}
-        .pin-dot{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--border);background:transparent;transition:all .12s;}
-        .pin-dot.filled{background:var(--grey);border-color:var(--grey);}
-        .pin-err{text-align:center;font-size:12px;color:var(--red);min-height:18px;margin-bottom:12px;font-weight:500;}
-        @keyframes pshake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
-        .pshake{animation:pshake .45s ease;}
-        .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:240px;}
-        .np-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:18px 8px;font-size:22px;font-weight:700;font-family:inherit;color:var(--navy);cursor:pointer;text-align:center;}
-        .np-btn:active{transform:scale(.93);}
-        .np-btn.del{font-size:18px;color:var(--red);border-color:transparent;background:transparent;}
-        .np-btn.empty{opacity:0;pointer-events:none;}
 
         /* Sections admin */
         .admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
@@ -99,35 +85,9 @@
         <p>PAGANETTI THERMIQUE</p>
         <h1>⚙️ Administration</h1>
     </div>
-    <a href="dashboard.html" class="btn-back">← Tableau de bord</a>
-</div>
-
-<!-- PIN phase -->
-<div class="content" id="pin-phase">
-    <div class="pin-page">
-        <div class="pin-title">Accès réservé</div>
-        <div class="pin-sub">Saisissez le code d'accès</div>
-        <div class="pin-dots" id="pin-dots">
-            <div class="pin-dot" id="pd1"></div>
-            <div class="pin-dot" id="pd2"></div>
-            <div class="pin-dot" id="pd3"></div>
-            <div class="pin-dot" id="pd4"></div>
-        </div>
-        <div class="pin-err" id="pin-err"></div>
-        <div class="numpad">
-            <button class="np-btn" onclick="pressPin('1')">1</button>
-            <button class="np-btn" onclick="pressPin('2')">2</button>
-            <button class="np-btn" onclick="pressPin('3')">3</button>
-            <button class="np-btn" onclick="pressPin('4')">4</button>
-            <button class="np-btn" onclick="pressPin('5')">5</button>
-            <button class="np-btn" onclick="pressPin('6')">6</button>
-            <button class="np-btn" onclick="pressPin('7')">7</button>
-            <button class="np-btn" onclick="pressPin('8')">8</button>
-            <button class="np-btn" onclick="pressPin('9')">9</button>
-            <button class="np-btn empty" disabled></button>
-            <button class="np-btn" onclick="pressPin('0')">0</button>
-            <button class="np-btn del" onclick="deletePin()">⌫</button>
-        </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <span id="pf-chip"></span>
+        <a href="dashboard.html" class="btn-back">← Tableau de bord</a>
     </div>
 </div>
 
@@ -158,14 +118,20 @@
             <div class="admin-card">
                 <div class="admin-card-hdr">
                     <span class="admin-card-icon">🏢</span>
-                    <span class="admin-card-title">Gestionnaires</span>
+                    <span class="admin-card-title">Gestionnaires et accès</span>
                 </div>
                 <div class="admin-card-body">
-                    <div class="item-list" id="list-gestionnaire"></div>
-                    <div class="add-row">
-                        <input class="add-input" id="add-gestionnaire" placeholder="Nom Prénom" autocomplete="off"/>
-                        <button class="btn-add" onclick="addItem('gestionnaire','add-gestionnaire','list-gestionnaire')">Ajouter</button>
+                    <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px">
+                        L'adresse mail est l'identifiant de connexion. Les mots de passe sont enregistrés en clair dans l'onglet
+                        Configuration (colonne D) : utilisez des mots de passe propres à cet outil.
                     </div>
+                    <div id="list-gestionnaire" style="margin-bottom:14px;display:flex;flex-direction:column;gap:8px;"></div>
+                    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px">
+                        <input class="add-input" id="add-gest-name" placeholder="Nom Prénom" autocomplete="off"/>
+                        <input class="add-input" id="add-gest-email" type="email" placeholder="adresse@email.com (identifiant)" autocomplete="off"/>
+                        <input class="add-input" id="add-gest-pass" placeholder="Mot de passe" autocomplete="off"/>
+                    </div>
+                    <button class="btn-add" style="width:100%" onclick="addManager()">Ajouter le gestionnaire</button>
                     <div id="msg-gestionnaire"></div>
                 </div>
             </div>
@@ -258,37 +224,11 @@
     </div>
 </div>
 
+<script src="auth.js"></script>
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzYoKD0FWNrQ87sbAMn3yLcE-Qej37VYDVwECZFAg65rtA5UdiWzjJMpYn1p-AccUYVnQ/exec';
-const PIN_CODE   = '1858';
 
-let pin = '';
 let adminData = null;
-
-// ── PIN ────────────────────────────────────
-function pressPin(d) {
-    if (pin.length >= 4) return;
-    pin += d; updateDots();
-    document.getElementById('pin-err').textContent = '';
-    if (pin.length === 4) setTimeout(checkPin, 160);
-}
-function deletePin() { pin = pin.slice(0,-1); updateDots(); }
-function updateDots() {
-    for (let i=1;i<=4;i++)
-        document.getElementById('pd'+i).classList.toggle('filled', i<=pin.length);
-}
-function checkPin() {
-    if (pin === PIN_CODE) {
-        document.getElementById('pin-phase').style.display = 'none';
-        document.getElementById('admin-phase').style.display = 'block';
-        loadAdmin();
-    } else {
-        const dots = document.getElementById('pin-dots');
-        dots.classList.add('pshake');
-        setTimeout(() => { pin=''; updateDots(); dots.classList.remove('pshake');
-            document.getElementById('pin-err').textContent='Code incorrect'; }, 420);
-    }
-}
 
 // ── Load ───────────────────────────────────
 async function loadAdmin() {
@@ -309,7 +249,7 @@ function renderAdmin() {
     document.getElementById('admin-content').style.display = 'block';
 
     renderTechnicienList(adminData.techniciens);
-    renderList('gestionnaire',adminData.gestionnaires);
+    renderManagerList(adminData.gestionnaires);
     renderList('fluide',      adminData.fluides);
     renderList('fournisseur', adminData.fournisseurs);
 
@@ -344,6 +284,99 @@ function renderBackupStatus(active) {
     btn.textContent = active ? '⏹ Désactiver la sauvegarde automatique' : '▶ Activer la sauvegarde automatique (lundi 7h)';
     btn.style.background = active ? '#E05F00' : '#1A6E38';
     btn.style.color = '#fff';
+}
+
+// ── Gestionnaires (nom + mail + mot de passe) ──
+let managers = [];
+
+function esc(v) {
+    return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function renderManagerList(items) {
+    managers = items || [];
+    const el = document.getElementById('list-gestionnaire');
+    if (!managers.length) { el.innerHTML = '<span class="item-empty">Aucun gestionnaire</span>'; return; }
+    el.innerHTML = managers.map((g, i) => `
+        <div style="background:var(--grey-bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                <span style="font-size:13px;font-weight:600">${esc(g.name)}</span>
+                <button class="item-del" onclick="removeManager(${i})" title="Supprimer">✕</button>
+            </div>
+            <div style="font-size:11px;margin:4px 0 6px;font-weight:600;color:${g.hasPassword && g.email ? 'var(--green)' : 'var(--orange)'}">
+                ${g.hasPassword && g.email ? '🔑 Connexion possible' : '⚠️ Connexion impossible : ' + (!g.email ? 'adresse mail manquante' : 'mot de passe manquant')}
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+                <input id="gm-email-${i}" type="email" value="${esc(g.email)}" placeholder="adresse@email.com" autocomplete="off"
+                    style="padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-family:inherit"/>
+                <input id="gm-pass-${i}" type="text" autocomplete="off"
+                    placeholder="${g.hasPassword ? 'Nouveau mot de passe (vide = inchangé)' : 'Définir un mot de passe'}"
+                    style="padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:12px;font-family:inherit"/>
+                <button onclick="saveManager(${i})"
+                    style="padding:7px 12px;background:var(--navy);color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">
+                    ✔ Enregistrer l'accès
+                </button>
+            </div>
+        </div>`).join('');
+}
+
+// Enregistrement d'un accès : réservé à un gestionnaire connecté (le script le revérifie)
+async function callAccess(payload) {
+    const s = PFAuth.getSession();
+    const url = new URL(SCRIPT_URL);
+    url.searchParams.set('action', 'saveGestionnaireAccess');
+    url.searchParams.set('data', JSON.stringify(Object.assign({ session: { email: s.email, token: s.token } }, payload)));
+    const r   = await fetch(url.toString());
+    const res = await r.json();
+    if (res.error) throw new Error(res.error);
+    if (res.session) PFAuth.setSession(res.session);   // la personne a modifié son propre accès : on la garde connectée
+    return res;
+}
+
+async function saveManager(i) {
+    const g     = managers[i];
+    const msgEl = document.getElementById('msg-gestionnaire');
+    const email = document.getElementById('gm-email-' + i).value.trim();
+    const pass  = document.getElementById('gm-pass-' + i).value.trim();
+    try {
+        await callAccess({ name: g.name, email: email, password: pass });
+        showMsg(msgEl, '✓ Accès enregistré pour ' + g.name, 'ok');
+        await loadAdmin();
+    } catch (err) { showMsg(msgEl, '❌ ' + err.message, 'err'); }
+}
+
+async function addManager() {
+    const name  = document.getElementById('add-gest-name').value.trim();
+    const email = document.getElementById('add-gest-email').value.trim();
+    const pass  = document.getElementById('add-gest-pass').value.trim();
+    const msgEl = document.getElementById('msg-gestionnaire');
+    if (!name || !email || !pass) { showMsg(msgEl, 'Nom, adresse mail et mot de passe sont obligatoires.', 'err'); return; }
+    try {
+        await callAccess({ name: name, email: email, password: pass, create: true });
+        ['add-gest-name','add-gest-email','add-gest-pass'].forEach(id => document.getElementById(id).value = '');
+        showMsg(msgEl, '✓ Gestionnaire ajouté', 'ok');
+        await loadAdmin();
+    } catch (err) { showMsg(msgEl, '❌ ' + err.message, 'err'); }
+}
+
+async function removeManager(i) {
+    const g     = managers[i];
+    const s     = PFAuth.getSession();
+    const own   = s && g.email && g.email.toLowerCase() === s.email.toLowerCase();
+    const msgEl = document.getElementById('msg-gestionnaire');
+    if (!confirm(own ? `C'est votre propre accès : vous serez déconnecté(e). Supprimer "${g.name}" ?`
+                     : `Supprimer "${g.name}" de la liste ?`)) return;
+    try {
+        const url = new URL(SCRIPT_URL);
+        url.searchParams.set('action', 'removeConfigItem');
+        url.searchParams.set('data', JSON.stringify({ type: 'gestionnaire', value: g.name }));
+        const r   = await fetch(url.toString());
+        const res = await r.json();
+        if (res.error) throw new Error(res.error);
+        if (own) { PFAuth.logout(); location.reload(); return; }
+        showMsg(msgEl, '✓ Supprimé', 'ok');
+        await loadAdmin();
+    } catch (err) { showMsg(msgEl, '❌ ' + err.message, 'err'); }
 }
 
 // ── Techniciens (nom + email) ──────────────
@@ -557,6 +590,13 @@ function showMsg(el, text, type) {
     el.textContent = text;
     setTimeout(() => { if (el) el.textContent = ''; }, 4000);
 }
+
+// ── Connexion gestionnaire (remplace l'ancien code) ──
+PFAuth.gate(SCRIPT_URL, { backHref: 'dashboard.html' }).then(() => {
+    document.getElementById('admin-phase').style.display = 'block';
+    PFAuth.renderChip(document.getElementById('pf-chip'), SCRIPT_URL, { reloadOnLogout: true });
+    loadAdmin();
+});
 </script>
 </body>
 </html>
