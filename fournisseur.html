@@ -63,7 +63,10 @@
         .wcard-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:0 16px 16px;}
         .btn-go{padding:11px 22px;background:var(--violet);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
         .btn-go:hover{opacity:.9;}
-        .btn-go:disabled{opacity:.5;cursor:default;}
+        .btn-go:disabled{opacity:.5;cursor:not-allowed;}
+        .cerfa-block{margin:14px 16px 0;padding:12px 14px;border-radius:10px;background:var(--red-bg);border:1.5px solid #F5B7B1;color:var(--red);font-size:13px;line-height:1.5;}
+        .cerfa-block-list{margin-top:6px;font-size:12px;color:var(--text);}
+        .cerfa-block-link{display:inline-block;margin-top:8px;font-weight:700;color:var(--red);}
         .btn-undo{padding:10px 14px;background:transparent;color:var(--muted);border:none;font-size:13px;cursor:pointer;font-family:inherit;text-decoration:underline;}
         .err{font-size:12px;color:var(--red);font-weight:600;}
 
@@ -240,8 +243,30 @@ function render() {
         .map(b => `<option value="${b.id} — ${b.fluide||'?'} (${b.type})">`).join('');
 }
 
+// Fournisseur d'arrivée retrouvé dans la liste (sans tenir compte de la casse ni des espaces)
+function matchSupplier(name) {
+    const n = String(name || '').trim().toLowerCase();
+    if (!n) return '';
+    return (data.fournisseurs || []).find(f => f.trim().toLowerCase() === n) || '';
+}
+
 function cardHtml(b, i) {
-    const isNeuf = b.type === 'Neuf';
+    const isNeuf  = b.type === 'Neuf';
+    const miss    = b.cerfaManquants || [];
+    const arrivee = matchSupplier(b.fournisseurArrivee);
+    const fourHint = !b.fournisseurArrivee
+        ? "Fournisseur d'arrivée non renseigné"
+        : arrivee
+            ? `Fournisseur d'arrivée : <strong>${arrivee}</strong> (présélectionné)`
+            : `Fournisseur d'arrivée « ${b.fournisseurArrivee} » absent de la liste`;
+    const cerfaBlock = miss.length
+        ? `<div class="cerfa-block">
+            ⚠️ <strong>${miss.length} Cerfa à saisir</strong> : la bouteille ne peut pas quitter le parc tant qu'ils ne sont pas enregistrés.
+            <div class="cerfa-block-list">${miss.map(m => `${m.date} · Affaire ${m.affaire}`).join('<br>')}</div>
+            <a href="cerfa.html" class="cerfa-block-link">📑 Ouvrir la page Cerfa</a>
+        </div>`
+        : '';
+
     return `<div class="wcard" id="wc-${i}">
         <div class="wcard-hdr">
             <div>
@@ -250,6 +275,7 @@ function cardHtml(b, i) {
             </div>
             <div class="wcard-w">Dernier poids connu<br><strong>${b.poids ? b.poids.toFixed(3)+' kg' : '—'}</strong></div>
         </div>
+        ${cerfaBlock}
         <div class="wcard-form">
             <div>
                 <label class="fl">Poids de départ (kg) — repesée</label>
@@ -263,8 +289,9 @@ function cardHtml(b, i) {
                     : `<input class="fi" id="w-bsd-${i}" autocomplete="off" placeholder="N° du bordereau"/>`}
             </div>
             <div>
-                <label class="fl">Fournisseur</label>
-                <select class="fi" id="w-four-${i}" onchange="lastFour=this.value">${opts(data.fournisseurs, lastFour)}</select>
+                <label class="fl">Fournisseur du retour</label>
+                <select class="fi" id="w-four-${i}" onchange="lastFour=this.value">${opts(data.fournisseurs, arrivee || lastFour)}</select>
+                <div class="hint">${fourHint}</div>
             </div>
             <div>
                 <label class="fl">Gestionnaire</label>
@@ -272,7 +299,7 @@ function cardHtml(b, i) {
             </div>
         </div>
         <div class="wcard-actions">
-            <button class="btn-go" id="go-${i}" onclick="depart(${i})">🚚 Valider le départ</button>
+            <button class="btn-go" id="go-${i}" onclick="depart(${i})" ${miss.length ? 'disabled' : ''}>${miss.length ? '⛔ Départ impossible (Cerfa manquants)' : '🚚 Valider le départ'}</button>
             <button class="btn-undo" onclick="undo(${i})">↩ Remettre en stock</button>
             <span class="err" id="w-err-${i}"></span>
         </div>
@@ -289,6 +316,7 @@ async function depart(i) {
     const gest  = document.getElementById('w-gest-'+i).value;
     const isNeuf = b.type === 'Neuf';
 
+    if ((b.cerfaManquants || []).length) { errEl.textContent = 'Des Cerfa sont à saisir pour cette bouteille.'; return; }
     if (!poids || poids <= 0)  { errEl.textContent = 'Saisissez le poids de départ.'; return; }
     if (poids < b.tare)        { errEl.textContent = `Poids inférieur à la tare (${b.tare} kg).`; return; }
     if (!isNeuf && !bsd)       { errEl.textContent = 'Saisissez le n° de BSD Trackdéchets.'; return; }
@@ -298,6 +326,8 @@ async function depart(i) {
 
     const recap = `Valider le départ de ${b.id} ?\n\n`
         + `Fournisseur : ${four}\nPoids : ${poids.toFixed(3)} kg\n`
+        + (matchSupplier(b.fournisseurArrivee) && matchSupplier(b.fournisseurArrivee) !== four
+            ? `⚠️ Différent du fournisseur d'arrivée (${matchSupplier(b.fournisseurArrivee)})\n` : '')
         + (isNeuf ? '' : `BSD : ${bsd}\n`)
         + `\nLa bouteille sera archivée (Retournée fournisseur).`;
     if (!confirm(recap)) return;
