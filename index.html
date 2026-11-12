@@ -120,27 +120,7 @@
         .btn-archive   { background: var(--red-bg); color: var(--red); border: 1.5px solid var(--red-bdr); font-size: 12px; padding: 16px 8px; }
 
         /* PIN */
-        .pin-hero { text-align: center; padding: 8px 0 0; }
-        .pin-hero-bottle { font-size: 20px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
-        .pin-hero-tag { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 4px; }
-        .pin-hero-tag.sortie          { background: var(--orange-bg); color: var(--orange); }
-        .pin-hero-tag.retour          { background: var(--green-bg);  color: var(--green); }
-        .pin-hero-tag.réception       { background: var(--blue-bg);   color: var(--blue); }
-        .pin-hero-tag.retour_fournisseur { background: var(--red-bg);  color: var(--red); }
-        .pin-hero-tag.créer           { background: var(--green-bg);  color: var(--green); }
         .btn-create-bottle { width:100%;padding:14px;background:var(--green);color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px; }
-        .pin-hero-sub { font-size: 12px; color: var(--muted); margin-top: 8px; }
-        .pin-dots { display: flex; gap: 18px; justify-content: center; margin: 22px 0 8px; }
-        .pin-dot { width: 16px; height: 16px; border-radius: 50%; border: 2.5px solid var(--border); background: transparent; transition: all 0.12s; }
-        .pin-dot.filled { background: var(--navy); border-color: var(--navy); }
-        .pin-err { text-align: center; font-size: 12px; color: var(--danger); min-height: 20px; margin-bottom: 16px; font-weight: 500; }
-        @keyframes pshake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-10px)} 40%{transform:translateX(10px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} }
-        .pshake { animation: pshake 0.45s ease; }
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .np-btn { background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px; padding: 18px 8px; font-size: 22px; font-weight: 700; font-family: inherit; color: var(--navy); cursor: pointer; transition: transform 0.08s; text-align: center; }
-        .np-btn:active { transform: scale(0.93); background: #dde2e8; }
-        .np-btn.del { font-size: 18px; color: var(--danger); border-color: transparent; background: transparent; }
-        .np-btn.empty { opacity: 0; pointer-events: none; }
 
         /* Form */
         .form-section { margin-bottom: 18px; }
@@ -218,7 +198,10 @@
         <div class="header-eyebrow">PAGANETTI THERMIQUE</div>
         <div class="header-title">🧊 Parc à Fluides</div>
     </div>
-    <div id="demo-badge" style="display:none"><span class="demo-tag">DÉMO</span></div>
+    <div style="display:flex;align-items:center;gap:12px">
+        <span id="pf-chip"></span>
+        <div id="demo-badge" style="display:none"><span class="demo-tag">DÉMO</span></div>
+    </div>
 </div>
 
 <!-- Loading -->
@@ -254,37 +237,6 @@
     <button class="btn-ghost" style="margin-bottom:10px;text-align:left;padding-left:0" onclick="goSearch()">← Autre bouteille</button>
     <div id="bottle-card" class="card"></div>
     <div id="action-buttons"></div>
-</div>
-
-<!-- PIN -->
-<div id="s-pin" class="screen">
-    <div class="card">
-        <div class="pin-hero">
-            <div class="pin-hero-bottle" id="pin-bottle-id"></div>
-            <div class="pin-hero-tag" id="pin-action-tag"></div>
-            <div class="pin-hero-sub">Saisissez le code d'accès à 4 chiffres</div>
-        </div>
-        <div class="pin-dots" id="pin-dots">
-            <div class="pin-dot" id="pd1"></div><div class="pin-dot" id="pd2"></div>
-            <div class="pin-dot" id="pd3"></div><div class="pin-dot" id="pd4"></div>
-        </div>
-        <div class="pin-err" id="pin-err"></div>
-        <div class="numpad">
-            <button class="np-btn" onclick="pressPin('1')">1</button>
-            <button class="np-btn" onclick="pressPin('2')">2</button>
-            <button class="np-btn" onclick="pressPin('3')">3</button>
-            <button class="np-btn" onclick="pressPin('4')">4</button>
-            <button class="np-btn" onclick="pressPin('5')">5</button>
-            <button class="np-btn" onclick="pressPin('6')">6</button>
-            <button class="np-btn" onclick="pressPin('7')">7</button>
-            <button class="np-btn" onclick="pressPin('8')">8</button>
-            <button class="np-btn" onclick="pressPin('9')">9</button>
-            <button class="np-btn empty" disabled></button>
-            <button class="np-btn" onclick="pressPin('0')">0</button>
-            <button class="np-btn del" onclick="deletePin()">⌫</button>
-        </div>
-    </div>
-    <button class="btn-ghost" onclick="showScreen('s-bottle')">Annuler</button>
 </div>
 
 <!-- Form -->
@@ -446,6 +398,7 @@
     <button class="btn-primary" id="succ-btn" onclick="reset()">Nouveau mouvement</button>
 </div>
 
+<script src="auth.js"></script>
 <script>
 // ══════════════════════════════════════════
 //  CONFIGURATION (fallback si Sheet indisponible)
@@ -457,7 +410,6 @@ const CFG = {
     fournisseurs: ['FRITEC','GFF','Techniparts'],
     fluides:      ['MO29-R422D','MO79-R422A','R134A','R22','R32','R404A','R407C','R410A','R413A','R417A','R449A','R452A','R454C','R513A'],
 };
-const PIN_CODE = '1858';
 
 // ══════════════════════════════════════════
 //  DÉMO
@@ -473,7 +425,7 @@ const DEMO = {
 // ══════════════════════════════════════════
 //  STATE + CONFIG chargée
 // ══════════════════════════════════════════
-let ST      = { bottleId:null, bottle:null, action:null, pin:'' };
+let ST      = { bottleId:null, bottle:null, action:null };
 let LCONFIG = null; // loaded from Sheet
 
 // ══════════════════════════════════════════
@@ -566,7 +518,7 @@ function populateDatalist(id, items) {
 function buildDemoList() {
     const wrap = document.getElementById('demo-list');
     wrap.style.display = 'block';
-    wrap.innerHTML = `<div class="demo-notice">⚗️ Mode démo · Code PIN : <strong>1858</strong></div>`;
+    wrap.innerHTML = `<div class="demo-notice">⚗️ Mode démo</div>`;
     Object.values(DEMO).forEach(b => {
         const d = document.createElement('div');
         d.className = 'card demo-item';
@@ -785,39 +737,16 @@ function renderBottle(b) {
 }
 
 // ══════════════════════════════════════════
-//  PIN
+//  MOUVEMENTS — connexion gestionnaire requise (la consultation reste libre)
 // ══════════════════════════════════════════
-function startAction(action) {
-    ST.action = action; ST.pin = '';
-    updatePinDots();
-    document.getElementById('pin-err').textContent = '';
-    document.getElementById('pin-bottle-id').textContent = ST.bottleId;
-    const tag = document.getElementById('pin-action-tag');
-    tag.textContent = ACTION_LABELS[action] || action;
-    tag.className = `pin-hero-tag ${action}`;
-    showScreen('s-pin');
-}
-function pressPin(d) {
-    if (ST.pin.length >= 4) return;
-    ST.pin += d; updatePinDots();
-    document.getElementById('pin-err').textContent = '';
-    if (ST.pin.length === 4) setTimeout(checkPin, 160);
-}
-function deletePin() { ST.pin = ST.pin.slice(0,-1); updatePinDots(); }
-function checkPin() {
-    if (ST.pin === PIN_CODE) {
-        if (ST.action === 'créer') buildCreateForm();
-        else buildForm();
-        return;
+async function startAction(action) {
+    if (!IS_DEMO) {
+        const ok = await PFAuth.ensure(CFG.SCRIPT_URL, 'Connexion gestionnaire requise pour enregistrer un mouvement.');
+        if (!ok) return;
     }
-    const dots = document.getElementById('pin-dots');
-    dots.classList.add('pshake');
-    setTimeout(() => { ST.pin=''; updatePinDots(); dots.classList.remove('pshake'); document.getElementById('pin-err').textContent='Code incorrect — réessayez'; }, 420);
+    ST.action = action;
+    buildForm();
 }
-function updatePinDots() {
-    for (let i=1;i<=4;i++) document.getElementById(`pd${i}`).classList.toggle('filled', i<=ST.pin.length);
-}
-
 // ══════════════════════════════════════════
 //  BUILD FORM
 // ══════════════════════════════════════════
@@ -1067,17 +996,14 @@ function renderSuccess(p) {
 // ══════════════════════════════════════════
 //  CRÉATION DE BOUTEILLE
 // ══════════════════════════════════════════
-function openCreate() {
+async function openCreate() {
+    if (!IS_DEMO) {
+        const ok = await PFAuth.ensure(CFG.SCRIPT_URL, 'Connexion gestionnaire requise pour créer une bouteille.');
+        if (!ok) return;
+    }
     ST.action = 'créer';
     ST.bottleId = null;
-    ST.pin = '';
-    updatePinDots();
-    document.getElementById('pin-err').textContent = '';
-    document.getElementById('pin-bottle-id').textContent = 'Nouvelle bouteille';
-    const tag = document.getElementById('pin-action-tag');
-    tag.textContent = '➕ CRÉATION';
-    tag.className = 'pin-hero-tag créer';
-    showScreen('s-pin');
+    buildCreateForm();
 }
 
 function buildCreateForm() {
@@ -1209,7 +1135,7 @@ function setCreateErr(msg) {
 }
 
 function goSearch() {
-    ST = {bottleId:null,bottle:null,action:null,pin:''};
+    ST = {bottleId:null,bottle:null,action:null};
     document.getElementById('manual-id').value='';
     document.getElementById('search-error').innerHTML='';
     showScreen('s-search');
@@ -1221,14 +1147,20 @@ function reset() {
 }
 
 // ── Sécurité contre l'actualisation accidentelle ──────────────
-// Bloque la fermeture/actualisation si une saisie est en cours (PIN ou formulaire)
+// Bloque la fermeture/actualisation si une saisie est en cours (formulaire)
 window.addEventListener('beforeunload', e => {
     const activeId = document.querySelector('.screen.active')?.id || '';
-    if (activeId === 's-form' || activeId === 's-pin') {
+    if (activeId === 's-form' || activeId === 's-create') {
         e.preventDefault();
         e.returnValue = ''; // déclenche la boîte de confirmation du navigateur
     }
 });
+
+// ── Connexion gestionnaire : consultation libre, mouvements verrouillés ──
+if (!IS_DEMO) {
+    PFAuth.renderChip(document.getElementById('pf-chip'), CFG.SCRIPT_URL);
+    PFAuth.verify(CFG.SCRIPT_URL);   // coupe la connexion mémorisée si le mot de passe a changé
+}
 </script>
 </body>
 </html>
